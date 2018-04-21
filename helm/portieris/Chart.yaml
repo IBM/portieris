@@ -1,7 +1,0 @@
-apiVersion: v1
-name: portieris
-version: 0.2.0
-description: An admission controller to enforce that only trusted images are deployed into your workloads
-maintainer:
-  - jhart@uk.ibm.com
-  - liamwhite@uk.ibm.com
