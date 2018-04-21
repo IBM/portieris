@@ -59,6 +59,10 @@ func (a *AdmissionResponder) SetAllowed() {
 	a.allowed = true
 }
 
+func (a *AdmissionResponder) IsAllowed() bool {
+	return a.allowed
+}
+
 func (a *AdmissionResponder) SetPatch(patch []byte) {
 	a.patches = patch
 }

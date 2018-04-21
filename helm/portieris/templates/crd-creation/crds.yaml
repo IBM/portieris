@@ -1,0 +1,33 @@
+{{ define "crds.yaml.tpl" }}
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: imagepolicies.securityenforcement.admission.cloud.ibm.com
+  labels:
+    app: {{ template "cise.name" . }}
+spec:
+  group: securityenforcement.admission.cloud.ibm.com
+  names:
+    kind: ImagePolicy
+    listKind: ImagePolicyList
+    plural: imagepolicies
+    singular: imagepolicy
+  scope: Namespaced
+  version: v1beta1
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: clusterimagepolicies.securityenforcement.admission.cloud.ibm.com
+  labels:
+    app: {{ template "cise.name" . }}
+spec:
+  group: securityenforcement.admission.cloud.ibm.com
+  names:
+    kind: ClusterImagePolicy
+    listKind: ClusterImagePolicyList
+    plural: clusterimagepolicies
+    singular: clusterimagepolicy
+  scope: Cluster
+  version: v1beta1
+{{ end }}

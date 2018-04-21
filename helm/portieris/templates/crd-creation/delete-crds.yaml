@@ -1,0 +1,43 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: delete-crds
+  namespace: ibm-system
+  annotations:
+    helm.sh/hook: pre-delete
+    helm.sh/hook-weight: "-9"
+    helm.sh/hook-delete-policy: hook-succeeded
+  labels:
+    app: {{ template "cise.name" . }}
+    chart: {{ template "cise.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  template:
+    metadata:
+      name: delete-crds
+      labels:
+        app: {{ template "cise.name" . }}
+        chart: {{ template "cise.chart" . }}
+        release: {{ .Release.Name }}
+        heritage: {{ .Release.Service }}
+    spec:
+      serviceAccountName: ibmcloud-image-enforcement
+      containers:
+        - name: hyperkube
+          image: "{{ .Values.hyperkube.repository }}:{{ .Values.hyperkube.tag }}"
+          command:
+            - /kubectl
+            - delete
+            - -f
+            - /tmp/scanner/custom-resource-definitions.yaml
+            - --ignore-not-found=true
+          volumeMounts:
+            - mountPath: "/tmp/scanner"
+              name: tmp-configmap-scanner
+      volumes:
+        - name: tmp-configmap-scanner
+          configMap:
+            name: image-policy-crds
+      restartPolicy: OnFailure
+      

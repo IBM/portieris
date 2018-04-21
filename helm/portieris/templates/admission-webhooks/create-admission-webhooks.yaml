@@ -1,0 +1,42 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: create-admission-webhooks
+  namespace: ibm-system
+  annotations:
+    helm.sh/hook: post-install
+    helm.sh/hook-weight: "5"
+    helm.sh/hook-delete-policy: hook-succeeded
+  labels:
+    app: {{ template "cise.name" . }}
+    chart: {{ template "cise.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  template:
+    metadata:
+      name: create-admission-webhooks
+      labels:
+        app: {{ template "cise.name" . }}
+        chart: {{ template "cise.chart" . }}
+        release: {{ .Release.Name }}
+        heritage: {{ .Release.Service }}
+    spec:
+      serviceAccountName: ibmcloud-image-enforcement
+      containers:
+        - name: hyperkube
+          image: "{{ .Values.hyperkube.repository }}:{{ .Values.hyperkube.tag }}"
+          command:
+            # TODO: Add a wait until scanner is healthy 
+            - /kubectl
+            - apply
+            - -f
+            - /tmp/scanner/webhooks.yaml
+          volumeMounts:
+            - mountPath: "/tmp/scanner"
+              name: tmp-configmap-scanner
+      volumes:
+        - name: tmp-configmap-scanner
+          configMap:
+            name: admission-webhooks
+      restartPolicy: OnFailure
