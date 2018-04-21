@@ -1,0 +1,42 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: create-crds
+  namespace: ibm-system
+  annotations:
+    helm.sh/hook: post-install
+    helm.sh/hook-weight: "-6"
+    helm.sh/hook-delete-policy: hook-succeeded
+  labels:
+    app: {{ template "cise.name" . }}
+    chart: {{ template "cise.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  template:
+    metadata:
+      name: create-crds
+      labels:
+        app: {{ template "cise.name" . }}
+        chart: {{ template "cise.chart" . }}
+        release: {{ .Release.Name }}
+        heritage: {{ .Release.Service }}
+    spec:
+      serviceAccountName: ibmcloud-image-enforcement
+      containers:
+        - name: hyperkube
+          image: "{{ .Values.hyperkube.repository }}:{{ .Values.hyperkube.tag }}"
+          command:
+            - /kubectl
+            - apply
+            - -f
+            - /tmp/scanner/custom-resource-definitions.yaml
+          volumeMounts:
+            - mountPath: "/tmp/scanner"
+              name: tmp-configmap-scanner
+      volumes:
+        - name: tmp-configmap-scanner
+          configMap:
+            name: image-policy-crds
+      restartPolicy: OnFailure
+      

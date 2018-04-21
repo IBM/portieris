@@ -1,0 +1,36 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: validate-crd-creation
+  namespace: ibm-system
+  annotations:
+    helm.sh/hook: post-install
+    helm.sh/hook-weight: "-5"
+    helm.sh/hook-delete-policy: hook-succeeded
+  labels:
+    app: {{ template "cise.name" . }}
+    chart: {{ template "cise.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  template:
+    metadata:
+      name: validate-crd-creation
+      labels:
+        app: {{ template "cise.name" . }}
+        chart: {{ template "cise.chart" . }}
+        release: {{ .Release.Name }}
+        heritage: {{ .Release.Service }}
+    spec:
+      serviceAccountName: ibmcloud-image-enforcement
+      containers:
+        - name: hyperkube
+          image: "{{ .Values.hyperkube.repository }}:{{ .Values.hyperkube.tag }}"
+          command:
+            - /kubectl
+            - get
+            - customresourcedefinitions
+            - imagepolicies.securityenforcement.admission.cloud.ibm.com
+            - clusterimagepolicies.securityenforcement.admission.cloud.ibm.com
+      restartPolicy: OnFailure
+      

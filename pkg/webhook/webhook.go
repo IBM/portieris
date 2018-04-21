@@ -82,8 +82,10 @@ func (s *Server) Run() {
 	// cert := getAPIServerCert(clientset)
 	// apiserverCA := x509.NewCertPool()
 	// apiserverCA.AppendCertsFromPEM(cert)
-	// TODO: handle err
-	certs, _ := tls.X509KeyPair(s.serverCert, s.serverKey)
+	certs, err := tls.X509KeyPair(s.serverCert, s.serverKey)
+	if err != nil {
+		panic(fmt.Sprintf("unable to load certs: %v", err))
+	}
 	tlsConfig := &tls.Config{
 		Certificates: []tls.Certificate{certs},
 		// TODO: Use mutual tls after we agree on what cert the apiserver should use.
