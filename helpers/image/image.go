@@ -15,7 +15,6 @@
 package image
 
 import (
-	"fmt"
 	"net/url"
 	"strings"
 
@@ -117,15 +116,6 @@ func (i ImageReference) GetRegistryURL() string {
 func (i ImageReference) GetContentTrustURL() string {
 	// TODO: Add support for notaries from other repos other than IBM
 	return "https://" + i.hostname + ":4443"
-}
-
-// GetVAURL returns the Vulnerability Advisor URL.
-func (i ImageReference) GetVAURL() (string, error) {
-	if !i.HasIBMRepo() {
-		return "", fmt.Errorf("Deny %q, Vulnerability Advisor is not supported for images from this registry: %s", i.String(), i.GetHostname())
-	}
-	vaURL := strings.Replace(i.hostname, "registry", "va", 1)
-	return "https://" + vaURL, nil
 }
 
 // GetTag returns the tag.
