@@ -1,0 +1,110 @@
+// Copyright 2018 IBM
+//
+// Licensed under the Apache License, Version 2.0 (the \"License\");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an \"AS IS\" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// This file was generated using openssl by the gencerts.sh script
+
+package main
+
+var caKey = []byte(`-----BEGIN RSA PRIVATE KEY-----
+MIIEogIBAAKCAQEA4jr5NVXV3InliOc5R/d771DAvbVr8fKvj5i7Sd4cnRRuFwaS
+4qQKe61DRTl5ux/9xQw59dbmXXJDLzbepnAL2zthlWy/vIYYkm5YsdsSjoaW3HjD
+aifYaachPaQsUyG0ouHGOzwXSxJTB+eAKopNNiBjH3c1NzplBd9KLOmLjeMjsoCR
+16II8GkezVG/P99b7kwvz3fSPiP9ONRyA3LqnKWUaZpY7ODWcX6vrZPqcbowkstl
+Mrlprz/0QBldCztf0FMWIrL7E3QFVj0x8njYxynvrCw6Z8ahJGgiWUASQyF2kUWg
+t21qO+PL2YJTkR2nBQXkUWbzLqQBhdlBuGbEiQIDAQABAoIBACR2guJA0nZ4V2Go
+ewgJcJVS+63YBuz5Q6iuYkl2nkAHIfNeIOCctf/XHkeTCvbJIjrXTKQ+HeUj3IZI
+nrxOxOpx+Ll/zKuTJXS8ilkoSSZltP0WDdEXWP82a9omkupXPWkfYLb9aXe1HWLh
+wjuZDPbTY4aXzSD4rX2zzp3Miqy0iL35xkGrjSbZD12VmXLsv+Qe11AmN4EFo2+I
+p7mqGXksNBGFbQQhVCHwYzgc4NPStKguKurDIaeJQt+4/ZsH8sslP6kD9IzgGm4+
+k/O7MdbGyPX7Cr+hstarhj5MiWWhlcr9RccTIUQg3Lh9MtTn/5RyBXAQCqMKUz6Z
+PWxmUHECgYEA/4cvvxliCieSduozH5xMN6GzQT/97QV1gbc+B126XY+ld6m35GhF
+qwOziymkYU7vDHCiT1uo8TE8GzT6WBD+bvAAEubXV/vhMu9RpKQacalhU3snawaz
+55+W5oXUzOs4NU4+ap6GdcHbzfWIxmKwywrsvxxPVQ3zMxzMidj6jTUCgYEA4qXv
+XdH1SAn0SmtZMzh/UlNdl7+9kcXNOeuwRQaq1JAx+7LuSxYC0ZTM1dWuB0oEl4u8
+GIH44SAIGnSfK0Tk8iiRw13k22tpo2ahDBMiMBo0tP14QCF+E6RQkb7AXoUilf/k
+5kHKLdw0zpMBfjOE0QMAmPqA2w3JsHUCor+CyIUCgYBgVRPABI68a0zBPevGGAN3
+2aMdj0VojO1O2Mkut7wht5zW7wnftxvErCGM7kcFVF+0neXi6xhWzYvuaduTRdzV
+7+7nMVWv2sp8jFKIMkGx5fxGH6CtrZo3USfvgjbGhkrrdbL8OQVR8aKvE8jbmasy
+8MxuA/s4gojUFSBbO4zBnQKBgHQwdtaU9PZaTAb+ozrT4smUfS13GTqquXvQ7Itm
+UJsp1MXgw7JwdT911dBle5K3CkWaV/IEZ08Zua2+TX7EEc5mp9sMvm8R0JT43uSu
+xl78gDqsmkHeKaDuInOk4z9RZxqYlYLJBVmfQt8Hk8Nbq+HudRb3jKk/lz7DrXc7
+UFN1AoGANEr/+e6jh3vI63r2e7SSUPmma9iYIZWeE065jsrx5oDQuW3EKQbjmtwV
+9E7HqpC7ycQHwI+NfcBSYfWwoDj0Cyc69KSpK+OjfucZYbiTW9Q5vbDPYTSZ2GVu
+bYWaGneNITVeZHAV3tWcUB9OkCwXrgxV5qLubWzWNU+IhOad3rA=
+-----END RSA PRIVATE KEY-----`)
+
+var caCert = []byte(`-----BEGIN CERTIFICATE-----
+MIICrDCCAZQCCQC1ASap1it50DANBgkqhkiG9w0BAQsFADAXMRUwEwYDVQQDDAxw
+b3J0aWVyaXNfY2EwIBcNMTgwNDIyMTMyNjM5WhgPMjI5MjAyMDUxMzI2MzlaMBcx
+FTATBgNVBAMMDHBvcnRpZXJpc19jYTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCC
+AQoCggEBAOI6+TVV1dyJ5YjnOUf3e+9QwL21a/Hyr4+Yu0neHJ0UbhcGkuKkCnut
+Q0U5ebsf/cUMOfXW5l1yQy823qZwC9s7YZVsv7yGGJJuWLHbEo6Gltx4w2on2Gmn
+IT2kLFMhtKLhxjs8F0sSUwfngCqKTTYgYx93NTc6ZQXfSizpi43jI7KAkdeiCPBp
+Hs1Rvz/fW+5ML8930j4j/TjUcgNy6pyllGmaWOzg1nF+r62T6nG6MJLLZTK5aa8/
+9EAZXQs7X9BTFiKy+xN0BVY9MfJ42Mcp76wsOmfGoSRoIllAEkMhdpFFoLdtajvj
+y9mCU5EdpwUF5FFm8y6kAYXZQbhmxIkCAwEAATANBgkqhkiG9w0BAQsFAAOCAQEA
+2RbJja3TK0eF4KQL9OhMLuUbAY775XPSOuW2EcGNWEK59p5PmUv8syjepE03gXgA
+JLH4CPpMO8kxU+ft+pN1ZFcpOSfJqn2LzYOyy0PV5m3sOXJsDuVPdWZcxUFUXkjb
+xB585VTE4bIMgOUrsr7yZ+hu4HYsDPsyvMlpGp4+H0A9OGfl0iuF/PcLndyWVWCO
+B9gwX1Ge4GFnk7qbFuJeUl07ph/ug8NqM7U8/Gpmn2UklSmNTawOdAodGeTI9Bi5
+BcrijUTDaEXe4xoM3SGsHhUTMHNNOWw32GKsxa2eMX/DkuxV7ZSbKKuD/STaZGE6
+Hp1Ackaj9yx15af3/Hevyg==
+-----END CERTIFICATE-----`)
+
+var serverKey = []byte(`-----BEGIN RSA PRIVATE KEY-----
+MIIEowIBAAKCAQEAp/g7kvmGBfIntNyBxkzfQXApPPsmgSoEibh5r2N1bnldnkFl
+g/FyXsxC+egtm7XfahNcHkGSgdrdPxUlGjQn2Kdrnobdg8BDK+/G0p7mNiz4PNtZ
+w67dzb/kNQt6dBREkRMMF4esZB9wDyJADO1cde5zIbnA7LLKBf63fasKr3Xiq/8P
+fgMPl7sUK9CmKpDhMY/4wgCmpS6zx2PQ4nvMalhmzT8mzxlXR0dTyi9OaE6ZESm5
+FoshKVM7Ytd4DJ8xojQvSvHEpYHis7vw4C0x4WBeMfOXrs8Fd7ZGT7o3rXRdQied
+odYC03/0L9d+0iG8WJbSecebzUPbdcBHtmQJPQIDAQABAoIBABblIhGti1QiJsFj
+URkbf07nH+fc/+mZNZckGwoKD4aoaldY6KJsdb9wLizsNdNEnhhSXTsOiw7CK2ge
+1LjWpRvF7khkb6s2uLEzdLFe0VhPFuMMrxaaLkeOQWftkZpi7Nmtc/d9GcVn95lI
+fNyGOhUlFHJjZGWfFSRuDMrHVqSFv1qFm6ECIADbovIW00gyJG67RsUyu69AD+wT
+wYrrLUJPR6CjYBCelZmqd3ss31Xwi3f0j0ew06x0ZmIpl11RwMFeGNUJN2MxbAbV
+Qwf5548trDYi8bPNY1f0DXAQd796V63NemepLKCZNJ6aDIfiy0wlViwbIm909Bwv
+P14JkMECgYEA3w8qHfPupvtSCFMf+Zx6onnUau2cjTFIhT/gPFCrgxNh+13/xXIN
+BVn52ftuWlV1OSXAh/U2uYdUJxkR/ernP/lf825DTqWzdFU6gUDvtpjx1OX+dfMt
+8I1lm+vDJsFAQ6XVt89hhpWgipB1U3r/qeb0SANgWs6d6ldJ5Sxe91ECgYEAwMZi
+/u79p23ouOsuU+p3qdgYehIiVUpo8TnyUy6NFDG4ffMoxyCecJVoREGpS8ztc7yG
+pTc4n/6dwxWkw3DeMzJGqJ1RVvN9LhUa0P6OzAnHepnJokU2cSBS3GxzVOaG1KCO
+iBtuB3BmsyKlSDNb3pqKQjQb7PtXZz4PzYoFkC0CgYBy1g/M0+Stuv2Eo6b2jwTj
+2OzvD91lI1Y+o6AB7VYfaT8sdjxTnl/tvWDQRI2PnCd5gGIanLfL1EwSxOlqXCEp
+4mzvmni0aMJ2xdoU6SWAUEVQYggbGVMxYNpK55nUvfEj4qCgvPdsnmPEcpK0o8Iz
+6l8hI/vbRDwwhTfZ8HoDwQKBgC7m1aUi7nHy6sE67w2ZqT2YhvQEP3gy3295Yrzc
+QZTdN/7kz1ILXKEVqMWamB8KH+edwcCmu88peqbBOFIYvucD328cv3KBUT6KAflB
+Rercojzw977USheh/qcEd9b7M2i+G49/5PhIX6RL1JzJahuxy9upo/W3fR9wWRXv
+88SNAoGBALyxIcBeFZGZ7/XAWLJ52UMurCcZlwU/SMJPt+pP96IDu4whnaGdho+u
+D/7NpF7hEyryzhrx190ve50LPzMzEoHLAWVmlIkwTD7edWJT5man2p8IkVPJR9ey
+6sWyC8RG7HpxIS1SaS1GD/4XOcV7xPdgtJvWbqLeNQ4qVME8H/KU
+-----END RSA PRIVATE KEY-----`)
+
+var serverCert = []byte(`-----BEGIN CERTIFICATE-----
+MIIC+DCCAeCgAwIBAgIJALxgH1rgWbt1MA0GCSqGSIb3DQEBBQUAMBcxFTATBgNV
+BAMMDHBvcnRpZXJpc19jYTAgFw0xODA0MjIxMzI2MzlaGA8yMjkyMDIwNTEzMjYz
+OVowIzEhMB8GA1UEAwwYcG9ydGllcmlzLmlibS1zeXN0ZW0uc3ZjMIIBIjANBgkq
+hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAp/g7kvmGBfIntNyBxkzfQXApPPsmgSoE
+ibh5r2N1bnldnkFlg/FyXsxC+egtm7XfahNcHkGSgdrdPxUlGjQn2Kdrnobdg8BD
+K+/G0p7mNiz4PNtZw67dzb/kNQt6dBREkRMMF4esZB9wDyJADO1cde5zIbnA7LLK
+Bf63fasKr3Xiq/8PfgMPl7sUK9CmKpDhMY/4wgCmpS6zx2PQ4nvMalhmzT8mzxlX
+R0dTyi9OaE6ZESm5FoshKVM7Ytd4DJ8xojQvSvHEpYHis7vw4C0x4WBeMfOXrs8F
+d7ZGT7o3rXRdQiedodYC03/0L9d+0iG8WJbSecebzUPbdcBHtmQJPQIDAQABozkw
+NzAJBgNVHRMEAjAAMAsGA1UdDwQEAwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYI
+KwYBBQUHAwEwDQYJKoZIhvcNAQEFBQADggEBABt+5719oLx6NDHHcOe9OxuU9eXO
+Qshxyr0nG9aK4k20VsaaZWkRQfY/r+AWys8/B5TmvXi9AJmGCkMKPx249PrCHE6z
+ofg/Jp+WcrpsylL1SF4hxfsYzLk2thQwp6mQ0mpLJLAhqW2YbyPGzXiXSayg29RC
+AiZ+Mg6Jba4AHs6fbfc4BGLeHI+1VtU339iFoImjHZwYSnyyvgC8PaSzTYF6y1hd
+1xcItVwchZ9puPKE1MviFzuNYmZSL35w4XoLN1KuOHsycoTIcoFg4z/fK1wPsnoY
+k32oIIXmcaSXTunct+O1zAOHsfI0mK4S4imed+s1uiyLVG6qQscLnoAsL9I=
+-----END CERTIFICATE-----`)

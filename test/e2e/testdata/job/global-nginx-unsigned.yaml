@@ -1,0 +1,16 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: global-nginx-unsigned
+  labels:
+    app:  global-nginx-unsigned
+    test: true
+spec:
+  template:
+    spec:
+      containers:
+      - name: nginx
+        image: registry.bluemix.net/cise/nginx:unsigned
+        ports:
+        - containerPort: 80
+      restartPolicy: Never

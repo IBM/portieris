@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: global-nginx-unsigned
+  labels:
+    app: global-nginx-unsigned
+    test: true
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: global-nginx-unsigned
+  template:
+    metadata:
+      labels:
+        app: global-nginx-unsigned
+    spec:
+      containers:
+      - name: nginx
+        image: registry.bluemix.net/cise/nginx:unsigned
+        ports:
+        - containerPort: 80

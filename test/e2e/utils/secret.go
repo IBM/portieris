@@ -12,33 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package registry
+package utils
 
 import (
-	"fmt"
+	"testing"
 
-	"github.com/IBM/portieris/helpers/oauth"
+	"github.com/IBM/portieris/test/framework"
 )
 
-// Client .
-type Client struct{}
-
-// Interface .
-type Interface interface {
-	GetContentTrustToken(registryToken, imageRepo, hostname string) (string, error)
-}
-
-// NewClient .
-func NewClient() Interface {
-	return &Client{}
-}
-
-// GetContentTrustToken .
-func (c Client) GetContentTrustToken(registryToken, imageRepo, hostname string) (string, error) {
-	token, err := oauth.Request(registryToken, imageRepo, "token", false, "notary", hostname)
+func CreateSecret(t *testing.T, fw *framework.Framework, manifestPath, namespace string) {
+	manifest, err := fw.LoadSecretManifest(manifestPath)
 	if err != nil {
-		return "", err
+		t.Fatalf("Error loading secret manifest: %v", err)
 	}
-	return fmt.Sprint(token.Token), nil
-	return "", nil
+	if manifest == nil {
+		t.Fatalf("Error loading manifest: manifest is nil")
+	}
+	if err := fw.CreateSecret(namespace, manifest); err != nil {
+		t.Fatalf("Error creating secret %q: %v", manifest.Name, err)
+	}
 }

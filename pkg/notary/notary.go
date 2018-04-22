@@ -84,7 +84,7 @@ func makeHubTransport(server, notaryToken, image string) http.RoundTripper {
 
 	modifiers := []transport.RequestModifier{
 		transport.NewHeaderRequestModifier(http.Header{
-			"User-Agent":    []string{"scanner-client"},
+			"User-Agent":    []string{"portieris-client"},
 			"Authorization": []string{fmt.Sprintf("Bearer %s", notaryToken)},
 		}),
 	}

@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: global-nginx-signed
+  labels:
+    app:  global-nginx-signed
+    test: true
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app:  global-nginx-signed
+  template:
+    metadata:
+      labels:
+        app:  global-nginx-signed
+    spec:
+      containers:
+      - name: scratch
+        image: registry.bluemix.net/cise/nginx:unsigned
+        ports:
+        - containerPort: 80

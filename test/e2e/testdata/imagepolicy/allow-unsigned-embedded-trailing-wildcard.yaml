@@ -1,0 +1,10 @@
+apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
+kind: ImagePolicy
+metadata:
+  name: allow-unsigned-embedded-trailing-wildcard
+spec:
+   repositories:
+    - name: "registry.bluemix.net/*/*"
+      policy:
+        trust:
+          enabled: false
