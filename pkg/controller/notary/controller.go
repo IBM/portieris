@@ -103,9 +103,10 @@ containerLoop:
 		// Trust is enforced
 		glog.Info("Trust is enforced")
 
-		// TODO: make this less experimental
+		// TODO: Support other registries
 		if !img.HasIBMRepo() {
-			glog.Warning("Trust on Images from a non-IBM registry is currently experimental")
+			a.StringToAdmissionResponse(fmt.Sprintf("Deny %q, trust is not supported for images from this registry: %s", img.String(), img.GetHostname()))
+			continue containerLoop
 		}
 
 		// Make sure image sure there is a ImagePullSecret defined

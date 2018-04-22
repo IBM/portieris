@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: global-nginx-signed
+  labels:
+    app: global-nginx-signed
+    test: true
+spec:
+  selector:
+    matchLabels:
+      name: global-nginx-signed
+  template:
+    metadata:
+      labels:
+        name: global-nginx-signed
+    spec:
+      containers:
+      - name: nginx
+        image: registry.bluemix.net/cise/nginx:signed
+        ports:
+        - containerPort: 80

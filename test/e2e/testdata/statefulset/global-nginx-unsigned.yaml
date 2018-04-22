@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: global-nginx-unsigned
+  labels:
+    app: global-nginx-unsigned
+    test: true
+spec:
+  selector:
+    matchLabels:
+      name: global-nginx-unsigned
+  template:
+    metadata:
+      labels:
+        name: global-nginx-unsigned
+    spec:
+      containers:
+      - name: nginx
+        image: registry.bluemix.net/cise/nginx:unsigned
+        ports:
+        - containerPort: 80

@@ -1,2 +1,4 @@
 vendor
 cover.*
+
+helm/certs

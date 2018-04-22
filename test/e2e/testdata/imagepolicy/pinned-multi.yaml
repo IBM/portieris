@@ -1,0 +1,13 @@
+apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
+kind: ImagePolicy
+metadata:
+  name: pinned-multi
+spec:
+   repositories:
+    - name: "registry.bluemix.net/cise/nginx"
+      policy:
+        trust:
+          enabled: true
+          signerSecrets:
+          - name: signer1pubkey
+          - name: signer2pubkey

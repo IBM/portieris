@@ -1,0 +1,19 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: global-nginx-signed
+  labels:
+    app:  global-nginx-signed
+    test: true
+spec:
+  schedule: "* * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: nginx
+            image: registry.bluemix.net/cise/nginx:signed
+            ports:
+            - containerPort: 80
+          restartPolicy: Never

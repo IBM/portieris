@@ -12,33 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package registry
+package utils
 
 import (
-	"fmt"
+	"io/ioutil"
+	"testing"
 
-	"github.com/IBM/portieris/helpers/oauth"
+	"github.com/IBM/portieris/test/framework"
 )
 
-// Client .
-type Client struct{}
-
-// Interface .
-type Interface interface {
-	GetContentTrustToken(registryToken, imageRepo, hostname string) (string, error)
+func DumpEvents(t *testing.T, fw *framework.Framework, namespace string) {
+	reader := fw.DumpEvents(namespace)
+	bytes, _ := ioutil.ReadAll(reader)
+	t.Errorf("%s\n", bytes)
 }
 
-// NewClient .
-func NewClient() Interface {
-	return &Client{}
-}
-
-// GetContentTrustToken .
-func (c Client) GetContentTrustToken(registryToken, imageRepo, hostname string) (string, error) {
-	token, err := oauth.Request(registryToken, imageRepo, "token", false, "notary", hostname)
-	if err != nil {
-		return "", err
-	}
-	return fmt.Sprint(token.Token), nil
-	return "", nil
+func DumpPolicies(t *testing.T, fw *framework.Framework, namespace string) {
+	reader := fw.DumpPolicies(namespace)
+	bytes, _ := ioutil.ReadAll(reader)
+	t.Errorf("%s\n", bytes)
 }

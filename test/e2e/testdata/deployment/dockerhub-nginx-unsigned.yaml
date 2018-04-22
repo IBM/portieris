@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dockerhub-nginx-unsigned
+  labels:
+    app: dockerhub-nginx-unsigned
+    test: true
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dockerhub-nginx-unsigned
+  template:
+    metadata:
+      labels:
+        app: dockerhub-nginx-unsigned
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.7.9
+        ports:
+        - containerPort: 80

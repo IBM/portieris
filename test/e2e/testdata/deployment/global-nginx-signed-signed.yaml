@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: global-nginx-signed-signed
+  labels:
+    app: global-nginx-signed-signed
+    test: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: global-nginx-signed-signed
+  template:
+    metadata:
+      labels:
+        app: global-nginx-signed-signed
+    spec:
+      containers:
+      - name: nginx-signed
+        image: registry.bluemix.net/cise/nginx:signed
+        ports:
+        - containerPort: 80
+      - name: nginx-alsosigned
+        image: registry.bluemix.net/cise/nginx:signed
+        ports:
+        - containerPort: 81
+        command: ["/bin/sh"]
+        args: ["-c", "sed -i 's/listen       80;/listen       81;/g' etc/nginx/conf.d/default.conf && \
+          nginx -g 'daemon off;'"]

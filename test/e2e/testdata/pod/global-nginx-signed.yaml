@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: global-nginx-signed
+  labels:
+    app: global-nginx-signed
+    test: true
+spec:
+  containers:
+  - name: nginx
+    image: registry.bluemix.net/cise/nginx:signed
+    ports:
+    - containerPort: 80
