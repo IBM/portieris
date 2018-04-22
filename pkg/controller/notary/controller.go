@@ -1,3 +1,17 @@
+// Copyright 2018 IBM
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package notary
 
 import (
@@ -5,8 +19,6 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-
-	"github.com/davecgh/go-spew/spew"
 
 	"github.com/IBM/portieris/helpers/image"
 	securityenforcementv1beta1 "github.com/IBM/portieris/pkg/apis/securityenforcement/v1beta1"
@@ -78,9 +90,6 @@ containerLoop:
 			a.StringToAdmissionResponse(fmt.Sprintf("Deny %q, invalid image name", container.Image))
 			continue containerLoop
 		}
-		fmt.Println("TEST")
-		spew.Dump(img.GetHostname())
-		spew.Dump(err)
 
 		glog.Infof("Container Image: %s   Namespace: %s", img.String(), namespace)
 		if policy, err = c.policyClient.GetPolicyToEnforce(namespace, img.String()); err != nil {
