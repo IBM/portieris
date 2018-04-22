@@ -16,8 +16,9 @@ package main
 
 import (
 	kube "github.com/IBM/portieris/helpers/kube"
-	notaryClient "github.com/IBM/portieris/pkg/controller/notary"
 	notaryController "github.com/IBM/portieris/pkg/controller/notary"
+	"github.com/IBM/portieris/pkg/kubernetes"
+	notaryClient "github.com/IBM/portieris/pkg/notary"
 	registryclient "github.com/IBM/portieris/pkg/registry"
 	"github.com/IBM/portieris/pkg/webhook"
 	"github.com/golang/glog"
@@ -25,6 +26,7 @@ import (
 
 func main() {
 	kubeClientset := kube.GetKubeClient()
+	kubeWrapper := kubernetes.NewKubeClientsetWrapper(kubeClientset)
 	policyClient, err := kube.GetPolicyClient()
 	if err != nil {
 		glog.Fatal("Could not get policy client", err)
@@ -36,7 +38,7 @@ func main() {
 	}
 
 	cr := registryclient.NewClient()
-	controller := notaryController.NewController(kubeClientset, policyClient, cr, trust)
+	controller := notaryController.NewController(kubeWrapper, policyClient, trust, cr)
 	webhook := webhook.NewServer("notary", controller, serverCert, serverKey)
 	webhook.Run()
 }

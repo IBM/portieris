@@ -36,7 +36,7 @@ func getTestWebhookServer() *Server {
 	}
 }
 
-func TestServer_handleAdmissionRequest(t *testing.T) {
+func TestServer_HandleAdmissionRequest(t *testing.T) {
 
 	tests := []struct {
 		name            string
@@ -61,7 +61,7 @@ func TestServer_handleAdmissionRequest(t *testing.T) {
 			bytesIn, _ := json.Marshal(tt.admissionReview)
 			req, _ := http.NewRequest("POST", "", bytes.NewBuffer(bytesIn))
 			rr := httptest.NewRecorder()
-			handler := http.HandlerFunc(server.handleAdmissionRequest)
+			handler := http.HandlerFunc(server.HandleAdmissionRequest)
 			handler.ServeHTTP(rr, req)
 
 			var reviewOut admissionv1beta1.AdmissionReview

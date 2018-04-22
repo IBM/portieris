@@ -53,7 +53,7 @@ func NewServer(name string, ctrl controller.Interface, cert, key []byte) *Server
 	}
 }
 
-func (s *Server) handleAdmissionRequest(w http.ResponseWriter, r *http.Request) {
+func (s *Server) HandleAdmissionRequest(w http.ResponseWriter, r *http.Request) {
 
 	defer r.Body.Close()
 	body, _ := ioutil.ReadAll(r.Body)
@@ -94,7 +94,7 @@ func (s *Server) Run() {
 		// ClientAuth:   tls.RequireAndVerifyClientCert,
 		ClientAuth: tls.NoClientCert,
 	}
-	s.mux.HandleFunc("/admit", s.handleAdmissionRequest)
+	s.mux.HandleFunc("/admit", s.HandleAdmissionRequest)
 	port := "8000"
 	server := &http.Server{
 		Addr:      fmt.Sprintf(":%s", port),
