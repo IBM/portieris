@@ -16,7 +16,7 @@ service:
   targetPort: 8000
 
 # If not running on IBM Cloud Container Service set to false
-ibmContainerService: true
+IBMContainerService: true
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
