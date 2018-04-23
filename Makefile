@@ -1,5 +1,5 @@
 GOFILES=$(shell find . -type f -name '*.go' -not -path "./vendor/*")
-GOPACKAGES=$(shell go list ./... | grep -v /vendor/)
+GOPACKAGES=$(shell go list ./... | grep -v /vendor/ | grep -v test/ | grep -v pkg/apis/)
 
 dep:
 	@go get -u github.com/golang/dep/cmd/dep

@@ -84,7 +84,7 @@ func (c *Controller) mutatePodSpec(namespace, specPath string, pod corev1.PodSpe
 containerLoop:
 	for containerIndex, container := range pod.Containers {
 		var policy *securityenforcementv1beta1.Policy
-		img, err := image.NewImageReference(container.Image)
+		img, err := image.NewReference(container.Image)
 		if err != nil {
 			glog.Error(err)
 			a.StringToAdmissionResponse(fmt.Sprintf("Deny %q, invalid image name", container.Image))

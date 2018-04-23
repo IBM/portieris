@@ -40,5 +40,4 @@ func (c Client) GetContentTrustToken(registryToken, imageRepo, hostname string) 
 		return "", err
 	}
 	return fmt.Sprint(token.Token), nil
-	return "", nil
 }
