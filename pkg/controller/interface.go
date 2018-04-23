@@ -16,6 +16,7 @@ package controller
 
 import admissionv1beta1 "k8s.io/api/admission/v1beta1"
 
+// Interface are the methods required to implement a controller for the webhook package
 type Interface interface {
 	Admit(*admissionv1beta1.AdmissionRequest) *admissionv1beta1.AdmissionResponse
 }

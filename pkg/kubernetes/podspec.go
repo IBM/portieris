@@ -39,9 +39,13 @@ const (
 	cronJobSpecPath  = "/spec/jobTemplate/spec/template/spec"
 )
 
+// ErrObjectHasParents is returned when the resource being created is the child of another resource
 var ErrObjectHasParents = fmt.Errorf("This object has parents")
+
+// ErrObjectHasZeroReplicas is returned when the resource being created has zero replicas
 var ErrObjectHasZeroReplicas = fmt.Errorf("This object has zero replicas")
 
+// GetPodSpec retrieves the podspec from the admission request passed in
 func (w *Wrapper) GetPodSpec(ar *v1beta1.AdmissionRequest) (string, *corev1.PodSpec, error) {
 	ps := corev1.PodSpec{}
 	var templateString string

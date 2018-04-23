@@ -35,7 +35,7 @@ type RegistriesStruct map[string]struct {
 	Auth     string `json:"auth"`
 }
 
-// Retrieve the token (password field) for the given namespace/secret/registry
+// GetSecretToken retrieve the token (password field) for the given namespace/secret/registry
 func (w *Wrapper) GetSecretToken(namespace, secretName, registry string) (string, error) {
 	// glog.Infof("getSecretToken << : namespace(%s) secret(%s) registry(%s)", namespace, secretName, registry)
 	var token string

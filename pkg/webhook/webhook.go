@@ -33,6 +33,7 @@ import (
 
 var codec = serializer.NewCodecFactory(runtime.NewScheme())
 
+// Server is the admission webhook server
 type Server struct {
 	name string
 	// Request multiplexer
@@ -43,6 +44,7 @@ type Server struct {
 	serverCert, serverKey []byte
 }
 
+// NewServer creates a new admission webhook server with the passed controller handling the admissions
 func NewServer(name string, ctrl controller.Interface, cert, key []byte) *Server {
 	return &Server{
 		name:       name,
@@ -53,6 +55,8 @@ func NewServer(name string, ctrl controller.Interface, cert, key []byte) *Server
 	}
 }
 
+// HandleAdmissionRequest handles an incoming request and calls the controllers admit function
+// It writes the response from the Admit to the response writer
 func (s *Server) HandleAdmissionRequest(w http.ResponseWriter, r *http.Request) {
 
 	defer r.Body.Close()
@@ -75,6 +79,7 @@ func (s *Server) HandleAdmissionRequest(w http.ResponseWriter, r *http.Request) 
 	w.Write(reviewResponseToByte(admissionResponse, admissionReview))
 }
 
+// Run starts the server
 func (s *Server) Run() {
 	flag.Parse()
 	// TODO: Use mutual tls after we agree on what cert the apiserver should use.

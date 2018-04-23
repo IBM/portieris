@@ -4,3 +4,5 @@ cover.*
 helm/certs
 
 *.tgz
+
+bin

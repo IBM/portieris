@@ -38,6 +38,7 @@ import (
 
 var codec = serializer.NewCodecFactory(runtime.NewScheme())
 
+// Controller is the notary controller
 type Controller struct {
 	// kubeClientsetWrapper is a standard kubernetes clientset with a wrapper for retrieving podSpec from a given object
 	kubeClientsetWrapper kubernetes.WrapperInterface
@@ -49,6 +50,7 @@ type Controller struct {
 	cr registryclient.Interface
 }
 
+// NewController creates a new controller object from the various clients passed in
 func NewController(kubeWrapper kubernetes.WrapperInterface, policyClient policy.Interface, trust notary.Interface, cr registryclient.Interface) *Controller {
 	return &Controller{
 		kubeClientsetWrapper: kubeWrapper,
@@ -58,6 +60,7 @@ func NewController(kubeWrapper kubernetes.WrapperInterface, policyClient policy.
 	}
 }
 
+// Admit is the admissionRequest handler
 func (c *Controller) Admit(admissionRequest *admissionv1beta1.AdmissionRequest) *admissionv1beta1.AdmissionResponse {
 	glog.Infof("Processing Trust Admission Request for %s on %s", admissionRequest.Operation, admissionRequest.Name)
 
