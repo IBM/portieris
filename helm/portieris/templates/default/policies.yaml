@@ -13,6 +13,7 @@ spec:
     # IMPORTANT: Review this policy and replace it with one that meets your requirements. If you do not run any third party applications in this namespace, you can remove this policy entirely.
     - name: "*"
       policy:
+    {{ if .Values.ibmContainerService }}
     # These policies allow all IBM Cloud Container Service images from the global and all regional registries to deploy in this namespace.
     # IMPORTANT: When you create your own policy in this namespace, make sure to include these repositories. If you do not, the cluster might not function properly.
     - name: "registry*.bluemix.net/armada/*"
@@ -21,13 +22,14 @@ spec:
       policy:
     - name: "registry*.bluemix.net/armada-master/*"
       policy:
+    {{ end }}
     # This policy prevents Image Security Enforcement from blocking itself
-    - name: "registry*.bluemix.net/ibm/portieris"
+    - name: "{{ .Values.image.host }}/{{ .Values.image.image }}:{{ .Values.image.tag }}"
       policy:
     # This policy allows Image Security Enforcement to use Hyperkube to configure your cluster. This policy must exist if you uninstall Image Security Enforcement.
-    - name: "registry.bluemix.net/kubectl"
+    - name: "{{ .Values.hyperkube.repository }}:{{ .Values.hyperkube.tag }}"
       policies:
-        
+  
 ---
 apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
 kind: ImagePolicy
@@ -43,6 +45,7 @@ spec:
     # IMPORTANT: Review this policy and replace it with one that meets your requirements. If you do not run any third party applications in this namespace, you can remove this policy entirely.
     - name: "*"
       policy:
+    {{ if .Values.ibmContainerService }}   
     # These policies allow all IBM Cloud Container Service images from the global and all regional registries to deploy in this namespace.
     # IMPORTANT: When you create your own policy in this namespace, make sure to include these repositories. If you do not, the cluster might not function properly.
     - name: "registry*.bluemix.net/armada/*"
@@ -51,22 +54,21 @@ spec:
       policy:
     - name: "registry*.bluemix.net/armada-master/*"
       policy:
+    {{ end }}
 ---
 apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
 kind: ClusterImagePolicy
 metadata:
-  name: ibmcloud-default-cluster-image-policy
+  name: default-cluster-image-policy
   annotations:
     helm.sh/hook: post-install
     helm.sh/hook-weight: "1"
 spec:
    repositories:
-    # This enforces that all images deployed to this cluster pass trust and va
-    # To override set an ImagePolicy for a specific Kubernetes namespace or modify this policy
+    # This enforces that all images deployed to this cluster pass trust
+    # IMPORTANT: Review this policy and replace it with one that meets your requirements.
     - name: "*"
       policy:
         trust:
-          enabled: true
-        va:
           enabled: true
 {{ end }}
