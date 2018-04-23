@@ -27,7 +27,7 @@ helm install -n portieris .
 
 ### Other Kubernetes Clusters
 
-If you're deploying onto a generic cluster Portieris automatically creates a policy to allow all images without verification. This is to prevent users from breaking their cluster and should be changed as its insecure.
+If you're deploying onto a generic cluster Portieris automatically creates a policy to allow all images without verification. This is to prevent Portieris from preventing you deploying to your cluster. You should update this policy to something more restrictive.
 
 ```
 helm install -n portieris . --set IBMContainerService=false --debug
