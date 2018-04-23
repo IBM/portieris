@@ -5,7 +5,7 @@
 replicaCount: 3
 
 image:
-  host: docker.io/liamwhite
+  host: docker.io/ibmcom
   image: portieris
   tag: 0.2.0
   pullPolicy: Always
