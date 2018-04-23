@@ -1,6 +1,6 @@
-# Container Image Security Enforcement
+# Portieris
 
-This chart installs Container Image Security Enforcement for IBM Cloud Container Service in your cluster.
+This chart installs Portieris in your cluster.
 
 ## Prerequisites
 
@@ -10,23 +10,34 @@ This chart installs Container Image Security Enforcement for IBM Cloud Container
 ## Chart details
 
 This chart:
-* Installs Container Image Security Enforcement.
-* Configures Kubernetes admission webhooks to direct admission requests to Container Image Security Enforcement.
+* Installs Portieris.
 * Adds a resource definition for security policies.
 * Adds a default cluster-wide security policy, and a default security policy in the kube-system and ibm-system Kubernetes namespaces.
+* Configures Kubernetes admission webhooks to direct admission requests to Portieris.
 
 ## Installing the chart
 
+### IBM Cloud Container Service
+
+If you're deploying onto an IBM Cloud cluster we automatically create policies to allow the various Kubernetes components to be deployed as well as a policy rule to allow everything. The allow everything should be changed because it is insecure but the IBM Cloud specific policies should be kept.
+
 ```
-helm repo add ibm https://registry.stage1.ng.bluemix.net/helm/ibm
-helm install -n cise ibm/ibmcloud-image-enforcement
+helm install -n portieris .
+```
+
+### Other Kubernetes Clusters
+
+If you're deploying onto a generic cluster we automatically create a policy to allow everything. This should be changed as its insecure.
+
+```
+helm install -n portieris . --set ibmContainerService=false --debug
 ```
 
 For full installation instructions, see [Installing security enforcement in your cluster](https://console.bluemix.net/docs/services/Registry/registry_security_enforce.html#sec_enforcer_install).
 
 ## Default security policies
 
-This chart installs default security policies in your cluster. You can modify the default policies or replace them with your own. For more information, see [Default policies](https://console.bluemix.net/docs/services/Registry/registry_security_enforce.html#default_policies).
+This chart installs default security policies in your cluster. You can, and should, modify the default policies or replace them with your own. For more information, see [Default policies](https://console.bluemix.net/docs/services/Registry/registry_security_enforce.html#default_policies).
 
 You can apply access control policies to limit who can modify Image Security Enforcement policies in your cluster. See [Controlling who can customize policies](https://console.bluemix.net/docs/services/Registry/registry_security_enforce.html#assign_user_policy).
 
@@ -38,21 +49,16 @@ For information about configuring security policies, and an explanation of the s
 
 ## Removing the chart
 
-1. Container Image Security Enforcement uses Hyperkube to remove some configuration from your cluster when you remove it. Before you can remove Container Image Security Enforcement, you must make sure that Hyperkube is allowed to run. Make sure that the policy for the ibm-system namespace allows the `hyperkube` image.
+1. Portieris uses Hyperkube to remove some configuration from your cluster when you remove it. Before you can remove Portieris, you must make sure that Hyperkube is allowed to run. Make sure that the policy for the ibm-system namespace allows the `hyperkube` image.
     ```yaml
     - name: quay.io/coreos/hyperkube
       policies:
     ```
-    Alternatively, disable Container Image Security Enforcement entirely.
+    Alternatively, disable Portieris manually.
     ```
     kubectl delete MutatingWebhookConfiguration image-admission-config 
-    kubectl delete ValidatingWebhookConfiguration image-admission-config
     ```
-2. Remove the resource definitions for your security policies. When you delete the resource definitions, your security policies are also deleted.
-    ```
-    kubectl delete crd clusterimagepolicies.securityenforcement.admission.cloud.ibm.com imagepolicies.securityenforcement.admission.cloud.ibm.com
-    ```
-3. Remove the chart.
+2. Remove the chart.
     ```
     helm delete --purge cise
     ```

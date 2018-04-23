@@ -1,4 +1,4 @@
-Container Image Security Enforcement for the IBM Container Service is installed in your cluster.
+Portieris is installed in your cluster.
 
 Default security policies are installed in your cluster. You can modify the default policies or replace them with your own. For more information, see http://ibm.biz/cise_default.
 

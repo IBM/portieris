@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: create-armada-image-policies
+  name: create-default-image-policies
   namespace: ibm-system
   annotations:
     helm.sh/hook: post-install
@@ -30,13 +30,13 @@ spec:
             - /kubectl
             - apply
             - -f
-            - /tmp/portieris/armada-custom-resources.yaml
+            - /tmp/portieris/default-custom-resources.yaml
           volumeMounts:
             - mountPath: "/tmp/portieris"
               name: tmp-configmap-portieris
       volumes:
         - name: tmp-configmap-portieris
           configMap:
-            name: armada-image-policies
+            name: default-image-policies
       restartPolicy: OnFailure
       
