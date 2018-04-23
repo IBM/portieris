@@ -26,16 +26,19 @@ var codec = serializer.NewCodecFactory(runtime.NewScheme())
 
 var _ WrapperInterface = &Wrapper{}
 
+// WrapperInterface is the interface for a wrapper around kubeclientset that includes some helper functions for applying behaviour to kube resources
 type WrapperInterface interface {
 	kubernetes.Interface
 	GetPodSpec(*v1beta1.AdmissionRequest) (string, *corev1.PodSpec, error)
 	GetSecretToken(namespace, secretName, registry string) (string, error)
 }
 
+// Wrapper is a wrapper around kubeclientset that includes some helper functions for applying behaviour to kube resources
 type Wrapper struct {
 	kubernetes.Interface
 }
 
+// NewKubeClientsetWrapper creates a wrapper from the kubeclientset passed in
 func NewKubeClientsetWrapper(kubeClientset kubernetes.Interface) *Wrapper {
 	return &Wrapper{kubeClientset}
 }

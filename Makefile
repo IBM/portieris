@@ -1,11 +1,27 @@
 GOFILES=$(shell find . -type f -name '*.go' -not -path "./vendor/*")
-GOPACKAGES=$(shell go list ./... | grep -v /vendor/)
+GOPACKAGES=$(shell go list ./... | grep -v /vendor/ | grep -v test/ | grep -v pkg/apis/)
+
+dep:
+	@go get -u github.com/golang/dep/cmd/dep
+
+build-deps: dep
+	@dep ensure -v -vendor-only
+
+test-deps: build-deps
+	@go get github.com/stretchr/testify/assert
+	@go get github.com/golang/lint/golint
+	@go get github.com/pierrre/gotestcover
+	@go get github.com/onsi/ginkgo/ginkgo
+	@go get github.com/onsi/gomega/...
+
+test: test-deps
+	$(GOPATH)/bin/gotestcover -v -coverprofile=cover.out ${GOPACKAGES}
 
 copyright:
 	@${GOPATH}/src/github.com/IBM/portieris/scripts/copyright.sh
 
-test:
-	$(GOPATH)/bin/gotestcover -v -coverprofile=cover.out ${GOPACKAGES}
+copyright-check:
+	@${GOPATH}/src/github.com/IBM/portieris/scripts/copyright-check.sh
 
 fmt:
 	@if [ -n "$$(gofmt -l ${GOFILES})" ]; then echo 'Please run gofmt -l -w on your code.' && exit 1; fi

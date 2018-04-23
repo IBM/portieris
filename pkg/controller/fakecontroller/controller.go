@@ -16,9 +16,11 @@ package fakecontroller
 
 import admissionv1beta1 "k8s.io/api/admission/v1beta1"
 
+// Controller is a fake controller for stubbing
 type Controller struct {
 }
 
+// Admit is a fake admit function for stubbing
 func (c *Controller) Admit(admissionRequest *admissionv1beta1.AdmissionRequest) *admissionv1beta1.AdmissionResponse {
 	return &admissionv1beta1.AdmissionResponse{Allowed: true}
 }

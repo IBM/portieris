@@ -21,8 +21,8 @@ import (
 	"github.com/docker/distribution/reference"
 )
 
-// ImageReference .
-type ImageReference struct {
+// Reference .
+type Reference struct {
 	original string
 	name     string
 	tag      string
@@ -31,8 +31,8 @@ type ImageReference struct {
 	port     string
 }
 
-// NewImageReference parses the image name and returns an error if the name is invalid.
-func NewImageReference(name string) (*ImageReference, error) {
+// NewReference parses the image name and returns an error if the name is invalid.
+func NewReference(name string) (*Reference, error) {
 	var digest string
 	original := name
 	// Remove the digest so `ParseNamed` doesn't fail, it can't handle short digests.
@@ -73,7 +73,7 @@ func NewImageReference(name string) (*ImageReference, error) {
 	// we ommit the error here since we already parsed the original string above.
 	ref, _ = reference.ParseNamed(name)
 
-	return &ImageReference{
+	return &Reference{
 		original: original,
 		name:     ref.Name(),
 		tag:      ref.(reference.Tagged).Tag(),
@@ -84,61 +84,61 @@ func NewImageReference(name string) (*ImageReference, error) {
 }
 
 // GetHostname returns the repository hostname of an image
-func (i ImageReference) GetHostname() string {
-	return i.hostname
+func (r Reference) GetHostname() string {
+	return r.hostname
 }
 
 // GetPort returns the port of the hostname.
-func (i ImageReference) GetPort() string {
-	return i.port
+func (r Reference) GetPort() string {
+	return r.port
 }
 
 // HasIBMRepo returns true if the image has an IBM repository, otherwise false.
-func (i ImageReference) HasIBMRepo() bool {
+func (r Reference) HasIBMRepo() bool {
 	prefix := "registry"
 	suffix := ".bluemix.net"
-	if !strings.HasPrefix(i.hostname, prefix) || !strings.HasSuffix(i.hostname, suffix) {
+	if !strings.HasPrefix(r.hostname, prefix) || !strings.HasSuffix(r.hostname, suffix) {
 		return false
 	}
 	return true
 }
 
 // GetRegistryURL returns the Registry URL.
-func (i ImageReference) GetRegistryURL() string {
-	port := i.port
+func (r Reference) GetRegistryURL() string {
+	port := r.port
 	if port != "" {
 		port = ":" + port
 	}
-	return "https://" + i.hostname + port
+	return "https://" + r.hostname + port
 }
 
 // GetContentTrustURL returns the Content Trust URL.
-func (i ImageReference) GetContentTrustURL() string {
+func (r Reference) GetContentTrustURL() string {
 	// TODO: Add support for notaries from other repos other than IBM
-	return "https://" + i.hostname + ":4443"
+	return "https://" + r.hostname + ":4443"
 }
 
 // GetTag returns the tag.
-func (i ImageReference) GetTag() string {
-	return i.tag
+func (r Reference) GetTag() string {
+	return r.tag
 }
 
 // GetDigest returns the digest.
-func (i ImageReference) GetDigest() string {
-	return i.digest
+func (r Reference) GetDigest() string {
+	return r.digest
 }
 
 // NameWithTag returns the image name with the tag.
-func (i ImageReference) NameWithTag() string {
-	return i.name + ":" + i.tag
+func (r Reference) NameWithTag() string {
+	return r.name + ":" + r.tag
 }
 
 // NameWithoutTag returns the image name without the tag.
-func (i ImageReference) NameWithoutTag() string {
-	return i.name
+func (r Reference) NameWithoutTag() string {
+	return r.name
 }
 
 // String returns the original image name.
-func (i ImageReference) String() string {
-	return i.original
+func (r Reference) String() string {
+	return r.original
 }

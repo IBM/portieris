@@ -22,6 +22,7 @@ import (
 	"k8s.io/client-go/rest"
 )
 
+// GetKubeClient creates a kube clientset
 func GetKubeClient() *kubernetes.Clientset {
 	config, err := rest.InClusterConfig()
 	if err != nil {
@@ -34,6 +35,7 @@ func GetKubeClient() *kubernetes.Clientset {
 	return clientset
 }
 
+// GetPolicyClient creates a policy clientset
 func GetPolicyClient() (*policy.Client, error) {
 	// Get configuration
 	cfg, err := rest.InClusterConfig()

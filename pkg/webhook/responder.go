@@ -24,12 +24,15 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// AdmissionResponder is a helper for handling admission response creation
+// It supports adding and returning multiple errors to the user
 type AdmissionResponder struct {
 	allowed bool
 	errors  []string
 	patches []byte
 }
 
+// Flush creates the admission response to return
 func (a *AdmissionResponder) Flush() *v1beta1.AdmissionResponse {
 	if a.allowed && !a.HasErrors() {
 		res := &v1beta1.AdmissionResponse{
@@ -51,22 +54,27 @@ func (a *AdmissionResponder) Flush() *v1beta1.AdmissionResponse {
 	}
 }
 
+// HasErrors returns a true if there are errors false if not
 func (a *AdmissionResponder) HasErrors() bool {
 	return len(a.errors) != 0
 }
 
+// SetAllowed sets the admission response to allow the admission
 func (a *AdmissionResponder) SetAllowed() {
 	a.allowed = true
 }
 
+// IsAllowed returns a true if the admission is allowed false if not
 func (a *AdmissionResponder) IsAllowed() bool {
 	return a.allowed
 }
 
+// SetPatch sets the patches to be applied by the api server
 func (a *AdmissionResponder) SetPatch(patch []byte) {
 	a.patches = patch
 }
 
+// Write writes the output of flush to the passed responsewriter
 func (a *AdmissionResponder) Write(w http.ResponseWriter, ar v1beta1.AdmissionReview) {
 	resp := reviewResponseToByte(a.Flush(), ar)
 	if _, err := w.Write(resp); err != nil {
@@ -74,11 +82,13 @@ func (a *AdmissionResponder) Write(w http.ResponseWriter, ar v1beta1.AdmissionRe
 	}
 }
 
+// ToAdmissionResponse adds an error to the response
 func (a *AdmissionResponder) ToAdmissionResponse(err error) {
 	glog.Error(err)
 	a.errors = append(a.errors, err.Error())
 }
 
+// StringToAdmissionResponse adds a string as an error to the response
 func (a *AdmissionResponder) StringToAdmissionResponse(msg string) {
 	a.errors = append(a.errors, msg)
 }

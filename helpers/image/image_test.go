@@ -29,7 +29,7 @@ func TestImage(t *testing.T) {
 
 		Describe("When the image name is invalid", func() {
 			It("should return an error", func() {
-				image, err := NewImageReference("?")
+				image, err := NewReference("?")
 				Expect(err).To(HaveOccurred())
 				Expect(image).To(BeNil())
 			})
@@ -37,7 +37,7 @@ func TestImage(t *testing.T) {
 
 		Describe("When the image is valid without a tag", func() {
 			It("should use `latest` as tag", func() {
-				image, err := NewImageReference("test.com/namespace/name")
+				image, err := NewReference("test.com/namespace/name")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(image).ToNot(BeNil())
 				Expect(image.GetTag()).To(Equal("latest"))
@@ -49,7 +49,7 @@ func TestImage(t *testing.T) {
 
 		Describe("When the image is valid without a tag but with digest", func() {
 			It("should be OK", func() {
-				image, err := NewImageReference("test.com:8080/namespace/name@sha256:1234567890")
+				image, err := NewReference("test.com:8080/namespace/name@sha256:1234567890")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(image).ToNot(BeNil())
 				Expect(image.GetTag()).To(Equal("latest"))
@@ -62,7 +62,7 @@ func TestImage(t *testing.T) {
 
 		Describe("When the image is valid with a tag", func() {
 			It("should not be latest", func() {
-				image, err := NewImageReference("test.com/namespace/name:v1")
+				image, err := NewReference("test.com/namespace/name:v1")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(image).ToNot(BeNil())
 				Expect(image.GetTag()).To(Equal("v1"))
@@ -74,7 +74,7 @@ func TestImage(t *testing.T) {
 
 		Describe("When the image is valid and has a digest", func() {
 			It("should be OK", func() {
-				image, err := NewImageReference("test.com:8080/namespace/name:v1@sha256:1234567890")
+				image, err := NewReference("test.com:8080/namespace/name:v1@sha256:1234567890")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(image).ToNot(BeNil())
 				Expect(image.GetTag()).To(Equal("v1"))
@@ -88,7 +88,7 @@ func TestImage(t *testing.T) {
 
 		Describe("When the image is from Docker Hub and has a digest", func() {
 			It("should be OK", func() {
-				image, err := NewImageReference("namespace/name:v1@sha256:1234567890")
+				image, err := NewReference("namespace/name:v1@sha256:1234567890")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(image).ToNot(BeNil())
 				Expect(image.GetTag()).To(Equal("v1"))
@@ -102,7 +102,7 @@ func TestImage(t *testing.T) {
 
 		Describe("When the image is a Docker Hub public image and has a digest", func() {
 			It("should be OK", func() {
-				image, err := NewImageReference("ubuntu:v1@sha256:1234567890")
+				image, err := NewReference("ubuntu:v1@sha256:1234567890")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(image).ToNot(BeNil())
 				Expect(image.GetTag()).To(Equal("v1"))
@@ -116,7 +116,7 @@ func TestImage(t *testing.T) {
 
 		Describe("When the image is valid and it's an IBM repository", func() {
 			It("should be OK", func() {
-				image, err := NewImageReference("registry.ng.bluemix.net/namespace/name")
+				image, err := NewReference("registry.ng.bluemix.net/namespace/name")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(image).ToNot(BeNil())
 				Expect(image.GetHostname()).To(Equal("registry.ng.bluemix.net"))
@@ -132,7 +132,7 @@ func TestImage(t *testing.T) {
 
 		Describe("When the image is valid and it's an IBM repository but the hostname has a port", func() {
 			It("should be OK", func() {
-				image, err := NewImageReference("registry.ng.bluemix.net:8080/namespace/name:v1")
+				image, err := NewReference("registry.ng.bluemix.net:8080/namespace/name:v1")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(image).ToNot(BeNil())
 				Expect(image.GetHostname()).To(Equal("registry.ng.bluemix.net"))
@@ -148,7 +148,7 @@ func TestImage(t *testing.T) {
 
 		Describe("When the image is valid but it's not an IBM repository", func() {
 			It("should be OK", func() {
-				image, err := NewImageReference("test.com/namespace/name")
+				image, err := NewReference("test.com/namespace/name")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(image).ToNot(BeNil())
 				Expect(image.GetHostname()).To(Equal("test.com"))
@@ -164,7 +164,7 @@ func TestImage(t *testing.T) {
 
 		Describe("When the image is valid but it's not an IBM repository and the hostname has a port", func() {
 			It("should be OK", func() {
-				image, err := NewImageReference("test.com:8080/namespace/name:v1")
+				image, err := NewReference("test.com:8080/namespace/name:v1")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(image).ToNot(BeNil())
 				Expect(image.GetHostname()).To(Equal("test.com"))
