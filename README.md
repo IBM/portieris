@@ -20,6 +20,10 @@ Portieris receives AdmissionRequests for creation of or edits to all types of wo
 
 Portieris' Admission Webhook is configured to fail closed. Three instances of Portieris make sure that it is able to approve its own upgrades and auto-recovery. If all instance of Portieris are unavailable, Kubernetes will not auto-recover it, and you must delete the MutatingAdmissionWebhook to allow Portieris to recover.
 
+## Current limitations
+
+Portieris only supports sourcing trust data from the IBM Cloud Notary servers. You can deploy images from other servers while Portieris is installed, but you must disable trust enforcement for these images. The default ClusterImagePolicy enforces trust disabled for "*". We are looking to support additional Notary servers. If you want a particular Notary server to be supported, [raise an issue](https://github.com/ibm/portieris/issues/new).
+
 ## Installing Portieris
 
 Portieris is installed using a Helm chart. Before you begin, make sure that you have Kubernetes 1.9 or above, and Helm 2.8 or above installed in your cluster.
@@ -51,7 +55,3 @@ You can configure Kubernetes RBAC rules to define which users and applications h
 ## Reporting security issues
 
 To report a security issue, DO NOT open an issue. Instead, send your report via email to alchreg@uk.ibm.com privately.
-
-## Current limitations
-
-Portieris only supports sourcing trust data from the IBM Cloud Notary servers. You can deploy images from other servers while Portieris is installed, but you must disable trust enforcement for these images. The default ClusterImagePolicy enforces trust disabled for "*".
