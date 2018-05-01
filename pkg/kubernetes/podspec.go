@@ -20,8 +20,11 @@ import (
 	"github.com/golang/glog"
 	"k8s.io/api/admission/v1beta1"
 	appsv1 "k8s.io/api/apps/v1"
+	appsv1beta1 "k8s.io/api/apps/v1beta1"
+	appsv1beta2 "k8s.io/api/apps/v1beta2"
 	batchv1 "k8s.io/api/batch/v1"
 	batchv1beta1 "k8s.io/api/batch/v1beta1"
+	batchv2alpha1 "k8s.io/api/batch/v2alpha1"
 	corev1 "k8s.io/api/core/v1"
 	extensionsv1beta1 "k8s.io/api/extensions/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -80,6 +83,28 @@ func (w *Wrapper) GetPodSpec(ar *v1beta1.AdmissionRequest) (string, *corev1.PodS
 		ps = deploy.Spec.Template.Spec
 		w.mutateWithSA(ar.Namespace, &ps)
 		templateString = templateSpecPath
+	case metav1.GroupVersionResource{Group: "apps", Version: "v1beta1", Resource: "deployments"}:
+		deploy := appsv1beta1.Deployment{}
+		if err := w.decodeObject(ar.Object.Raw, &deploy); err != nil {
+			return "", nil, err
+		}
+		if deploy.Spec.Replicas != nil && *deploy.Spec.Replicas == int32(0) {
+			return "", nil, ErrObjectHasZeroReplicas
+		}
+		ps = deploy.Spec.Template.Spec
+		w.mutateWithSA(ar.Namespace, &ps)
+		templateString = templateSpecPath
+	case metav1.GroupVersionResource{Group: "apps", Version: "v1beta2", Resource: "deployments"}:
+		deploy := appsv1beta2.Deployment{}
+		if err := w.decodeObject(ar.Object.Raw, &deploy); err != nil {
+			return "", nil, err
+		}
+		if deploy.Spec.Replicas != nil && *deploy.Spec.Replicas == int32(0) {
+			return "", nil, ErrObjectHasZeroReplicas
+		}
+		ps = deploy.Spec.Template.Spec
+		w.mutateWithSA(ar.Namespace, &ps)
+		templateString = templateSpecPath
 	case metav1.GroupVersionResource{Group: "apps", Version: "v1", Resource: "deployments"}:
 		deploy := appsv1.Deployment{}
 		if err := w.decodeObject(ar.Object.Raw, &deploy); err != nil {
@@ -113,6 +138,17 @@ func (w *Wrapper) GetPodSpec(ar *v1beta1.AdmissionRequest) (string, *corev1.PodS
 		ps = rs.Spec.Template.Spec
 		w.mutateWithSA(ar.Namespace, &ps)
 		templateString = templateSpecPath
+	case metav1.GroupVersionResource{Group: "apps", Version: "v1beta2", Resource: "replicasets"}:
+		rs := appsv1beta2.ReplicaSet{}
+		if err := w.decodeObject(ar.Object.Raw, &rs); err != nil {
+			return "", nil, err
+		}
+		if rs.Spec.Replicas != nil && *rs.Spec.Replicas == int32(0) {
+			return "", nil, ErrObjectHasZeroReplicas
+		}
+		ps = rs.Spec.Template.Spec
+		w.mutateWithSA(ar.Namespace, &ps)
+		templateString = templateSpecPath
 	case metav1.GroupVersionResource{Group: "apps", Version: "v1", Resource: "daemonsets"}:
 		ds := appsv1.DaemonSet{}
 		if err := w.decodeObject(ar.Object.Raw, &ds); err != nil {
@@ -121,8 +157,46 @@ func (w *Wrapper) GetPodSpec(ar *v1beta1.AdmissionRequest) (string, *corev1.PodS
 		ps = ds.Spec.Template.Spec
 		w.mutateWithSA(ar.Namespace, &ps)
 		templateString = templateSpecPath
+	case metav1.GroupVersionResource{Group: "extensions", Version: "v1beta1", Resource: "daemonsets"}:
+		ds := extensionsv1beta1.DaemonSet{}
+		if err := w.decodeObject(ar.Object.Raw, &ds); err != nil {
+			return "", nil, err
+		}
+		ps = ds.Spec.Template.Spec
+		w.mutateWithSA(ar.Namespace, &ps)
+		templateString = templateSpecPath
+	case metav1.GroupVersionResource{Group: "apps", Version: "v1beta2", Resource: "daemonsets"}:
+		ds := appsv1beta2.DaemonSet{}
+		if err := w.decodeObject(ar.Object.Raw, &ds); err != nil {
+			return "", nil, err
+		}
+		ps = ds.Spec.Template.Spec
+		w.mutateWithSA(ar.Namespace, &ps)
+		templateString = templateSpecPath
 	case metav1.GroupVersionResource{Group: "apps", Version: "v1", Resource: "statefulsets"}:
 		sts := appsv1.StatefulSet{}
+		if err := w.decodeObject(ar.Object.Raw, &sts); err != nil {
+			return "", nil, err
+		}
+		if sts.Spec.Replicas != nil && *sts.Spec.Replicas == int32(0) {
+			return "", nil, ErrObjectHasZeroReplicas
+		}
+		ps = sts.Spec.Template.Spec
+		w.mutateWithSA(ar.Namespace, &ps)
+		templateString = templateSpecPath
+	case metav1.GroupVersionResource{Group: "apps", Version: "v1beta1", Resource: "statefulsets"}:
+		sts := appsv1beta1.StatefulSet{}
+		if err := w.decodeObject(ar.Object.Raw, &sts); err != nil {
+			return "", nil, err
+		}
+		if sts.Spec.Replicas != nil && *sts.Spec.Replicas == int32(0) {
+			return "", nil, ErrObjectHasZeroReplicas
+		}
+		ps = sts.Spec.Template.Spec
+		w.mutateWithSA(ar.Namespace, &ps)
+		templateString = templateSpecPath
+	case metav1.GroupVersionResource{Group: "apps", Version: "v1beta2", Resource: "statefulsets"}:
+		sts := appsv1beta2.StatefulSet{}
 		if err := w.decodeObject(ar.Object.Raw, &sts); err != nil {
 			return "", nil, err
 		}
@@ -142,6 +216,14 @@ func (w *Wrapper) GetPodSpec(ar *v1beta1.AdmissionRequest) (string, *corev1.PodS
 		templateString = templateSpecPath
 	case metav1.GroupVersionResource{Group: "batch", Version: "v1beta1", Resource: "cronjobs"}:
 		job := batchv1beta1.CronJob{}
+		if err := w.decodeObject(ar.Object.Raw, &job); err != nil {
+			return "", nil, err
+		}
+		ps = job.Spec.JobTemplate.Spec.Template.Spec //:sob:
+		w.mutateWithSA(ar.Namespace, &ps)
+		templateString = cronJobSpecPath
+	case metav1.GroupVersionResource{Group: "batch", Version: "v2alpha1", Resource: "cronjobs"}:
+		job := batchv2alpha1.CronJob{}
 		if err := w.decodeObject(ar.Object.Raw, &job); err != nil {
 			return "", nil, err
 		}
