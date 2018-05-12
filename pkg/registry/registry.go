@@ -15,8 +15,6 @@
 package registry
 
 import (
-	"fmt"
-
 	"github.com/IBM/portieris/helpers/oauth"
 )
 
@@ -39,5 +37,5 @@ func (c Client) GetContentTrustToken(registryToken, imageRepo, hostname string) 
 	if err != nil {
 		return "", err
 	}
-	return fmt.Sprint(token.Token), nil
+	return token.Token, nil
 }

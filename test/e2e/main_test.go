@@ -42,7 +42,6 @@ const (
 )
 
 func TestMain(m *testing.M) {
-	kubeconfig := flag.String("kubeconfig", "", "kube config path")
 	helmChart := flag.String("helmChart", "", "helm chart location")
 	flag.BoolVar(&noInstall, "no-install", false, "turns off helm chart installation for quicker feedback loops")
 	flag.BoolVar(&testTrustImagePolicy, "trust-image-policy", false, "runs trust tests for image policies")
@@ -65,7 +64,7 @@ func TestMain(m *testing.M) {
 		}
 	}()
 
-	framework, err = testFramework.New(*kubeconfig, *helmChart, noInstall)
+	framework, err = testFramework.New(os.Getenv("KUBECONFIG"), *helmChart, noInstall)
 	if err != nil {
 		log.Printf("error during framework initialisation: %v\n", err)
 		os.Exit(1)
