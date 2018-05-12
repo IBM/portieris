@@ -14,6 +14,10 @@ test-deps: build-deps
 	@go get github.com/onsi/ginkgo/ginkgo
 	@go get github.com/onsi/gomega/...
 
+push:
+	docker build -t $(HUB)/portieris:$(TAG) .
+	docker push $(HUB)/portieris:$(TAG)
+
 test: test-deps
 	$(GOPATH)/bin/gotestcover -v -coverprofile=cover.out ${GOPACKAGES}
 
@@ -32,6 +36,11 @@ lint:
 vet:
 	@set -e; for LINE in ${GOPACKAGES}; do go vet $${LINE} ; done
 
+helm.install.local: push
+	-rm $$(pwd)/portieris-0.2.0.tgz
+	helm package helm/portieris
+	helm install -n portieris $$(pwd)/portieris-0.2.0.tgz --set image.host=$(HUB) --set image.tag=$(TAG)
+
 helm.install:
 	-rm $$(pwd)/portieris-0.2.0.tgz
 	helm package helm/portieris
@@ -42,29 +51,34 @@ helm.clean:
 
 e2e:
 	-helm package install/helm/portieris
-	@go test -v ./test/e2e --kubeconfig $$HOME/.kube/config --helmChart $$(pwd)/portieris-0.2.0.tgz
+	@go test -v ./test/e2e --helmChart $$(pwd)/portieris-0.2.0.tgz
 
-e2e.quick: e2e.quick.trust.imagepolicy e2e.quick.trust.clusterimagepolicy e2e.quick.armada e2e.quick.wildcards e2e.quick.generic
+e2e.local: helm.install.local e2e.quick
+
+e2e.quick: e2e.quick.trust.imagepolicy e2e.quick.trust.clusterimagepolicy e2e.quick.wildcards e2e.quick.generic
+	- kubectl delete namespace $$(kubectl get namespaces | grep -v ibm | grep -v kube | grep -v default | awk '{ print $$1 }' | grep -v NAME)
+
+e2e.quick.armada: e2e.quick.trust.imagepolicy e2e.quick.trust.clusterimagepolicy e2e.quick.armada e2e.quick.wildcards e2e.quick.generic
 	- kubectl delete namespace $$(kubectl get namespaces | grep -v ibm | grep -v kube | grep -v default | awk '{ print $$1 }' | grep -v NAME)
 
 e2e.quick.trust.imagepolicy:
-	@go test -v ./test/e2e --no-install --trust-image-policy --kubeconfig $$HOME/.kube/config --helmChart $$(pwd)/portieris-0.2.0.tgz
+	@go test -v ./test/e2e --no-install --trust-image-policy --helmChart $$(pwd)/portieris-0.2.0.tgz
 	-kubectl delete namespace $$(kubectl get namespaces | grep -v ibm | grep -v kube | grep -v default | awk '{ print $$1 }' | grep -v NAME)
 
 e2e.quick.trust.clusterimagepolicy:
-	@go test -v ./test/e2e --no-install --trust-cluster-image-policy --kubeconfig $$HOME/.kube/config --helmChart $$(pwd)/portieris-0.2.0.tgz
+	@go test -v ./test/e2e --no-install --trust-cluster-image-policy --helmChart $$(pwd)/portieris-0.2.0.tgz
 	-kubectl delete namespace $$(kubectl get namespaces | grep -v ibm | grep -v kube | grep -v default | awk '{ print $$1 }' | grep -v NAME)
 
 e2e.quick.wildcards:
-	@go test -v ./test/e2e --no-install --wildcards-image-policy --kubeconfig $$HOME/.kube/config --helmChart $$(pwd)/portieris-0.2.0.tgz
+	@go test -v ./test/e2e --no-install --wildcards-image-policy --helmChart $$(pwd)/portieris-0.2.0.tgz
 	-kubectl delete namespace $$(kubectl get namespaces | grep -v ibm | grep -v kube | grep -v default | awk '{ print $$1 }' | grep -v NAME)
 
 e2e.quick.armada:
-	@go test -v ./test/e2e --no-install --armada --kubeconfig $$HOME/.kube/config --helmChart $$(pwd)/portieris-0.2.0.tgz
+	@go test -v ./test/e2e --no-install --armada --helmChart $$(pwd)/portieris-0.2.0.tgz
 	-kubectl delete namespace $$(kubectl get namespaces | grep -v ibm | grep -v kube | grep -v default | awk '{ print $$1 }' | grep -v NAME)
 
 e2e.quick.generic:
-	@go test -v ./test/e2e --no-install --generic --kubeconfig $$HOME/.kube/config --helmChart $$(pwd)/portieris-0.2.0.tgz
+	@go test -v ./test/e2e --no-install --generic --helmChart $$(pwd)/portieris-0.2.0.tgz
 	-kubectl delete namespace $$(kubectl get namespaces | grep -v ibm | grep -v kube | grep -v default | awk '{ print $$1 }' | grep -v NAME)
 
 e2e.helm:
