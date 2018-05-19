@@ -146,19 +146,40 @@ func TestImage(t *testing.T) {
 			})
 		})
 
-		Describe("When the image is valid but it's not an IBM repository", func() {
+		Describe("When the image is valid but it's not an supported repository", func() {
 			It("should be OK", func() {
 				image, err := NewReference("test.com/namespace/name")
 				Expect(err).ToNot(HaveOccurred())
+				_, trustErr := image.GetContentTrustURL()
+				Expect(trustErr).To(HaveOccurred())
+			})
+		})
+
+		Describe("When the image is valid and it's from docker hub", func() {
+			It("should be OK", func() {
+				image, err := NewReference("namespace/name")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(err).ToNot(HaveOccurred())
 				Expect(image).ToNot(BeNil())
-				Expect(image.GetHostname()).To(Equal("test.com"))
+				Expect(image.GetHostname()).To(Equal("docker.io"))
 				Expect(image.GetPort()).To(Equal(""))
 				Expect(image.HasIBMRepo()).To(BeFalse())
-				Expect(image.GetRegistryURL()).To(Equal("https://test.com"))
-				Expect(image.GetContentTrustURL()).To(Equal("https://test.com:4443"))
-				Expect(image.GetTag()).To(Equal("latest"))
-				Expect(image.NameWithTag()).To(Equal("test.com/namespace/name:latest"))
-				Expect(image.NameWithoutTag()).To(Equal("test.com/namespace/name"))
+				Expect(image.GetRegistryURL()).To(Equal("https://docker.io"))
+				Expect(image.GetContentTrustURL()).To(Equal("https://notary.docker.io"))
+			})
+		})
+
+		Describe("When the image is valid and it's from docker hub", func() {
+			It("should be OK", func() {
+				image, err := NewReference("quay.io/namespace/name")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(err).ToNot(HaveOccurred())
+				Expect(image).ToNot(BeNil())
+				Expect(image.GetHostname()).To(Equal("quay.io"))
+				Expect(image.GetPort()).To(Equal(""))
+				Expect(image.HasIBMRepo()).To(BeFalse())
+				Expect(image.GetRegistryURL()).To(Equal("https://quay.io"))
+				Expect(image.GetContentTrustURL()).To(Equal("https://quay.io:443"))
 			})
 		})
 

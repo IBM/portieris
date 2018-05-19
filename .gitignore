@@ -6,3 +6,5 @@ helm/certs
 *.tgz
 
 bin
+.idea
+.go-version

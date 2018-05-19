@@ -106,12 +106,6 @@ containerLoop:
 		// Trust is enforced
 		glog.Info("Trust is enforced")
 
-		// TODO: Support other registries
-		if !img.HasIBMRepo() {
-			a.StringToAdmissionResponse(fmt.Sprintf("Deny %q, trust is not supported for images from this registry: %s", img.String(), img.GetHostname()))
-			continue containerLoop
-		}
-
 		// Make sure image sure there is a ImagePullSecret defined
 		// TODO: This prevents use of signed publically available images with publically available signing data
 		var registryToken string
@@ -149,7 +143,11 @@ containerLoop:
 
 			// Get image digest
 			glog.Info("getting signed image...")
-			notaryURL := img.GetContentTrustURL()
+			notaryURL, err := img.GetContentTrustURL()
+			if err != nil {
+				a.StringToAdmissionResponse(fmt.Sprintf("Trust Server/Image Configuration Error: %v", err.Error()))
+				continue containerLoop
+			}
 			digest, err := c.getDigest(notaryURL, img.NameWithoutTag(), notaryToken, img.GetTag(), signers)
 			if err != nil {
 				if strings.Contains(err.Error(), "401") {
