@@ -34,7 +34,7 @@ openssl x509 -req -in $CERT_DIR/server.csr -CA $CERT_DIR/caCert.pem -CAkey $CERT
 outfile=$CERT_DIR/certs.go
 
 cat > $outfile << EOF
-// Copyright 2018 IBM
+// Copyright 2018 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the \"License\");
 // you may not use this file except in compliance with the License.
