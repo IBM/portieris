@@ -28,15 +28,15 @@ func Identity(value string) TrustServerFn {
 	}
 }
 
-// IbmRegional Ibm Sponsored Trust server, depends on the regional part of the docker image hostname.
-func IbmRegional(registryHostname string, imageHostname string) string {
-	trustPrefix := "bluemix.net:4443"
-	return "https://" + strings.TrimSuffix(imageHostname, registryHostname) + trustPrefix
+// IBMRegional IBM Sponsored Trust server, depends on the regional part of the docker image hostname.
+func IBMRegional(registryHostname string, imageHostname string) string {
+	trustSuffix := "bluemix.net:4443"
+	return "https://" + strings.TrimSuffix(imageHostname, registryHostname) + trustSuffix
 }
 
 // TrustServerMap Easy way to link known registries to their sponsored trust servers
 var TrustServerMap = map[string]TrustServerFn{
 	"docker.io":   Identity("https://notary.docker.io"),
 	"quay.io":     Identity("https://quay.io:4443"),
-	"bluemix.net": IbmRegional,
+	"bluemix.net": IBMRegional,
 }
