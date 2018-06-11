@@ -20,7 +20,14 @@ Portieris' Admission Webhook is configured to fail closed. Three instances of Po
 
 ## Current limitations
 
-Portieris only supports sourcing trust data from the IBM Cloud Notary servers. You can deploy images from other servers while Portieris is installed, but you must disable trust enforcement for these images. The default ClusterImagePolicy enforces trust disabled for "*". We are looking to support additional Notary servers. If you want a particular Notary server to be supported, [raise an issue](https://github.com/ibm/portieris/issues/new).
+Portieris only supports sourcing trust data from the following registries:
+* IBM Regional Registries
+* Quay.io
+* Docker Hub
+
+You can deploy images from other servers while Portieris is installed, but you must disable trust enforcement for these images. The default ClusterImagePolicy enforces trust disabled for "*".
+We are looking to support additional Notary servers and support for configuring your own via CRD configuration.
+If you want a particular Notary server to be supported, [raise an issue](https://github.com/ibm/portieris/issues/new). Its pretty easy to add a new registry, see [Trust Map](https://github.com/ibm/portieris/tree/master/helpers/trustmap/trust_server_map.go) if interested in helping.
 
 ## Installing Portieris
 
