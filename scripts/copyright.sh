@@ -5,7 +5,7 @@ GOSRCFILES=($(find . -name "*.go" | grep -v vendor))
 for GOFILE in "${GOSRCFILES[@]}"; do
   # If no copyright at all
   if ! grep -q "Licensed under the Apache License, Version 2.0" $GOFILE; then
-    echo "// Copyright 2018 IBM
+    echo "// Copyright 2018 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the \"License\");
 // you may not use this file except in compliance with the License.
