@@ -18,6 +18,8 @@ import (
 	"net/url"
 	"strings"
 
+	"fmt"
+	"github.com/IBM/portieris/helpers/trustmap"
 	"github.com/docker/distribution/reference"
 )
 
@@ -113,9 +115,18 @@ func (r Reference) GetRegistryURL() string {
 }
 
 // GetContentTrustURL returns the Content Trust URL.
-func (r Reference) GetContentTrustURL() string {
-	// TODO: Add support for notaries from other repos other than IBM
-	return "https://" + r.hostname + ":4443"
+func (r Reference) GetContentTrustURL() (string, error) {
+	var output string
+	var err error
+	for registry, trustServerFn := range trustmap.TrustServerMap {
+		if strings.HasSuffix(r.hostname, registry) {
+			output = trustServerFn(registry, r.hostname)
+		}
+	}
+	if output == "" {
+		err = fmt.Errorf("no trust server could be found")
+	}
+	return output, err
 }
 
 // GetTag returns the tag.

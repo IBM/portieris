@@ -363,7 +363,7 @@
     "pkg/apis/apiextensions/v1beta1",
     "pkg/client/clientset/internalclientset/scheme"
   ]
-  revision = "7b39da1b358297541946b7c7b8e6c276a2085f02"
+  revision = "ab3e6971b48ebf5dbda5d69c8295bb667add6f8d"
 
 [[projects]]
   branch = "master"
@@ -372,9 +372,6 @@
     "pkg/api/errors",
     "pkg/api/meta",
     "pkg/api/resource",
-    "pkg/apimachinery",
-    "pkg/apimachinery/announced",
-    "pkg/apimachinery/registered",
     "pkg/apis/meta/internalversion",
     "pkg/apis/meta/v1",
     "pkg/apis/meta/v1/unstructured",
@@ -508,6 +505,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c91aa91bd8ca9d4a9fee249a817f4174bf52d0f121b978e62150ea6fc0202a7b"
+  inputs-digest = "cff38869f87443af496550a6aa018dd0166cba72df2c3beced5f591d88e9c5c5"
   solver-name = "gps-cdcl"
   solver-version = 1
