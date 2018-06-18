@@ -21,7 +21,7 @@ Portieris' Admission Webhook is configured to fail closed. Three instances of Po
 ## Current limitations
 
 Portieris only supports sourcing trust data from the following registries:
-* IBM Regional Registries
+* IBM Cloud Container Registry
 * Quay.io
 * Docker Hub
 
