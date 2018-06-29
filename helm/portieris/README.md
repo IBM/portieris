@@ -60,5 +60,5 @@ For information about configuring security policies, and an explanation of the s
     ```
 2. Remove the chart.
     ```
-    helm delete --purge cise
+    helm delete --purge portieris
     ```
