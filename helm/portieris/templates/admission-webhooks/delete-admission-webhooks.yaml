@@ -2,7 +2,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: delete-admission-webhooks
-  namespace: ibm-system
+  namespace: {{ .Values.namespace }}
   annotations:
     helm.sh/hook: pre-delete
     helm.sh/hook-weight: "-10"

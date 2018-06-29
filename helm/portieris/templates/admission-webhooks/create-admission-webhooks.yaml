@@ -2,7 +2,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: create-admission-webhooks
-  namespace: ibm-system
+  namespace: {{ .Values.namespace }}
   annotations:
     helm.sh/hook: post-install
     helm.sh/hook-weight: "5"
