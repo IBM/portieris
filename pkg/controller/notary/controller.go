@@ -173,7 +173,7 @@ func (c *Controller) mutatePodSpec(namespace, specPath string, pod corev1.PodSpe
 					glog.Warningf("Failed to get trust information for %q: %v", img.String(), err)
 					continue containerLoop
 				}
-				glog.Infof("Mutation #: %d  Image name: %s", containerIndex+1, img.String())
+				glog.Infof("Mutation #: %s %d  Image name: %s", containerType, containerIndex+1, img.String())
 				if strings.Contains(container.Image, img.String()) {
 					glog.Infof("Mutated to: %s@sha256:%s", img.String(), digest.String())
 					patches = append(patches, types.JSONPatch{

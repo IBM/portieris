@@ -679,7 +679,6 @@ var _ = Describe("Main", func() {
 					req := newFakeRequestInitContainer("registry.bluemix.net/hello", "registry.ng.bluemix.net/goodbye")
 					wh.HandleAdmissionRequest(w, req)
 					parseResponse()
-					fmt.Println(resp.Response.Allowed)
 					Expect(resp.Response.Allowed).To(BeFalse())
 				})
 			})
