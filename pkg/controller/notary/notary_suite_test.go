@@ -740,6 +740,134 @@ func newFakeRequestMultiContainer(image, image1 string) *http.Request {
 }
 
 // newFakeRequest creates a new http request
+func newFakeRequestInitContainer(initImage, image string) *http.Request {
+	// TODO: Delete what we don't need for unit tests
+	req, _ := http.NewRequest("POST", "/", bytes.NewBufferString(fmt.Sprintf(`
+		{
+		  "kind": "AdmissionReview",
+		  "apiVersion": "admission.k8s.io/v1beta1",
+		  "request": {
+		    "uid": "ed782967-1c99-11e8-936d-08002789d446",
+		    "kind": {
+		      "group": "",
+		      "version": "v1",
+		      "kind": "Pod"
+		    },
+		    "resource": {
+		      "group": "",
+		      "version": "v1",
+		      "resource": "pods"
+		    },
+		    "namespace": "default",
+		    "operation": "CREATE",
+		    "userInfo": {
+		      "username": "minikube-user",
+		      "groups": [
+		        "system:masters",
+		        "system:authenticated"
+		      ]
+		    },
+		    "object": {
+		      "metadata": {
+		        "name": "nginx",
+		        "namespace": "default",
+		        "creationTimestamp": null
+		      },
+		      "spec": {
+		        "volumes": [
+		          {
+		            "name": "default-token-xff4f",
+		            "secret": {
+		              "secretName": "default-token-xff4f"
+		            }
+		          }
+		        ],
+                "initContainers" : [
+				{
+		            "name": "nginx",
+		            "image": "%s",
+		            "ports": [
+		              {
+		                "hostPort": 8080,
+		                "containerPort": 8080,
+		                "protocol": "TCP"
+		              }
+		            ],
+		            "resources": {},
+		            "volumeMounts": [
+		              {
+		                "name": "default-token-xff4f",
+		                "readOnly": true,
+		                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount"
+		              }
+		            ],
+		            "terminationMessagePath": "/dev/termination-log",
+		            "terminationMessagePolicy": "File",
+		            "imagePullPolicy": "Always"
+					}
+                ],
+		        "containers": [
+                 {
+		            "name": "statsd",
+		            "image": "%s",
+		            "ports": [
+		              {
+		                "hostPort": 8080,
+		                "containerPort": 8080,
+		                "protocol": "TCP"
+		              }
+		            ],
+		            "resources": {},
+		            "volumeMounts": [
+		              {
+		                "name": "default-token-xff4f",
+		                "readOnly": true,
+		                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount"
+		              }
+		            ],
+		            "terminationMessagePath": "/dev/termination-log",
+		            "terminationMessagePolicy": "File",
+		            "imagePullPolicy": "Always"
+		          }
+		        ],
+		        "restartPolicy": "Always",
+		        "terminationGracePeriodSeconds": 30,
+		        "dnsPolicy": "ClusterFirst",
+		        "serviceAccountName": "default",
+		        "serviceAccount": "default",
+		        "hostNetwork": true,
+		        "securityContext": {},
+		        "imagePullSecrets": [
+		          {
+		            "name": "regsecret"
+		          }
+		        ],
+		        "schedulerName": "default-scheduler",
+		        "tolerations": [
+		          {
+		            "key": "node.kubernetes.io/not-ready",
+		            "operator": "Exists",
+		            "effect": "NoExecute",
+		            "tolerationSeconds": 300
+		          },
+		          {
+		            "key": "node.kubernetes.io/unreachable",
+		            "operator": "Exists",
+		            "effect": "NoExecute",
+		            "tolerationSeconds": 300
+		          }
+		        ]
+		      },
+		      "status": {}
+		    },
+		    "oldObject": null
+		  }
+		}`, initImage, image)))
+	req.Header.Set("Content-Type", "application/json")
+	return req
+}
+
+// newFakeRequest creates a new http request
 func newFakeRequestDeployment(image string) *http.Request {
 	// TODO: Delete what we don't need for unit tests
 	req, _ := http.NewRequest("POST", "/", bytes.NewBufferString(fmt.Sprintf(`

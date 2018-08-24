@@ -84,97 +84,110 @@ func (c *Controller) mutatePodSpec(namespace, specPath string, pod corev1.PodSpe
 	patches := []types.JSONPatch{}
 
 	// Iterate over each container image specified
-containerLoop:
-	for containerIndex, container := range pod.Containers {
-		var policy *securityenforcementv1beta1.Policy
-		img, err := image.NewReference(container.Image)
-		if err != nil {
-			glog.Error(err)
-			a.StringToAdmissionResponse(fmt.Sprintf("Deny %q, invalid image name", container.Image))
-			continue containerLoop
+	for _, containerType := range []string{"initContainers", "containers"} {
+		var containers []corev1.Container
+		switch containerType {
+		case "initContainers":
+			containers = pod.InitContainers
+		case "containers":
+			containers = pod.Containers
+		default:
+			a.StringToAdmissionResponse("Unhandled container type")
+			return a.Flush()
 		}
 
-		glog.Infof("Container Image: %s   Namespace: %s", img.String(), namespace)
-		if policy, err = c.policyClient.GetPolicyToEnforce(namespace, img.String()); err != nil {
-			a.StringToAdmissionResponse(err.Error())
-			continue containerLoop
-		} else if policy == nil || !(policy.Trust.Enabled != nil && *policy.Trust.Enabled == true) {
-			a.SetAllowed()
-			continue containerLoop
-		}
-
-		// Trust is enforced
-		glog.Info("Trust is enforced")
-
-		// Make sure image sure there is a ImagePullSecret defined
-		// TODO: This prevents use of signed publically available images with publically available signing data
-		var registryToken string
-		if len(pod.ImagePullSecrets) == 0 {
-			a.StringToAdmissionResponse(fmt.Sprintf("Deny %q, no ImagePullSecret defined for %s", img.String(), img.GetHostname()))
-			continue containerLoop
-		}
-
-	secretLoop:
-		for _, secret := range pod.ImagePullSecrets {
-			registryToken, err = c.kubeClientsetWrapper.GetSecretToken(namespace, secret.Name, img.GetHostname())
+	containerLoop:
+		for containerIndex, container := range containers {
+			var policy *securityenforcementv1beta1.Policy
+			img, err := image.NewReference(container.Image)
 			if err != nil {
 				glog.Error(err)
-				continue secretLoop
-			}
-
-			notaryToken, err := c.cr.GetContentTrustToken(registryToken, img.NameWithoutTag(), img.GetRegistryURL())
-			if err != nil {
-				glog.Error(err)
-				continue secretLoop
-			}
-
-			var signers []Signer
-			if policy.Trust.SignerSecrets != nil {
-				// Generate a []Singer with the values for each signerSecret
-				signers = make([]Signer, len(policy.Trust.SignerSecrets))
-				for i, secretName := range policy.Trust.SignerSecrets {
-					signers[i], err = c.getSignerSecret(namespace, secretName.Name)
-					if err != nil {
-						a.StringToAdmissionResponse(fmt.Sprintf("Deny %q, could not get signerSecret from your cluster, %s", img.String(), err.Error()))
-						continue containerLoop
-					}
-				}
-			}
-
-			// Get image digest
-			glog.Info("getting signed image...")
-			notaryURL, err := img.GetContentTrustURL()
-			if err != nil {
-				a.StringToAdmissionResponse(fmt.Sprintf("Trust Server/Image Configuration Error: %v", err.Error()))
+				a.StringToAdmissionResponse(fmt.Sprintf("Deny %q, invalid image name", container.Image))
 				continue containerLoop
 			}
-			digest, err := c.getDigest(notaryURL, img.NameWithoutTag(), notaryToken, img.GetTag(), signers)
-			if err != nil {
-				if strings.Contains(err.Error(), "401") {
+
+			glog.Infof("Container Image: %s   Namespace: %s", img.String(), namespace)
+			if policy, err = c.policyClient.GetPolicyToEnforce(namespace, img.String()); err != nil {
+				a.StringToAdmissionResponse(err.Error())
+				continue containerLoop
+			} else if policy == nil || !(policy.Trust.Enabled != nil && *policy.Trust.Enabled == true) {
+				a.SetAllowed()
+				continue containerLoop
+			}
+
+			// Trust is enforced
+			glog.Info("Trust is enforced")
+
+			// Make sure image sure there is a ImagePullSecret defined
+			// TODO: This prevents use of signed publically available images with publically available signing data
+			var registryToken string
+			if len(pod.ImagePullSecrets) == 0 {
+				a.StringToAdmissionResponse(fmt.Sprintf("Deny %q, no ImagePullSecret defined for %s", img.String(), img.GetHostname()))
+				continue containerLoop
+			}
+
+		secretLoop:
+			for _, secret := range pod.ImagePullSecrets {
+				registryToken, err = c.kubeClientsetWrapper.GetSecretToken(namespace, secret.Name, img.GetHostname())
+				if err != nil {
+					glog.Error(err)
 					continue secretLoop
 				}
-				a.StringToAdmissionResponse(fmt.Sprintf("Deny %q, failed to get content trust information: %s", img.String(), err.Error()))
-				if _, ok := err.(store.ErrServerUnavailable); ok {
-					glog.Errorf("Trust server unavailable: %v", err)
-					return a.Flush()
+
+				notaryToken, err := c.cr.GetContentTrustToken(registryToken, img.NameWithoutTag(), img.GetRegistryURL())
+				if err != nil {
+					glog.Error(err)
+					continue secretLoop
 				}
-				glog.Warningf("Failed to get trust information for %q: %v", img.String(), err)
-				continue containerLoop
+
+				var signers []Signer
+				if policy.Trust.SignerSecrets != nil {
+					// Generate a []Singer with the values for each signerSecret
+					signers = make([]Signer, len(policy.Trust.SignerSecrets))
+					for i, secretName := range policy.Trust.SignerSecrets {
+						signers[i], err = c.getSignerSecret(namespace, secretName.Name)
+						if err != nil {
+							a.StringToAdmissionResponse(fmt.Sprintf("Deny %q, could not get signerSecret from your cluster, %s", img.String(), err.Error()))
+							continue containerLoop
+						}
+					}
+				}
+
+				// Get image digest
+				glog.Info("getting signed image...")
+				notaryURL, err := img.GetContentTrustURL()
+				if err != nil {
+					a.StringToAdmissionResponse(fmt.Sprintf("Trust Server/Image Configuration Error: %v", err.Error()))
+					continue containerLoop
+				}
+				digest, err := c.getDigest(notaryURL, img.NameWithoutTag(), notaryToken, img.GetTag(), signers)
+				if err != nil {
+					if strings.Contains(err.Error(), "401") {
+						continue secretLoop
+					}
+					a.StringToAdmissionResponse(fmt.Sprintf("Deny %q, failed to get content trust information: %s", img.String(), err.Error()))
+					if _, ok := err.(store.ErrServerUnavailable); ok {
+						glog.Errorf("Trust server unavailable: %v", err)
+						return a.Flush()
+					}
+					glog.Warningf("Failed to get trust information for %q: %v", img.String(), err)
+					continue containerLoop
+				}
+				glog.Infof("Mutation #: %s %d  Image name: %s", containerType, containerIndex+1, img.String())
+				if strings.Contains(container.Image, img.String()) {
+					glog.Infof("Mutated to: %s@sha256:%s", img.String(), digest.String())
+					patches = append(patches, types.JSONPatch{
+						Op:    "replace",
+						Path:  fmt.Sprintf("%s/%s/%s/image", specPath, containerType, strconv.Itoa(containerIndex)),
+						Value: fmt.Sprintf("%s@sha256:%s", img.NameWithTag(), digest.String()),
+					})
+				}
+				a.SetAllowed()
+				break secretLoop
 			}
-			glog.Infof("Mutation #: %d  Image name: %s", containerIndex+1, img.String())
-			if strings.Contains(container.Image, img.String()) {
-				glog.Infof("Mutated to: %s@sha256:%s", img.String(), digest.String())
-				patches = append(patches, types.JSONPatch{
-					Op:    "replace",
-					Path:  fmt.Sprintf("%s/containers/%s/image", specPath, strconv.Itoa(containerIndex)),
-					Value: fmt.Sprintf("%s@sha256:%s", img.NameWithTag(), digest.String()),
-				})
+			if !a.IsAllowed() {
+				a.StringToAdmissionResponse(fmt.Sprintf("Deny %q, no valid ImagePullSecret defined for %s", img.String(), img.GetHostname()))
 			}
-			a.SetAllowed()
-			break secretLoop
-		}
-		if !a.IsAllowed() {
-			a.StringToAdmissionResponse(fmt.Sprintf("Deny %q, no valid ImagePullSecret defined for %s", img.String(), img.GetHostname()))
 		}
 	}
 

@@ -657,6 +657,72 @@ var _ = Describe("Main", func() {
 					Expect(resp.Response.Allowed).To(BeFalse())
 				})
 			})
+
+			Context("if request container initContainers with non-compliant images", func() {
+				It("should deny the admission of the request", func() {
+					imageRepos := `"repositories": [
+						{
+							"name": "registry.ng.bluemix.net/*",
+							"policy": {
+								"trust": {
+									"enabled": false
+								},
+								"va": {
+									"enabled": false
+								}
+							}
+						}
+					]`
+					clusterRepos := `"repositories": []`
+					fakeEnforcer(imageRepos, clusterRepos)
+					updateController()
+					req := newFakeRequestInitContainer("registry.bluemix.net/hello", "registry.ng.bluemix.net/goodbye")
+					wh.HandleAdmissionRequest(w, req)
+					parseResponse()
+					Expect(resp.Response.Allowed).To(BeFalse())
+				})
+			})
+
+			Context("if `trust` is enabled, initContainer pods require signing", func() {
+				It("should correctly mutate the initContainer field in the podspec", func() {
+					imageRepos := `"repositories": [
+                            {
+								"name": "registry.bluemix.net/*",
+								"policy": {
+									"trust": {
+										"enabled": false
+									},
+									"va": {
+										"enabled": false
+									}
+								}
+							},
+							{
+								"name": "registry.ng.bluemix.net/*",
+								"policy": {
+									"trust": {
+										"enabled": true
+									},
+									"va": {
+										"enabled": false
+									}
+								}
+							}
+						]`
+					clusterRepos := `"repositories": []`
+					fakeEnforcer(imageRepos, clusterRepos)
+					fakeGetRepo()
+					updateController()
+					req := newFakeRequestInitContainer("registry.ng.bluemix.net/hello", "registry.bluemix.net/nosign")
+					wh.HandleAdmissionRequest(w, req)
+					parseResponse()
+					Expect(string(resp.Response.Patch)).To(ContainSubstring("registry.ng.bluemix.net/hello:latest@sha256:31323334353637383930"))
+					// Check if added patch contains patch to initContainers
+					Expect(string(resp.Response.Patch)).To(ContainSubstring("initContainers"))
+					Expect(resp.Response.Allowed).To(BeTrue())
+				})
+			})
+
 		})
 	})
 })
