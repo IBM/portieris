@@ -47,14 +47,14 @@ var _ = Describe("Main", func() {
 	Describe("serveMutatePods", func() {
 
 		var (
-			imagePolicyPayload                          *bytes.Buffer
-			clusterImagePolicyPayload                   *bytes.Buffer
-			namespace                                   string
-			secretName, secretName1, badSecretName      string
-			registry                                    string
-			fakeSecret, fakeSecret1, fakeSecretWrongReg *corev1.Secret
-			w                                           *httptest.ResponseRecorder
-			resp                                        *v1beta1.AdmissionReview
+			imagePolicyPayload                                       *bytes.Buffer
+			clusterImagePolicyPayload                                *bytes.Buffer
+			namespace                                                string
+			secretName, secretName1, secretName2, badSecretName      string
+			registry1, registry2                                     string
+			fakeSecret, fakeSecret1, fakeSecret2, fakeSecretWrongReg *corev1.Secret
+			w                                                        *httptest.ResponseRecorder
+			resp                                                     *v1beta1.AdmissionReview
 		)
 
 		fakeGetRepo := func() {
@@ -94,14 +94,18 @@ var _ = Describe("Main", func() {
 			namespace = metav1.NamespaceDefault
 			secretName = "regsecret"
 			secretName1 = "regsecret1"
-			registry = "registry.ng.bluemix.net"
+			secretName2 = "regsecret3"
+			registry1 = "registry.ng.bluemix.net"
+			registry2 = "registry.bluemix.net"
+
 			badSecretName = "badSecretName"
 
 			// Fake kube objects
-			fakeSecret = newFakeSecret(secretName, namespace, registry)
-			fakeSecret1 = newFakeSecret(secretName1, namespace, registry)
+			fakeSecret = newFakeSecret(secretName, namespace, registry1)
+			fakeSecret1 = newFakeSecret(secretName1, namespace, registry1)
+			fakeSecret2 = newFakeSecret(secretName2, namespace, registry2)
 			fakeSecretWrongReg = newFakeSecret(badSecretName, namespace, "blah")
-			kubeClientset = k8sfake.NewSimpleClientset(fakeSecret, fakeSecretWrongReg, fakeSecret1)
+			kubeClientset = k8sfake.NewSimpleClientset(fakeSecret, fakeSecretWrongReg, fakeSecret1, fakeSecret2)
 			kubeWrapper = kubernetes.NewKubeClientsetWrapper(kubeClientset)
 
 			policies := []runtime.Object{}
@@ -583,6 +587,38 @@ var _ = Describe("Main", func() {
 					wh.HandleAdmissionRequest(w, req)
 					parseResponse()
 					Expect(len(trust.GetNotaryRepoArgsForCall)).To(Equal(1))
+					Expect(trust.GetNotaryRepoArgsForCall[0].Server).To(Equal("https://registry.ng.bluemix.net:4443"))
+					Expect(resp.Response.Allowed).To(BeFalse())
+					Expect(resp.Response.Result.Message).To(BeIdenticalTo("\n" + `Deny "registry.ng.bluemix.net/hello", failed to get content trust information: unable to reach trust server at this time: 0.`))
+				})
+			})
+
+			Context("if `trust is enabled`, with custom trust server and there is a server failure", func() {
+				It("should fail immediately", func() {
+					imageRepos := `"repositories": [
+							{
+								"name": "registry.ng.bluemix.net/*",
+								"policy": {
+									"trust": {
+										"enabled": true,
+										"trustServer": "https://some-trust-server.com:4443"
+									},
+									"va": {
+										"enabled": false
+									}
+								}
+							}
+						]`
+					clusterRepos := `"repositories": []`
+					fakeEnforcer(imageRepos, clusterRepos)
+					trust = &fakenotary.FakeNotary{} // Wipe out the stubbed good notary response that fakeEnforcer sets up
+					trust.GetNotaryRepoReturns(nil, store.ErrServerUnavailable{})
+					updateController()
+					req := newFakeRequestMultiContainer("registry.ng.bluemix.net/hello", "registry.ng.bluemix.net/goodbye")
+					wh.HandleAdmissionRequest(w, req)
+					parseResponse()
+					Expect(len(trust.GetNotaryRepoArgsForCall)).To(Equal(1))
+					Expect(trust.GetNotaryRepoArgsForCall[0].Server).To(Equal("https://some-trust-server.com:4443"))
 					Expect(resp.Response.Allowed).To(BeFalse())
 					Expect(resp.Response.Result.Message).To(BeIdenticalTo("\n" + `Deny "registry.ng.bluemix.net/hello", failed to get content trust information: unable to reach trust server at this time: 0.`))
 				})
@@ -613,6 +649,42 @@ var _ = Describe("Main", func() {
 					wh.HandleAdmissionRequest(w, req)
 					parseResponse()
 					Expect(len(trust.GetNotaryRepoArgsForCall)).To(Equal(2))
+					Expect(trust.GetNotaryRepoArgsForCall[0].Server).To(Equal("https://registry.ng.bluemix.net:4443"))
+					Expect(trust.GetNotaryRepoArgsForCall[1].Server).To(Equal("https://registry.ng.bluemix.net:4443"))
+					Expect(resp.Response.Allowed).To(BeFalse())
+					Expect(resp.Response.Result.Message).To(ContainSubstring(`Deny "registry.ng.bluemix.net/hello", failed to get content trust information: FAKE_NO_SIGNED_IMAGE_ERROR`))
+					Expect(resp.Response.Result.Message).To(ContainSubstring(`Deny "registry.ng.bluemix.net/goodbye", failed to get content trust information: FAKE_NO_SIGNED_IMAGE_ERROR`))
+				})
+			})
+
+			Context("if `trust is enabled`, with custom trust server and there mulitple containers in the pod", func() {
+				It("should return all failures", func() {
+					imageRepos := `"repositories": [
+							{
+								"name": "registry.ng.bluemix.net/*",
+								"policy": {
+									"trust": {
+										"enabled": true,
+										"trustServer": "https://some-trust-server.com:4443"
+									},
+									"va": {
+										"enabled": false
+									}
+								}
+							}
+						]`
+					clusterRepos := `"repositories": []`
+					fakeEnforcer(imageRepos, clusterRepos)
+					trust = &fakenotary.FakeNotary{} // Wipe out the stubbed good notary response that fakeEnforcer sets up
+					trust.GetNotaryRepoReturns(nil, fmt.Errorf("FAKE_NO_SIGNED_IMAGE_ERROR"))
+					trust.GetNotaryRepoReturns(nil, fmt.Errorf("FAKE_NO_SIGNED_IMAGE_ERROR"))
+					updateController()
+					req := newFakeRequestMultiContainer("registry.ng.bluemix.net/hello", "registry.ng.bluemix.net/goodbye")
+					wh.HandleAdmissionRequest(w, req)
+					parseResponse()
+					Expect(len(trust.GetNotaryRepoArgsForCall)).To(Equal(2))
+					Expect(trust.GetNotaryRepoArgsForCall[0].Server).To(Equal("https://some-trust-server.com:4443"))
+					Expect(trust.GetNotaryRepoArgsForCall[1].Server).To(Equal("https://some-trust-server.com:4443"))
 					Expect(resp.Response.Allowed).To(BeFalse())
 					Expect(resp.Response.Result.Message).To(ContainSubstring(`Deny "registry.ng.bluemix.net/hello", failed to get content trust information: FAKE_NO_SIGNED_IMAGE_ERROR`))
 					Expect(resp.Response.Result.Message).To(ContainSubstring(`Deny "registry.ng.bluemix.net/goodbye", failed to get content trust information: FAKE_NO_SIGNED_IMAGE_ERROR`))
@@ -654,6 +726,52 @@ var _ = Describe("Main", func() {
 					wh.HandleAdmissionRequest(w, req)
 					parseResponse()
 					Expect(len(trust.GetNotaryRepoArgsForCall)).To(Equal(1))
+					Expect(trust.GetNotaryRepoArgsForCall[0].Server).To(Equal("https://registry.ng.bluemix.net:4443"))
+					Expect(resp.Response.Allowed).To(BeFalse())
+				})
+			})
+
+			Context("if the pod has 2 containers, with custom trust server that have different policies we should honor those policies correctly", func() {
+				It("should allow the image", func() {
+					imageRepos := `"repositories": [
+						{
+							"name": "registry.ng.bluemix.net/hello",
+							"policy": {
+								"trust": {
+									"enabled": true
+								},
+								"va": {
+									"enabled": false
+								}
+							}
+						},
+						{
+							"name": "registry.bluemix.net/goodbye",
+							"policy": {
+								"trust": {
+									"enabled": true,
+									"trustServer": "https://some-trust-server.com:4443"
+								},
+								"va": {
+									"enabled": false
+								}
+							}
+						}
+					]`
+					clusterRepos := `"repositories": []`
+					fakeEnforcer(imageRepos, clusterRepos)
+					trust = &fakenotary.FakeNotary{} // Wipe out the stubbed good notary response that fakeEnforcer sets up
+					trust.GetNotaryRepoReturns(nil, fmt.Errorf("some error"))
+					trust.GetNotaryRepoReturns(nil, fmt.Errorf("some error"))
+					updateController()
+					req := newFakeRequestMultiContainerMultiSecret("registry.ng.bluemix.net/hello", "registry.bluemix.net/goodbye")
+					wh.HandleAdmissionRequest(w, req)
+					parseResponse()
+					Expect(len(trust.GetNotaryRepoArgsForCall)).To(Equal(2))
+					Expect(trust.GetNotaryRepoArgsForCall[0].Server).To(Equal("https://registry.ng.bluemix.net:4443"))
+					Expect(trust.GetNotaryRepoArgsForCall[0].Image).To(Equal("registry.ng.bluemix.net/hello"))
+					Expect(trust.GetNotaryRepoArgsForCall[1].Server).To(Equal("https://some-trust-server.com:4443"))
+					Expect(trust.GetNotaryRepoArgsForCall[1].Image).To(Equal("registry.bluemix.net/goodbye"))
 					Expect(resp.Response.Allowed).To(BeFalse())
 				})
 			})

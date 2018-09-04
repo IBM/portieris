@@ -77,7 +77,7 @@ func (f *Framework) CreateNamespaceWithIPS(name string) (*corev1.Namespace, erro
 	}
 	sa := generateServiceAccount("default")
 	sa.ImagePullSecrets = []corev1.LocalObjectReference{
-		corev1.LocalObjectReference{Name: "bluemix-default-secret-international"},
+		{Name: "bluemix-default-secret-international"},
 	}
 	if _, err := f.KubeClient.CoreV1().ServiceAccounts(namespace.Name).Update(sa); err != nil {
 		return nil, fmt.Errorf("error adding imagePullSecret to ServiceAccount: %v", err)

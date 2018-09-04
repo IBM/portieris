@@ -35,10 +35,10 @@ var _ = Describe("Types", func() {
 		It("policy should be nil", func() {
 			apl := ImagePolicyList{
 				Items: []ImagePolicy{
-					ImagePolicy{
+					{
 						Spec: PolicySpec{
 							Repositories: []Repository{
-								Repository{
+								{
 									Name: "test.com/*",
 								},
 							},
@@ -57,10 +57,10 @@ var _ = Describe("Types", func() {
 			It("Should return a policy but `trust` and `va` should be nil", func() {
 				apl := ImagePolicyList{
 					Items: []ImagePolicy{
-						ImagePolicy{
+						{
 							Spec: PolicySpec{
 								Repositories: []Repository{
-									Repository{
+									{
 										Name: "test.com/*",
 									},
 								},
@@ -71,6 +71,7 @@ var _ = Describe("Types", func() {
 				policy := apl.FindImagePolicy("test.com/hello")
 				Expect(policy).ToNot(BeNil())
 				Expect(policy.Trust.Enabled).To(BeNil())
+				Expect(policy.Trust.TrustServer).To(BeEmpty())
 				Expect(policy.Va.Enabled).To(BeNil())
 			})
 		})
@@ -79,10 +80,10 @@ var _ = Describe("Types", func() {
 			It("Should return a policy but `trust` and `va` should be nil", func() {
 				apl := ImagePolicyList{
 					Items: []ImagePolicy{
-						ImagePolicy{
+						{
 							Spec: PolicySpec{
 								Repositories: []Repository{
-									Repository{
+									{
 										Name:   "test.com/namespace/hello:nopolicies",
 										Policy: Policy{},
 									},
@@ -94,6 +95,7 @@ var _ = Describe("Types", func() {
 				policy := apl.FindImagePolicy("test.com/namespace/hello:nopolicies")
 				Expect(policy).ToNot(BeNil())
 				Expect(policy.Trust.Enabled).To(BeNil())
+				Expect(policy.Trust.TrustServer).To(BeEmpty())
 				Expect(policy.Va.Enabled).To(BeNil())
 			})
 		})
@@ -102,10 +104,10 @@ var _ = Describe("Types", func() {
 			It("Should return a policy but `trust` should be nil", func() {
 				apl := ImagePolicyList{
 					Items: []ImagePolicy{
-						ImagePolicy{
+						{
 							Spec: PolicySpec{
 								Repositories: []Repository{
-									Repository{
+									{
 										Name: "test.com/namespace/hello:notrust",
 										Policy: Policy{
 											Va: VA{
@@ -121,6 +123,7 @@ var _ = Describe("Types", func() {
 				policy := apl.FindImagePolicy("test.com/namespace/hello:notrust")
 				Expect(policy).ToNot(BeNil())
 				Expect(policy.Trust.Enabled).To(BeNil())
+				Expect(policy.Trust.TrustServer).To(BeEmpty())
 				Expect(policy.Va.Enabled).ToNot(BeNil())
 				Expect(*policy.Va.Enabled).To(BeTrue())
 			})
@@ -130,14 +133,15 @@ var _ = Describe("Types", func() {
 			It("Should return a policy but `va` should be nil", func() {
 				apl := ImagePolicyList{
 					Items: []ImagePolicy{
-						ImagePolicy{
+						{
 							Spec: PolicySpec{
 								Repositories: []Repository{
-									Repository{
+									{
 										Name: "test.com/namespace/hello:nova",
 										Policy: Policy{
 											Trust: Trust{
-												Enabled: FalsePointer,
+												Enabled:     FalsePointer,
+												TrustServer: "https://some-trust-server.com",
 											},
 										},
 									},
@@ -150,6 +154,7 @@ var _ = Describe("Types", func() {
 				Expect(policy).ToNot(BeNil())
 				Expect(policy.Va.Enabled).To(BeNil())
 				Expect(policy.Trust.Enabled).ToNot(BeNil())
+				Expect(policy.Trust.TrustServer).ToNot(BeEmpty())
 				Expect(*policy.Trust.Enabled).To(BeFalse())
 			})
 		})
@@ -158,14 +163,15 @@ var _ = Describe("Types", func() {
 			It("Should return a policy and `trust` and `va` should be `true`", func() {
 				apl := ImagePolicyList{
 					Items: []ImagePolicy{
-						ImagePolicy{
+						{
 							Spec: PolicySpec{
 								Repositories: []Repository{
-									Repository{
+									{
 										Name: "test.com/namespace/hello:enabled",
 										Policy: Policy{
 											Trust: Trust{
-												Enabled: TruePointer,
+												Enabled:     TruePointer,
+												TrustServer: "https://some-trust-server.com",
 											},
 											Va: VA{
 												Enabled: TruePointer,
@@ -182,6 +188,7 @@ var _ = Describe("Types", func() {
 				Expect(policy.Va.Enabled).ToNot(BeNil())
 				Expect(*policy.Va.Enabled).To(BeTrue())
 				Expect(policy.Trust.Enabled).ToNot(BeNil())
+				Expect(policy.Trust.TrustServer).ToNot(BeEmpty())
 				Expect(*policy.Trust.Enabled).To(BeTrue())
 			})
 		})
@@ -190,10 +197,10 @@ var _ = Describe("Types", func() {
 			It("Should return a policy and `trust` and `va` should be `false`", func() {
 				apl := ImagePolicyList{
 					Items: []ImagePolicy{
-						ImagePolicy{
+						{
 							Spec: PolicySpec{
 								Repositories: []Repository{
-									Repository{
+									{
 										Name: "test.com/namespace/hello:disabled",
 										Policy: Policy{
 											Trust: Trust{
@@ -214,6 +221,7 @@ var _ = Describe("Types", func() {
 				Expect(policy.Va.Enabled).ToNot(BeNil())
 				Expect(*policy.Va.Enabled).To(BeFalse())
 				Expect(policy.Trust.Enabled).ToNot(BeNil())
+				Expect(policy.Trust.TrustServer).To(BeEmpty())
 				Expect(*policy.Trust.Enabled).To(BeFalse())
 			})
 		})
@@ -225,10 +233,10 @@ var _ = Describe("Types", func() {
 			It("Should find repo by adding `:*` and `trust` and `va` should be nil", func() {
 				apl := ImagePolicyList{
 					Items: []ImagePolicy{
-						ImagePolicy{
+						{
 							Spec: PolicySpec{
 								Repositories: []Repository{
-									Repository{
+									{
 										Name: "test.com/namespace/image",
 									},
 								},
@@ -239,6 +247,7 @@ var _ = Describe("Types", func() {
 				policy := apl.FindImagePolicy("test.com/namespace/image:tag")
 				Expect(policy).ToNot(BeNil())
 				Expect(policy.Trust.Enabled).To(BeNil())
+				Expect(policy.Trust.TrustServer).To(BeEmpty())
 				Expect(policy.Va.Enabled).To(BeNil())
 			})
 		})
@@ -256,10 +265,10 @@ var _ = Describe("Types", func() {
 		It("Should not fail but the policy should be nil", func() {
 			apl := ClusterImagePolicyList{
 				Items: []ClusterImagePolicy{
-					ClusterImagePolicy{
+					{
 						Spec: PolicySpec{
 							Repositories: []Repository{
-								Repository{
+								{
 									Name: "test.com/*",
 								},
 							},
@@ -278,10 +287,10 @@ var _ = Describe("Types", func() {
 			It("Should return a policy but `trust` and `va` should be nil", func() {
 				apl := ClusterImagePolicyList{
 					Items: []ClusterImagePolicy{
-						ClusterImagePolicy{
+						{
 							Spec: PolicySpec{
 								Repositories: []Repository{
-									Repository{
+									{
 										Name: "test.com/*",
 									},
 								},
@@ -292,6 +301,7 @@ var _ = Describe("Types", func() {
 				policy := apl.FindClusterImagePolicy("test.com/hello")
 				Expect(policy).ToNot(BeNil())
 				Expect(policy.Trust.Enabled).To(BeNil())
+				Expect(policy.Trust.TrustServer).To(BeEmpty())
 				Expect(policy.Va.Enabled).To(BeNil())
 			})
 		})
@@ -300,10 +310,10 @@ var _ = Describe("Types", func() {
 			It("Should return a policy but `trust` and `va` should be nil", func() {
 				apl := ClusterImagePolicyList{
 					Items: []ClusterImagePolicy{
-						ClusterImagePolicy{
+						{
 							Spec: PolicySpec{
 								Repositories: []Repository{
-									Repository{
+									{
 										Name:   "test.com/namespace/hello:nopolicies",
 										Policy: Policy{},
 									},
@@ -315,6 +325,7 @@ var _ = Describe("Types", func() {
 				policy := apl.FindClusterImagePolicy("test.com/namespace/hello:nopolicies")
 				Expect(policy).ToNot(BeNil())
 				Expect(policy.Trust.Enabled).To(BeNil())
+				Expect(policy.Trust.TrustServer).To(BeEmpty())
 				Expect(policy.Va.Enabled).To(BeNil())
 			})
 		})
@@ -323,10 +334,10 @@ var _ = Describe("Types", func() {
 			It("Should return a policy but `trust` should be nil", func() {
 				apl := ClusterImagePolicyList{
 					Items: []ClusterImagePolicy{
-						ClusterImagePolicy{
+						{
 							Spec: PolicySpec{
 								Repositories: []Repository{
-									Repository{
+									{
 										Name: "test.com/namespace/hello:notrust",
 										Policy: Policy{
 											Va: VA{
@@ -342,6 +353,7 @@ var _ = Describe("Types", func() {
 				policy := apl.FindClusterImagePolicy("test.com/namespace/hello:notrust")
 				Expect(policy).ToNot(BeNil())
 				Expect(policy.Trust.Enabled).To(BeNil())
+				Expect(policy.Trust.TrustServer).To(BeEmpty())
 				Expect(policy.Va.Enabled).ToNot(BeNil())
 				Expect(*policy.Va.Enabled).To(BeTrue())
 			})
@@ -351,14 +363,15 @@ var _ = Describe("Types", func() {
 			It("Should return a policy but `va` should be nil", func() {
 				apl := ClusterImagePolicyList{
 					Items: []ClusterImagePolicy{
-						ClusterImagePolicy{
+						{
 							Spec: PolicySpec{
 								Repositories: []Repository{
-									Repository{
+									{
 										Name: "test.com/namespace/hello:nova",
 										Policy: Policy{
 											Trust: Trust{
-												Enabled: FalsePointer,
+												Enabled:     FalsePointer,
+												TrustServer: "https://some-trust-server.com",
 											},
 										},
 									},
@@ -371,6 +384,7 @@ var _ = Describe("Types", func() {
 				Expect(policy).ToNot(BeNil())
 				Expect(policy.Va.Enabled).To(BeNil())
 				Expect(policy.Trust.Enabled).ToNot(BeNil())
+				Expect(policy.Trust.TrustServer).ToNot(BeEmpty())
 				Expect(*policy.Trust.Enabled).To(BeFalse())
 			})
 		})
@@ -379,14 +393,15 @@ var _ = Describe("Types", func() {
 			It("Should return a policy and `trust` and `va` should be `true`", func() {
 				apl := ClusterImagePolicyList{
 					Items: []ClusterImagePolicy{
-						ClusterImagePolicy{
+						{
 							Spec: PolicySpec{
 								Repositories: []Repository{
-									Repository{
+									{
 										Name: "test.com/namespace/hello:enabled",
 										Policy: Policy{
 											Trust: Trust{
-												Enabled: TruePointer,
+												Enabled:     TruePointer,
+												TrustServer: "https://some-trust-server.com",
 											},
 											Va: VA{
 												Enabled: TruePointer,
@@ -403,6 +418,7 @@ var _ = Describe("Types", func() {
 				Expect(policy.Va.Enabled).ToNot(BeNil())
 				Expect(*policy.Va.Enabled).To(BeTrue())
 				Expect(policy.Trust.Enabled).ToNot(BeNil())
+				Expect(policy.Trust.TrustServer).ToNot(BeEmpty())
 				Expect(*policy.Trust.Enabled).To(BeTrue())
 			})
 		})
@@ -411,10 +427,10 @@ var _ = Describe("Types", func() {
 			It("Should return a policy and `trust` and `va` should be `false`", func() {
 				apl := ClusterImagePolicyList{
 					Items: []ClusterImagePolicy{
-						ClusterImagePolicy{
+						{
 							Spec: PolicySpec{
 								Repositories: []Repository{
-									Repository{
+									{
 										Name: "test.com/namespace/hello:disabled",
 										Policy: Policy{
 											Trust: Trust{
@@ -435,6 +451,7 @@ var _ = Describe("Types", func() {
 				Expect(policy.Va.Enabled).ToNot(BeNil())
 				Expect(*policy.Va.Enabled).To(BeFalse())
 				Expect(policy.Trust.Enabled).ToNot(BeNil())
+				Expect(policy.Trust.TrustServer).To(BeEmpty())
 				Expect(*policy.Trust.Enabled).To(BeFalse())
 			})
 		})
@@ -446,10 +463,10 @@ var _ = Describe("Types", func() {
 			It("Should find repo by adding `:*` and `trust` and `va` should be nil", func() {
 				apl := ClusterImagePolicyList{
 					Items: []ClusterImagePolicy{
-						ClusterImagePolicy{
+						{
 							Spec: PolicySpec{
 								Repositories: []Repository{
-									Repository{
+									{
 										Name: "test.com/namespace/image",
 									},
 								},
@@ -460,6 +477,7 @@ var _ = Describe("Types", func() {
 				policy := apl.FindClusterImagePolicy("test.com/namespace/image:tag")
 				Expect(policy).ToNot(BeNil())
 				Expect(policy.Trust.Enabled).To(BeNil())
+				Expect(policy.Trust.TrustServer).To(BeEmpty())
 				Expect(policy.Va.Enabled).To(BeNil())
 			})
 		})

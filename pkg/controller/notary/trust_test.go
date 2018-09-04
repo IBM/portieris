@@ -94,7 +94,7 @@ Aaq77T1fhZkFO5uTAgMBAAE=
 			It("should return the digest if there is a target but not required signers", func() {
 				publicKey := data.NewPublicKey("sha256", []byte("abc"))
 				fakeRepo.GetAllTargetMetadataByNameReturns([]notaryclient.TargetSignedStruct{
-					notaryclient.TargetSignedStruct{
+					{
 						Target: notaryclient.Target{
 							Hashes: data.Hashes{"sha256": []byte("1234567890")},
 						},
@@ -118,7 +118,7 @@ Aaq77T1fhZkFO5uTAgMBAAE=
 			It("should fail if it can't parse a public key", func() {
 				publicKey := data.NewPublicKey("sha256", []byte("abc"))
 				fakeRepo.GetAllTargetMetadataByNameReturns([]notaryclient.TargetSignedStruct{
-					notaryclient.TargetSignedStruct{
+					{
 						Target: notaryclient.Target{
 							Hashes: data.Hashes{"sha256": []byte("1234567890")},
 						},
@@ -129,7 +129,7 @@ Aaq77T1fhZkFO5uTAgMBAAE=
 							},
 						},
 					},
-					notaryclient.TargetSignedStruct{
+					{
 						Target: notaryclient.Target{
 							Hashes: data.Hashes{"sha256": []byte("1234567890")},
 						},
@@ -144,7 +144,7 @@ Aaq77T1fhZkFO5uTAgMBAAE=
 				trust.GetNotaryRepoReturns(fakeRepo, nil)
 				ctrl = NewController(kubeWrapper, policyClient, trust, cr)
 				_, err := ctrl.getDigest(server, image, notaryToken, targetName, []Signer{
-					Signer{
+					{
 						signer:    "wibble",
 						publicKey: "invalid signer public key",
 					},
@@ -156,7 +156,7 @@ Aaq77T1fhZkFO5uTAgMBAAE=
 			It("should fail if the key ids are not the same", func() {
 				publicKey := data.NewPublicKey("sha256", []byte("abc"))
 				fakeRepo.GetAllTargetMetadataByNameReturns([]notaryclient.TargetSignedStruct{
-					notaryclient.TargetSignedStruct{
+					{
 						Target: notaryclient.Target{
 							Hashes: data.Hashes{"sha256": []byte("1234567890")},
 						},
@@ -167,7 +167,7 @@ Aaq77T1fhZkFO5uTAgMBAAE=
 							},
 						},
 					},
-					notaryclient.TargetSignedStruct{
+					{
 						Target: notaryclient.Target{
 							Hashes: data.Hashes{"sha256": []byte("1234567890")},
 						},
@@ -182,7 +182,7 @@ Aaq77T1fhZkFO5uTAgMBAAE=
 				trust.GetNotaryRepoReturns(fakeRepo, nil)
 				ctrl = NewController(kubeWrapper, policyClient, trust, cr)
 				_, err := ctrl.getDigest(server, image, notaryToken, targetName, []Signer{
-					Signer{
+					{
 						signer:    "wibble",
 						publicKey: signerPublicKey,
 					},
@@ -194,7 +194,7 @@ Aaq77T1fhZkFO5uTAgMBAAE=
 			It("should fail if the signer does not have a public key in the role", func() {
 				publicKey := data.NewPublicKey("sha256", []byte("abc"))
 				fakeRepo.GetAllTargetMetadataByNameReturns([]notaryclient.TargetSignedStruct{
-					notaryclient.TargetSignedStruct{
+					{
 						Target: notaryclient.Target{
 							Hashes: data.Hashes{"sha256": []byte("1234567890")},
 						},
@@ -205,7 +205,7 @@ Aaq77T1fhZkFO5uTAgMBAAE=
 							},
 						},
 					},
-					notaryclient.TargetSignedStruct{
+					{
 						Target: notaryclient.Target{
 							Hashes: data.Hashes{"sha256": []byte("1234567890")},
 						},
@@ -220,7 +220,7 @@ Aaq77T1fhZkFO5uTAgMBAAE=
 				trust.GetNotaryRepoReturns(fakeRepo, nil)
 				ctrl = NewController(kubeWrapper, policyClient, trust, cr)
 				_, err := ctrl.getDigest(server, image, notaryToken, targetName, []Signer{
-					Signer{
+					{
 						signer: "wibble",
 					},
 				})
@@ -231,7 +231,7 @@ Aaq77T1fhZkFO5uTAgMBAAE=
 			It("should fail if the signer does not have a role", func() {
 				publicKey := data.NewPublicKey("sha256", []byte("abc"))
 				fakeRepo.GetAllTargetMetadataByNameReturns([]notaryclient.TargetSignedStruct{
-					notaryclient.TargetSignedStruct{
+					{
 						Target: notaryclient.Target{
 							Hashes: data.Hashes{"sha256": []byte("1234567890")},
 						},
@@ -242,7 +242,7 @@ Aaq77T1fhZkFO5uTAgMBAAE=
 							},
 						},
 					},
-					notaryclient.TargetSignedStruct{
+					{
 						Target: notaryclient.Target{
 							Hashes: data.Hashes{"sha256": []byte("1234567890")},
 						},
@@ -257,7 +257,7 @@ Aaq77T1fhZkFO5uTAgMBAAE=
 				trust.GetNotaryRepoReturns(fakeRepo, nil)
 				ctrl = NewController(kubeWrapper, policyClient, trust, cr)
 				_, err := ctrl.getDigest(server, image, notaryToken, targetName, []Signer{
-					Signer{
+					{
 						// signer: "wibble",
 						publicKey: signerPublicKey,
 					},
@@ -269,7 +269,7 @@ Aaq77T1fhZkFO5uTAgMBAAE=
 			It("should return a digest", func() {
 				publicKey := data.NewPublicKey("sha256", []byte("abc"))
 				fakeRepo.GetAllTargetMetadataByNameReturns([]notaryclient.TargetSignedStruct{
-					notaryclient.TargetSignedStruct{
+					{
 						Target: notaryclient.Target{
 							Hashes: data.Hashes{"sha256": []byte("1234567890")},
 						},
@@ -280,7 +280,7 @@ Aaq77T1fhZkFO5uTAgMBAAE=
 							},
 						},
 					},
-					notaryclient.TargetSignedStruct{
+					{
 						Target: notaryclient.Target{
 							Hashes: data.Hashes{"sha256": []byte("1234567890")},
 						},
@@ -295,7 +295,7 @@ Aaq77T1fhZkFO5uTAgMBAAE=
 				trust.GetNotaryRepoReturns(fakeRepo, nil)
 				ctrl = NewController(kubeWrapper, policyClient, trust, cr)
 				digest, err := ctrl.getDigest(server, image, notaryToken, targetName, []Signer{
-					Signer{
+					{
 						signer:    "wibble",
 						publicKey: signerPublicKey,
 					},

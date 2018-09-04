@@ -33,14 +33,14 @@ var (
 		ObjectMeta: metav1.ObjectMeta{Namespace: "default", Name: "policy-one"},
 		TypeMeta:   metav1.TypeMeta{Kind: "ImagePolicy"},
 		Spec: securityenforcementv1beta1.PolicySpec{
-			Repositories: []securityenforcementv1beta1.Repository{securityenforcementv1beta1.Repository{Name: "repo-one"}},
+			Repositories: []securityenforcementv1beta1.Repository{{Name: "repo-one"}},
 		},
 	}
 	imagePolicyTwo = &securityenforcementv1beta1.ImagePolicy{
 		ObjectMeta: metav1.ObjectMeta{Namespace: "default", Name: "policy-two"},
 		TypeMeta:   metav1.TypeMeta{Kind: "ImagePolicy"},
 		Spec: securityenforcementv1beta1.PolicySpec{
-			Repositories: []securityenforcementv1beta1.Repository{securityenforcementv1beta1.Repository{Name: "repo-two"}},
+			Repositories: []securityenforcementv1beta1.Repository{{Name: "repo-two"}},
 		},
 	}
 
@@ -48,14 +48,14 @@ var (
 		ObjectMeta: metav1.ObjectMeta{Namespace: "default", Name: "policy-one"},
 		TypeMeta:   metav1.TypeMeta{Kind: "ClusterImagePolicy"},
 		Spec: securityenforcementv1beta1.PolicySpec{
-			Repositories: []securityenforcementv1beta1.Repository{securityenforcementv1beta1.Repository{Name: "repo-one"}},
+			Repositories: []securityenforcementv1beta1.Repository{{Name: "repo-one"}},
 		},
 	}
 	clusterImagePolicyTwo = &securityenforcementv1beta1.ClusterImagePolicy{
 		ObjectMeta: metav1.ObjectMeta{Namespace: "default", Name: "policy-two"},
 		TypeMeta:   metav1.TypeMeta{Kind: "ClusterImagePolicy"},
 		Spec: securityenforcementv1beta1.PolicySpec{
-			Repositories: []securityenforcementv1beta1.Repository{securityenforcementv1beta1.Repository{Name: "repo-two"}},
+			Repositories: []securityenforcementv1beta1.Repository{{Name: "repo-two"}},
 		},
 	}
 
