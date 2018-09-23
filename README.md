@@ -18,17 +18,6 @@ Portieris receives AdmissionRequests for creation of or edits to all types of wo
 
 Portieris' Admission Webhook is configured to fail closed. Three instances of Portieris make sure that it is able to approve its own upgrades and auto-recovery. If all instance of Portieris are unavailable, Kubernetes will not auto-recover it, and you must delete the MutatingAdmissionWebhook to allow Portieris to recover.
 
-## Current limitations
-
-Portieris only supports sourcing trust data from the following registries:
-* IBM Cloud Container Registry
-* Quay.io
-* Docker Hub
-
-You can deploy images from other servers while Portieris is installed, but you must disable trust enforcement for these images. The default ClusterImagePolicy enforces trust disabled for "*".
-We are looking to support additional Notary servers and support for configuring your own via CRD configuration.
-If you want a particular Notary server to be supported, [raise an issue](https://github.com/ibm/portieris/issues/new). Its pretty easy to add a new registry, see [Trust Map](https://github.com/ibm/portieris/tree/master/helpers/trustmap/trust_server_map.go) if interested in helping.
-
 ## Installing Portieris
 
 Portieris is installed using a Helm chart. Before you begin, make sure that you have Kubernetes 1.9 or above, and Helm 2.8 or above installed in your cluster.
@@ -51,8 +40,28 @@ Image security policies define Portieris' behavior in your cluster. There are tw
 
 ## Configuring image security policies
 
-You can configure custom security policies to control what images can be deployed in your Kubernetes namespaces, and to enforce trust pinning of particular signers. For more information, see the [IBM Cloud docs](https://console.bluemix.net/docs/services/Registry/registry_security_enforce.html#customize_policies).
+You can configure custom security policies to control what images can be deployed in your Kubernetes namespaces, and to enforce trust pinning of particular signers.  
+Portieris supports sourcing trust data from the following registries without additional configuration in the image policy:
+* IBM Cloud Container Registry
+* Quay.io
+* Docker Hub
 
+To use a different trust server for a repository, you can specify the `trustServer` parameter in your policy:
+*Example*
+```yaml
+apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
+kind: ImagePolicy
+metadata:
+  name: allow-custom
+spec:
+   repositories:
+    - name: "registry.bluemix.net/*"
+      policy:
+        trust:
+          enabled: true
+          trustServer: "https://registry.ng.bluemix.net:4443" # Optional, custom trust server for repository
+```  
+For more information, see the [IBM Cloud docs](https://console.bluemix.net/docs/services/Registry/registry_security_enforce.html#customize_policies).
 ## Configuring access controls for your security policies
 
 You can configure Kubernetes RBAC rules to define which users and applications have the ability to modify your security policies. For more information, see the [IBM Cloud docs](https://console.bluemix.net/docs/services/Registry/registry_security_enforce.html#assign_user_policy).
