@@ -155,10 +155,14 @@ func (c *Controller) mutatePodSpec(namespace, specPath string, pod corev1.PodSpe
 
 				// Get image digest
 				glog.Info("getting signed image...")
-				notaryURL, err := img.GetContentTrustURL()
-				if err != nil {
-					a.StringToAdmissionResponse(fmt.Sprintf("Trust Server/Image Configuration Error: %v", err.Error()))
-					continue containerLoop
+
+				notaryURL := policy.Trust.TrustServer
+				if notaryURL == "" {
+					notaryURL, err = img.GetContentTrustURL()
+					if err != nil {
+						a.StringToAdmissionResponse(fmt.Sprintf("Trust Server/Image Configuration Error: %v", err.Error()))
+						continue containerLoop
+					}
 				}
 				digest, err := c.getDigest(notaryURL, img.NameWithoutTag(), notaryToken, img.GetTag(), signers)
 				if err != nil {

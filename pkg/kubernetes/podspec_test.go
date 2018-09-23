@@ -30,7 +30,7 @@ import (
 func TestWrapper_GetPodSpec(t *testing.T) {
 	nginxSpec := &corev1.PodSpec{
 		Containers: []corev1.Container{
-			corev1.Container{
+			{
 				Name:  "nginx",
 				Image: "docker.io/nginx",
 			},
@@ -682,7 +682,7 @@ func TestWrapper_mutateWithSA(t *testing.T) {
 				Namespace: "default",
 			},
 			ImagePullSecrets: []corev1.LocalObjectReference{
-				corev1.LocalObjectReference{
+				{
 					Name: "wibble",
 				},
 			},
@@ -692,7 +692,7 @@ func TestWrapper_mutateWithSA(t *testing.T) {
 				Namespace: "default",
 			},
 			ImagePullSecrets: []corev1.LocalObjectReference{
-				corev1.LocalObjectReference{
+				{
 					Name: "dibble",
 				},
 			},
@@ -717,7 +717,7 @@ func TestWrapper_mutateWithSA(t *testing.T) {
 			ps:   &corev1.PodSpec{},
 			want: &corev1.PodSpec{
 				ImagePullSecrets: []corev1.LocalObjectReference{
-					corev1.LocalObjectReference{
+					{
 						Name: "wibble",
 					},
 				},
@@ -731,7 +731,7 @@ func TestWrapper_mutateWithSA(t *testing.T) {
 			},
 			want: &corev1.PodSpec{
 				ImagePullSecrets: []corev1.LocalObjectReference{
-					corev1.LocalObjectReference{
+					{
 						Name: "dibble",
 					},
 				},
@@ -784,7 +784,7 @@ func TestWrapper_decodeObject(t *testing.T) {
 				},
 				Spec: corev1.PodSpec{
 					Containers: []corev1.Container{
-						corev1.Container{
+						{
 							Name:  "nginx",
 							Image: "docker.io/nginx",
 						},
@@ -805,7 +805,7 @@ func TestWrapper_decodeObject(t *testing.T) {
 					Template: corev1.PodTemplateSpec{
 						Spec: corev1.PodSpec{
 							Containers: []corev1.Container{
-								corev1.Container{
+								{
 									Name:  "nginx",
 									Image: "docker.io/nginx",
 								},
@@ -828,7 +828,7 @@ func TestWrapper_decodeObject(t *testing.T) {
 					Template: corev1.PodTemplateSpec{
 						Spec: corev1.PodSpec{
 							Containers: []corev1.Container{
-								corev1.Container{
+								{
 									Name:  "nginx",
 									Image: "docker.io/nginx",
 								},

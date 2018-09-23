@@ -1,0 +1,11 @@
+apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
+kind: ImagePolicy
+metadata:
+  name: allow-signed
+spec:
+   repositories:
+    - name: "registry.bluemix.net/cise/nginx"
+      policy:
+        trust:
+          enabled: true
+          trustServer: "https://registry.ng.bluemix.net:4443"

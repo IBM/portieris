@@ -25,9 +25,9 @@ type FakeNotary struct {
 	GetNotaryRepoStub        func(server, image, notaryToken string) (notaryclient.Repository, error)
 	getNotaryRepoMutex       sync.RWMutex
 	GetNotaryRepoArgsForCall []struct {
-		server      string
-		image       string
-		notaryToken string
+		Server      string
+		Image       string
+		NotaryToken string
 	}
 	getNotaryRepoReturns []struct {
 		notaryRepo notaryclient.Repository
@@ -39,9 +39,9 @@ type FakeNotary struct {
 func (fake *FakeNotary) GetNotaryRepo(server, image, notaryToken string) (notaryclient.Repository, error) {
 	fake.getNotaryRepoMutex.Lock()
 	fake.GetNotaryRepoArgsForCall = append(fake.GetNotaryRepoArgsForCall, struct {
-		server      string
-		image       string
-		notaryToken string
+		Server      string
+		Image       string
+		NotaryToken string
 	}{server, image, notaryToken})
 	fake.getNotaryRepoMutex.Unlock()
 	if fake.GetNotaryRepoStub != nil {
