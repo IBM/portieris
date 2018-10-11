@@ -176,9 +176,7 @@ func TestReference(t *testing.T) {
 				String:          "quay.io/namespace/name",
 				RegistryURL:     "https://quay.io",
 				ContentTrustErr: false,
-				// TODO the previous ginkgo test was testing for port 443, but the code returns 4443. Need to verify which is correct.
-				// ContentTrustURL: "https://quay.io:443",
-				ContentTrustURL: "https://quay.io:4443",
+				ContentTrustURL: "https://quay.io:443",
 			},
 		},
 	}
