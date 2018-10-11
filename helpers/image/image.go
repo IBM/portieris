@@ -15,10 +15,10 @@
 package image
 
 import (
+	"fmt"
 	"net/url"
 	"strings"
 
-	"fmt"
 	"github.com/IBM/portieris/helpers/trustmap"
 	"github.com/docker/distribution/reference"
 )
@@ -97,12 +97,13 @@ func (r Reference) GetPort() string {
 
 // HasIBMRepo returns true if the image has an IBM repository, otherwise false.
 func (r Reference) HasIBMRepo() bool {
-	prefix := "registry"
-	suffix := ".bluemix.net"
-	if !strings.HasPrefix(r.hostname, prefix) || !strings.HasSuffix(r.hostname, suffix) {
-		return false
+	if strings.HasPrefix(r.hostname, "registry") && strings.HasSuffix(r.hostname, ".bluemix.net") {
+		return true
 	}
-	return true
+	if strings.HasSuffix(r.hostname, "icr.io") {
+		return true
+	}
+	return false
 }
 
 // GetRegistryURL returns the Registry URL.
