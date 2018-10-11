@@ -37,6 +37,6 @@ func IBMRegional(registryHostname string, imageHostname string) string {
 // TrustServerMap Easy way to link known registries to their sponsored trust servers
 var TrustServerMap = map[string]TrustServerFn{
 	"docker.io":   Identity("https://notary.docker.io"),
-	"quay.io":     Identity("https://quay.io:4443"),
+	"quay.io":     Identity("https://quay.io:443"),
 	"bluemix.net": IBMRegional,
 }

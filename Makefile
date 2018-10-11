@@ -9,7 +9,7 @@ build-deps: dep
 
 test-deps: build-deps
 	@go get github.com/stretchr/testify/assert
-	@go get github.com/golang/lint/golint
+	@go get golang.org/x/lint/golint
 	@go get github.com/pierrre/gotestcover
 	@go get github.com/onsi/ginkgo/ginkgo
 	@go get github.com/onsi/gomega/...
@@ -88,5 +88,3 @@ e2e.helm:
 	helm init --service-account tiller
 
 e2e.clean: helm.clean
-
-
