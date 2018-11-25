@@ -15,6 +15,8 @@
 package main
 
 import (
+	"io/ioutil"
+
 	kube "github.com/IBM/portieris/helpers/kube"
 	notaryController "github.com/IBM/portieris/pkg/controller/notary"
 	"github.com/IBM/portieris/pkg/kubernetes"
@@ -35,6 +37,15 @@ func main() {
 	trust, err := notaryClient.NewClient(".trust")
 	if err != nil {
 		glog.Fatal("Could not get trust client", err)
+	}
+
+	serverCert, err := ioutil.ReadFile("/etc/certs/serverCert.pem")
+	if err != nil {
+		glog.Fatal("Could not read serverCert.pem", err)
+	}
+	serverKey, err := ioutil.ReadFile("/etc/certs/serverKey.pem")
+	if err != nil {
+		glog.Fatal("Could not read serverKey.pem", err)
 	}
 
 	cr := registryclient.NewClient()

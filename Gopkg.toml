@@ -7,12 +7,24 @@
   version = "1.2.1"
 
 [[constraint]]
-  branch = "master"
+  version = "kubernetes-1.12.2"
   name = "k8s.io/api"
 
 [[constraint]]
-  branch = "master"
+  version = "kubernetes-1.12.2"
+  name = "k8s.io/client-go"
+
+[[constraint]]
+  version = "kubernetes-1.12.2"
+  name = "k8s.io/apiextensions-apiserver"
+
+[[constraint]]
+  version = "kubernetes-1.12.2"
   name = "k8s.io/apimachinery"
+
+[[override]]
+  name = "gopkg.in/fsnotify.v1"
+  source = "https://github.com/fsnotify/fsnotify.git"
 
 [prune]
   go-tests = true

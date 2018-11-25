@@ -37,21 +37,21 @@ vet:
 	@set -e; for LINE in ${GOPACKAGES}; do go vet $${LINE} ; done
 
 helm.install.local: push
-	-rm $$(pwd)/portieris-0.2.0.tgz
+	-rm $$(pwd)/portieris-0.5.0.tgz
 	helm package helm/portieris
-	helm install -n portieris $$(pwd)/portieris-0.2.0.tgz --set image.host=$(HUB) --set image.tag=$(TAG)
+	helm install -n portieris $$(pwd)/portieris-0.5.0.tgz --set image.host=$(HUB) --set image.tag=$(TAG)
 
 helm.install:
-	-rm $$(pwd)/portieris-0.2.0.tgz
+	-rm $$(pwd)/portieris-0.5.0.tgz
 	helm package helm/portieris
-	helm install -n portieris $$(pwd)/portieris-0.2.0.tgz
+	helm install -n portieris $$(pwd)/portieris-0.5.0.tgz
 
 helm.clean:
 	-helm/cleanup.sh portieris
 
 e2e:
 	-helm package install/helm/portieris
-	@go test -v ./test/e2e --helmChart $$(pwd)/portieris-0.2.0.tgz
+	@go test -v ./test/e2e --helmChart $$(pwd)/portieris-0.5.0.tgz
 
 e2e.local: helm.install.local e2e.quick
 
@@ -80,7 +80,7 @@ e2e.quick.armada:
 	-kubectl delete namespace $$(kubectl get namespaces | grep -v ibm | grep -v kube | grep -v default | awk '{ print $$1 }' | grep -v NAME)
 
 e2e.quick.generic:
-	@go test -v ./test/e2e --no-install --generic --helmChart $$(pwd)/portieris-0.2.0.tgz
+	go test -v ./test/e2e --no-install --generic --helmChart $$(pwd)/portieris-0.5.0.tgz
 	-kubectl delete namespace $$(kubectl get namespaces | grep -v ibm | grep -v kube | grep -v default | awk '{ print $$1 }' | grep -v NAME)
 
 e2e.helm:

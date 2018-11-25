@@ -29,6 +29,10 @@ spec:
             - name: http
               containerPort: 80
               protocol: TCP
+          volumeMounts:
+          - name: portieris-certs
+            readOnly: true
+            mountPath: "/etc/certs"
           env:
           resources:
 {{ toYaml .Values.resources | indent 12 }}
@@ -44,3 +48,7 @@ spec:
       tolerations:
 {{ toYaml . | indent 8 }}
     {{- end }}
+      volumes:
+      - name: portieris-certs
+        secret:
+          secretName: portieris-certs
