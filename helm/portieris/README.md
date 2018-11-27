@@ -17,6 +17,12 @@ This chart:
 
 ## Installing the chart
 
+### !!! Regenerate Certs !!!
+The install will use the default certs if you do not run the gencerts script. **This means you will deploying with certs that are publically accessible on GitHub.**
+```
+./gencerts
+```
+
 ### IBM Cloud Container Service
 
 If you're deploying onto an IBM Cloud cluster Portieris automatically creates policies to allow the various Kubernetes components to be deployed as well as a policy rule to allow all images without verification. The allow everything should be changed because it is insecure but the IBM Cloud specific policies should be kept.
