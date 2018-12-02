@@ -16,6 +16,7 @@ package notary
 
 import (
 	"crypto/tls"
+	"crypto/x509"
 	"fmt"
 	"net"
 	"net/http"
@@ -32,6 +33,7 @@ import (
 // Client .
 type Client struct {
 	trustDir string
+	rootCAs  *x509.CertPool
 }
 
 // Interface .
@@ -40,15 +42,20 @@ type Interface interface {
 }
 
 // NewClient creates and initializes the client
-func NewClient(trustDir string) (Interface, error) {
+func NewClient(trustDir string, customCA []byte) (Interface, error) {
 	// Create a trust directory
 	err := createTrustDir(trustDir)
 	if err != nil {
 		return nil, err
 	}
-	return &Client{
-		trustDir: trustDir,
-	}, nil
+	rootCA, err := x509.SystemCertPool()
+	if err != nil {
+		return nil, err
+	}
+	if customCA != nil {
+		rootCA.AppendCertsFromPEM(customCA)
+	}
+	return &Client{trustDir: trustDir, rootCAs: rootCA}, nil
 }
 
 // GetNotaryRepo .
@@ -57,13 +64,13 @@ func (c Client) GetNotaryRepo(server, image, notaryToken string) (notaryclient.R
 		c.trustDir,
 		data.GUN(image),
 		server,
-		makeHubTransport(server, notaryToken, image),
+		c.makeHubTransport(server, notaryToken, image),
 		nil,
 		trustpinning.TrustPinConfig{},
 	)
 }
 
-func makeHubTransport(server, notaryToken, image string) http.RoundTripper {
+func (c Client) makeHubTransport(server, notaryToken, image string) http.RoundTripper {
 	base := &http.Transport{
 		Proxy: http.ProxyFromEnvironment,
 		Dial: (&net.Dialer{
@@ -73,11 +80,10 @@ func makeHubTransport(server, notaryToken, image string) http.RoundTripper {
 		}).Dial,
 		TLSHandshakeTimeout: 10 * time.Second,
 		TLSClientConfig: &tls.Config{
-			// Avoid fallback by default to SSL protocols < TLS1.0
-			MinVersion:               tls.VersionTLS10,
+			// Avoid fallback by default to SSL protocols < TLS1.2
+			MinVersion:               tls.VersionTLS12,
 			PreferServerCipherSuites: true,
-			// Uncomment this for self-signed certs
-			InsecureSkipVerify: true,
+			RootCAs:                  c.rootCAs,
 		},
 		DisableKeepAlives: true,
 	}

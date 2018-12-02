@@ -16,6 +16,7 @@ package main
 
 import (
 	"io/ioutil"
+	"os"
 
 	kube "github.com/IBM/portieris/helpers/kube"
 	notaryController "github.com/IBM/portieris/pkg/controller/notary"
@@ -34,18 +35,26 @@ func main() {
 		glog.Fatal("Could not get policy client", err)
 	}
 
-	trust, err := notaryClient.NewClient(".trust")
+	ca, err := ioutil.ReadFile("/etc/certs/ca.pem")
+	if err != nil {
+		if os.IsNotExist(err) {
+			glog.Info("CA not provided at /etc/certs/ca.pem, will use default system pool")
+		} else {
+			glog.Fatal("Could not read /etc/certs/ca.pem", err)
+		}
+	}
+	trust, err := notaryClient.NewClient(".trust", ca)
 	if err != nil {
 		glog.Fatal("Could not get trust client", err)
 	}
 
 	serverCert, err := ioutil.ReadFile("/etc/certs/serverCert.pem")
 	if err != nil {
-		glog.Fatal("Could not read serverCert.pem", err)
+		glog.Fatal("Could not read /etc/certs/serverCert.pem", err)
 	}
 	serverKey, err := ioutil.ReadFile("/etc/certs/serverKey.pem")
 	if err != nil {
-		glog.Fatal("Could not read serverKey.pem", err)
+		glog.Fatal("Could not read /etc/certs/serverKey.pem", err)
 	}
 
 	cr := registryclient.NewClient()

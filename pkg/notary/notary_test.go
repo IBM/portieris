@@ -25,7 +25,7 @@ var _ = Describe("Notary", func() {
 	)
 
 	BeforeEach(func() {
-		trust, _ = NewClient(trustDir)
+		trust, _ = NewClient(trustDir, nil)
 	})
 
 	Describe("Getting the notary repo", func() {
