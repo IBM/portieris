@@ -7,7 +7,7 @@ replicaCount: 3
 image:
   host: docker.io/ibmcom
   image: portieris
-  tag: 0.5.0
+  tag: 0.5.1
   pullPolicy: Always
 
 service:
