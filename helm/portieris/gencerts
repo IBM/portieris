@@ -1,0 +1,34 @@
+#! /bin/bash -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SERVICE_NAME=$(yq r $SCRIPT_DIR/Chart.yaml name)
+
+echo "Using $SERVICE_NAME as the service name"
+
+CERT_DIR=$SCRIPT_DIR/certs
+
+rm -rf $CERT_DIR
+mkdir -p $CERT_DIR
+
+cat > $CERT_DIR/server.conf << EOF
+[req]
+req_extensions = v3_req
+distinguished_name = req_distinguished_name
+[req_distinguished_name]
+[ v3_req ]
+basicConstraints = CA:FALSE
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+extendedKeyUsage = clientAuth, serverAuth
+EOF
+
+# Create a certificate authority
+openssl genrsa -out $CERT_DIR/caKey.pem 2048
+openssl req -x509 -new -nodes -key $CERT_DIR/caKey.pem -days 100000 -out $CERT_DIR/caCert.pem -subj "/CN=${SERVICE_NAME}_ca"
+
+# Create a server certiticate
+openssl genrsa -out $CERT_DIR/serverKey.pem 2048
+# Note the CN is the DNS name of the service of the webhook.
+openssl req -new -key $CERT_DIR/serverKey.pem -out $CERT_DIR/server.csr -subj "/CN=${SERVICE_NAME}.ibm-system.svc" -config $CERT_DIR/server.conf
+openssl x509 -req -in $CERT_DIR/server.csr -CA $CERT_DIR/caCert.pem -CAkey $CERT_DIR/caKey.pem -CAcreateserial -out $CERT_DIR/serverCert.pem -days 100000 -extensions v3_req -extfile $CERT_DIR/server.conf
+
+rm $CERT_DIR/caKey.pem $CERT_DIR/server.conf $CERT_DIR/server.csr

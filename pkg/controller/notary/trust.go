@@ -80,7 +80,7 @@ func (c *Controller) getDigest(server, image, notaryToken, targetName string, si
 	}
 
 	if len(rolelist) == 0 {
-		glog.Info("roleList length == 0, returning digest %s", digest)
+		glog.Infof("roleList length == 0, returning digest %s", digest)
 	} else {
 		for _, target := range targets { // iterate over each target
 			// See if a signer was specified for this target

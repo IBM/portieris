@@ -17,209 +17,246 @@ package image
 import (
 	"testing"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-	urlPackage "net/url"
-	"strings"
+	"github.com/stretchr/testify/assert"
 )
 
-// TODO: Work out why these tests aren't running/rip out ginkgo
-
-func TestImage(t *testing.T) {
-
-	var _ = Describe("Image", func() {
-
-		Describe("When the image name is invalid", func() {
-			It("should return an error", func() {
-				image, err := NewReference("?")
-				Expect(err).To(HaveOccurred())
-				Expect(image).To(BeNil())
-			})
-		})
-
-		Describe("When the image is valid without a tag", func() {
-			It("should use `latest` as tag", func() {
-				image, err := NewReference("test.com/namespace/name")
-				Expect(err).ToNot(HaveOccurred())
-				Expect(image).ToNot(BeNil())
-				Expect(image.GetTag()).To(Equal("latest"))
-				Expect(image.NameWithTag()).To(Equal("test.com/namespace/name:latest"))
-				Expect(image.NameWithoutTag()).To(Equal("test.com/namespace/name"))
-				Expect(image.String()).To(Equal("test.com/namespace/name"))
-			})
-		})
-
-		Describe("When the image is valid without a tag but with digest", func() {
-			It("should be OK", func() {
-				image, err := NewReference("test.com:8080/namespace/name@sha256:1234567890")
-				Expect(err).ToNot(HaveOccurred())
-				Expect(image).ToNot(BeNil())
-				Expect(image.GetTag()).To(Equal("latest"))
-				Expect(image.NameWithTag()).To(Equal("test.com:8080/namespace/name:latest"))
-				Expect(image.NameWithoutTag()).To(Equal("test.com:8080/namespace/name"))
-				Expect(image.String()).To(Equal("test.com:8080/namespace/name@sha256:1234567890"))
-				Expect(image.GetDigest()).To(Equal("1234567890"))
-			})
-		})
-
-		Describe("When the image is valid with a tag", func() {
-			It("should not be latest", func() {
-				image, err := NewReference("test.com/namespace/name:v1")
-				Expect(err).ToNot(HaveOccurred())
-				Expect(image).ToNot(BeNil())
-				Expect(image.GetTag()).To(Equal("v1"))
-				Expect(image.NameWithTag()).To(Equal("test.com/namespace/name:v1"))
-				Expect(image.NameWithoutTag()).To(Equal("test.com/namespace/name"))
-				Expect(image.String()).To(Equal("test.com/namespace/name:v1"))
-			})
-		})
-
-		Describe("When the image is valid and has a digest", func() {
-			It("should be OK", func() {
-				image, err := NewReference("test.com:8080/namespace/name:v1@sha256:1234567890")
-				Expect(err).ToNot(HaveOccurred())
-				Expect(image).ToNot(BeNil())
-				Expect(image.GetTag()).To(Equal("v1"))
-				Expect(image.NameWithTag()).To(Equal("test.com:8080/namespace/name:v1"))
-				Expect(image.NameWithoutTag()).To(Equal("test.com:8080/namespace/name"))
-				Expect(image.String()).To(Equal("test.com:8080/namespace/name:v1@sha256:1234567890"))
-				Expect(image.GetDigest()).To(Equal("1234567890"))
-
-			})
-		})
-
-		Describe("When the image is from Docker Hub and has a digest", func() {
-			It("should be OK", func() {
-				image, err := NewReference("namespace/name:v1@sha256:1234567890")
-				Expect(err).ToNot(HaveOccurred())
-				Expect(image).ToNot(BeNil())
-				Expect(image.GetTag()).To(Equal("v1"))
-				Expect(image.NameWithTag()).To(Equal("namespace/name:v1"))
-				Expect(image.NameWithoutTag()).To(Equal("namespace/name"))
-				Expect(image.String()).To(Equal("namespace/name:v1@sha256:1234567890"))
-				Expect(image.GetDigest()).To(Equal("1234567890"))
-				Expect(image.GetHostname()).To(Equal("docker.io"))
-			})
-		})
-
-		Describe("When the image is a Docker Hub public image and has a digest", func() {
-			It("should be OK", func() {
-				image, err := NewReference("ubuntu:v1@sha256:1234567890")
-				Expect(err).ToNot(HaveOccurred())
-				Expect(image).ToNot(BeNil())
-				Expect(image.GetTag()).To(Equal("v1"))
-				Expect(image.NameWithTag()).To(Equal("ubuntu:v1"))
-				Expect(image.NameWithoutTag()).To(Equal("ubuntu"))
-				Expect(image.String()).To(Equal("ubuntu:v1@sha256:1234567890"))
-				Expect(image.GetDigest()).To(Equal("1234567890"))
-				Expect(image.GetHostname()).To(Equal("docker.io"))
-			})
-		})
-
-		Describe("When the image is valid and it's an IBM repository", func() {
-			It("should be OK", func() {
-				image, err := NewReference("registry.ng.bluemix.net/namespace/name")
-				Expect(err).ToNot(HaveOccurred())
-				Expect(image).ToNot(BeNil())
-				Expect(image.GetHostname()).To(Equal("registry.ng.bluemix.net"))
-				Expect(image.GetPort()).To(Equal(""))
-				Expect(image.HasIBMRepo()).To(BeTrue())
-				Expect(image.GetRegistryURL()).To(Equal("https://registry.ng.bluemix.net"))
-				Expect(image.GetContentTrustURL()).To(Equal("https://registry.ng.bluemix.net:4443"))
-				Expect(image.NameWithTag()).To(Equal("registry.ng.bluemix.net/namespace/name:latest"))
-				Expect(image.NameWithoutTag()).To(Equal("registry.ng.bluemix.net/namespace/name"))
-				Expect(image.GetTag()).To(Equal("latest"))
-			})
-		})
-
-		Describe("When the image is valid and it's an IBM repository", func() {
-			urls := []string{
-				"registry.ng.bluemix.net/namespace/name",
-				"registry.ng.bluemix.net:8080/namespace/name:v1",
-				"registry.eu-de.bluemix.net/namespace/name",
-				"registry.bluemix.net/namespace/name",
-				"registry.stage1.ng.bluemix.net/namespace/name",
+func TestReference(t *testing.T) {
+	type expectations struct {
+		ReferenceError  bool
+		Hostname        string
+		Port            string
+		HasIBMRepo      bool
+		RegistryURL     string
+		ContentTrustURL string
+		ContentTrustErr bool
+		Tag             string
+		Digest          string
+		NameWithTag     string
+		NameWithoutTag  string
+		String          string
+	}
+	tests := []struct {
+		name   string
+		in     string
+		expect expectations
+	}{
+		{
+			name: "errors on invalid input",
+			in:   "?",
+			expect: expectations{
+				ReferenceError: true,
+			},
+		},
+		{
+			name: "parses an image without a tag",
+			in:   "test.com/namespace/name",
+			expect: expectations{
+				Hostname:        "test.com",
+				HasIBMRepo:      false,
+				Port:            "",
+				Tag:             "latest",
+				Digest:          "",
+				NameWithTag:     "test.com/namespace/name:latest",
+				NameWithoutTag:  "test.com/namespace/name",
+				String:          "test.com/namespace/name",
+				RegistryURL:     "https://test.com",
+				ContentTrustErr: true,
+			},
+		},
+		{
+			name: "parses an image with a digest",
+			in:   "test.com:8080/namespace/name@sha256:1234567890",
+			expect: expectations{
+				Hostname:        "test.com",
+				HasIBMRepo:      false,
+				Port:            "8080",
+				Tag:             "latest",
+				Digest:          "1234567890",
+				NameWithTag:     "test.com:8080/namespace/name:latest",
+				NameWithoutTag:  "test.com:8080/namespace/name",
+				String:          "test.com:8080/namespace/name@sha256:1234567890",
+				RegistryURL:     "https://test.com:8080",
+				ContentTrustErr: true,
+			},
+		},
+		{
+			name: "parses an image with a tag",
+			in:   "test.com/namespace/name:v1",
+			expect: expectations{
+				Hostname:        "test.com",
+				HasIBMRepo:      false,
+				Port:            "",
+				Tag:             "v1",
+				Digest:          "",
+				NameWithTag:     "test.com/namespace/name:v1",
+				NameWithoutTag:  "test.com/namespace/name",
+				String:          "test.com/namespace/name:v1",
+				RegistryURL:     "https://test.com",
+				ContentTrustErr: true,
+			},
+		},
+		{
+			name: "parses an image with a tag and a digest",
+			in:   "test.com:8080/namespace/name:v1@sha256:1234567890",
+			expect: expectations{
+				Hostname:        "test.com",
+				HasIBMRepo:      false,
+				Port:            "8080",
+				Tag:             "v1",
+				Digest:          "1234567890",
+				NameWithTag:     "test.com:8080/namespace/name:v1",
+				NameWithoutTag:  "test.com:8080/namespace/name",
+				String:          "test.com:8080/namespace/name:v1@sha256:1234567890",
+				RegistryURL:     "https://test.com:8080",
+				ContentTrustErr: true,
+			},
+		},
+		{
+			name: "parses an image from Docker Hub with a tag and a digest",
+			in:   "namespace/name:v1@sha256:1234567890",
+			expect: expectations{
+				Hostname:        "docker.io",
+				HasIBMRepo:      false,
+				Port:            "",
+				Tag:             "v1",
+				Digest:          "1234567890",
+				NameWithTag:     "namespace/name:v1",
+				NameWithoutTag:  "namespace/name",
+				String:          "namespace/name:v1@sha256:1234567890",
+				RegistryURL:     "https://docker.io",
+				ContentTrustErr: false,
+				ContentTrustURL: "https://notary.docker.io",
+			},
+		},
+		{
+			name: "parses a Docker Hub public image with a tag and a digest",
+			in:   "ubuntu:v1@sha256:1234567890",
+			expect: expectations{
+				Hostname:        "docker.io",
+				HasIBMRepo:      false,
+				Port:            "",
+				Tag:             "v1",
+				Digest:          "1234567890",
+				NameWithTag:     "ubuntu:v1",
+				NameWithoutTag:  "ubuntu",
+				String:          "ubuntu:v1@sha256:1234567890",
+				RegistryURL:     "https://docker.io",
+				ContentTrustErr: false,
+				ContentTrustURL: "https://notary.docker.io",
+			},
+		},
+		{
+			name: "parses an IBM image",
+			in:   "registry.ng.bluemix.net/namespace/name",
+			expect: expectations{
+				Hostname:        "registry.ng.bluemix.net",
+				HasIBMRepo:      true,
+				Port:            "",
+				Tag:             "latest",
+				Digest:          "",
+				NameWithTag:     "registry.ng.bluemix.net/namespace/name:latest",
+				NameWithoutTag:  "registry.ng.bluemix.net/namespace/name",
+				String:          "registry.ng.bluemix.net/namespace/name",
+				RegistryURL:     "https://registry.ng.bluemix.net",
+				ContentTrustErr: false,
+				ContentTrustURL: "https://registry.ng.bluemix.net:4443",
+			},
+		},
+		{
+			name: "parses a quay.io image",
+			in:   "quay.io/namespace/name",
+			expect: expectations{
+				Hostname:        "quay.io",
+				HasIBMRepo:      false,
+				Port:            "",
+				Tag:             "latest",
+				Digest:          "",
+				NameWithTag:     "quay.io/namespace/name:latest",
+				NameWithoutTag:  "quay.io/namespace/name",
+				String:          "quay.io/namespace/name",
+				RegistryURL:     "https://quay.io",
+				ContentTrustErr: false,
+				ContentTrustURL: "https://quay.io:443",
+			},
+		},
+		{
+			name: "parses an ICR image",
+			in:   "us.icr.io/namespace/name",
+			expect: expectations{
+				Hostname:        "us.icr.io",
+				HasIBMRepo:      true,
+				Port:            "",
+				Tag:             "latest",
+				Digest:          "",
+				NameWithTag:     "us.icr.io/namespace/name:latest",
+				NameWithoutTag:  "us.icr.io/namespace/name",
+				String:          "us.icr.io/namespace/name",
+				RegistryURL:     "https://us.icr.io",
+				ContentTrustErr: false,
+				ContentTrustURL: "https://us.icr.io:4443",
+			},
+		},
+		{
+			name: "parses a staging ICR image",
+			in:   "stg.icr.io/namespace/name",
+			expect: expectations{
+				Hostname:        "stg.icr.io",
+				HasIBMRepo:      true,
+				Port:            "",
+				Tag:             "latest",
+				Digest:          "",
+				NameWithTag:     "stg.icr.io/namespace/name:latest",
+				NameWithoutTag:  "stg.icr.io/namespace/name",
+				String:          "stg.icr.io/namespace/name",
+				RegistryURL:     "https://stg.icr.io",
+				ContentTrustErr: false,
+				ContentTrustURL: "https://stg.icr.io:4443",
+			},
+		},
+		{
+			name: "parses an ICR image with a port",
+			in:   "de.icr.io:8080/namespace/name",
+			expect: expectations{
+				Hostname:        "de.icr.io",
+				HasIBMRepo:      true,
+				Port:            "8080",
+				Tag:             "latest",
+				Digest:          "",
+				NameWithTag:     "de.icr.io:8080/namespace/name:latest",
+				NameWithoutTag:  "de.icr.io:8080/namespace/name",
+				String:          "de.icr.io:8080/namespace/name",
+				RegistryURL:     "https://de.icr.io:8080",
+				ContentTrustErr: false,
+				ContentTrustURL: "https://de.icr.io:4443",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			image, err := NewReference(tt.in)
+			if tt.expect.ReferenceError {
+				assert.Error(t, err)
+				return
 			}
 
-			for _, imageStr := range urls {
-				It("should be OK with "+imageStr, func() {
-					parse, urlError := urlPackage.Parse(imageStr)
-					if urlError != nil {
-						panic(urlError.Error())
-					}
-					parts := strings.Split(imageStr, ":")
-					image, err := NewReference(imageStr)
-					Expect(err).ToNot(HaveOccurred())
-					Expect(image).ToNot(BeNil())
-					Expect(image.GetHostname()).To(Equal(parse.Hostname()))
-					Expect(image.GetPort()).To(Equal(parse.Port()))
-					Expect(image.HasIBMRepo()).To(BeTrue())
-					Expect(image.GetRegistryURL()).To(Equal(parse.Hostname() + ":" + parse.Port()))
-					Expect(image.GetContentTrustURL()).To(Equal("https://" + parse.Hostname() + "4443"))
-					if len(parts) > 1 {
-						tag := parts[2]
-						Expect(image.GetTag()).To(Equal(tag))
-						Expect(image.NameWithTag()).To(Equal(imageStr))
-						Expect(image.NameWithoutTag()).To(Equal(strings.TrimSuffix(imageStr, tag)))
-					}
-
-				})
+			if assert.NoError(t, err) {
+				assert.Equal(t, tt.expect.Hostname, image.GetHostname(), "Hostname")
+				assert.Equal(t, tt.expect.Port, image.GetPort(), "Port")
+				assert.Equal(t, tt.expect.HasIBMRepo, image.HasIBMRepo(), "HasIBMRepo")
+				assert.Equal(t, tt.expect.RegistryURL, image.GetRegistryURL(), "GetRegistryURL")
+				trustURL, trustErr := image.GetContentTrustURL()
+				if tt.expect.ContentTrustErr {
+					assert.Error(t, trustErr, "GetContentTrust err")
+				} else {
+					assert.NoError(t, trustErr, "GetContentTrust err")
+					assert.Equal(t, tt.expect.ContentTrustURL, trustURL, "GetContentTrust")
+				}
+				assert.Equal(t, tt.expect.Tag, image.GetTag(), "Tag")
+				assert.Equal(t, tt.expect.Digest, image.GetDigest(), "Digest")
+				assert.Equal(t, tt.expect.NameWithTag, image.NameWithTag(), "NameWithTag")
+				assert.Equal(t, tt.expect.NameWithoutTag, image.NameWithoutTag(), "NameWithoutTag")
+				assert.Equal(t, tt.expect.String, image.String(), "String")
 			}
 		})
-
-		Describe("When the image is valid but it's not an supported repository", func() {
-			It("should be OK", func() {
-				image, err := NewReference("test.com/namespace/name")
-				Expect(err).ToNot(HaveOccurred())
-				_, trustErr := image.GetContentTrustURL()
-				Expect(trustErr).To(HaveOccurred())
-			})
-		})
-
-		Describe("When the image is valid and it's from docker hub", func() {
-			It("should be OK", func() {
-				image, err := NewReference("namespace/name")
-				Expect(err).ToNot(HaveOccurred())
-				Expect(err).ToNot(HaveOccurred())
-				Expect(image).ToNot(BeNil())
-				Expect(image.GetHostname()).To(Equal("docker.io"))
-				Expect(image.GetPort()).To(Equal(""))
-				Expect(image.HasIBMRepo()).To(BeFalse())
-				Expect(image.GetRegistryURL()).To(Equal("https://docker.io"))
-				Expect(image.GetContentTrustURL()).To(Equal("https://notary.docker.io"))
-			})
-		})
-
-		Describe("When the image is valid and it's from quay.io", func() {
-			It("should be OK", func() {
-				image, err := NewReference("quay.io/namespace/name")
-				Expect(err).ToNot(HaveOccurred())
-				Expect(err).ToNot(HaveOccurred())
-				Expect(image).ToNot(BeNil())
-				Expect(image.GetHostname()).To(Equal("quay.io"))
-				Expect(image.GetPort()).To(Equal(""))
-				Expect(image.HasIBMRepo()).To(BeFalse())
-				Expect(image.GetRegistryURL()).To(Equal("https://quay.io"))
-				Expect(image.GetContentTrustURL()).To(Equal("https://quay.io:443"))
-			})
-		})
-
-		Describe("When the image is valid but it's not an IBM repository and the hostname has a port", func() {
-			It("should be OK", func() {
-				image, err := NewReference("test.com:8080/namespace/name:v1")
-				Expect(err).ToNot(HaveOccurred())
-				Expect(image).ToNot(BeNil())
-				Expect(image.GetHostname()).To(Equal("test.com"))
-				Expect(image.GetPort()).To(Equal("8080"))
-				Expect(image.HasIBMRepo()).To(BeFalse())
-				Expect(image.GetRegistryURL()).To(Equal("https://test.com:8080"))
-				Expect(image.GetContentTrustURL()).To(Equal("https://test.com:4443"))
-				Expect(image.GetTag()).To(Equal("v1"))
-				Expect(image.NameWithTag()).To(Equal("test.com:8080/namespace/name:v1"))
-				Expect(image.NameWithoutTag()).To(Equal("test.com:8080/namespace/name"))
-			})
-		})
-
-	})
-
+	}
 }

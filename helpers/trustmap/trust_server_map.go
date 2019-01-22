@@ -34,9 +34,16 @@ func IBMRegional(registryHostname string, imageHostname string) string {
 	return "https://" + strings.TrimSuffix(imageHostname, registryHostname) + trustSuffix
 }
 
+// ICRRegional IBM Sponsored Trust server, depends on the regional part of the docker image hostname.
+func ICRRegional(registryHostname string, imageHostname string) string {
+	trustSuffix := "icr.io:4443"
+	return "https://" + strings.TrimSuffix(imageHostname, registryHostname) + trustSuffix
+}
+
 // TrustServerMap Easy way to link known registries to their sponsored trust servers
 var TrustServerMap = map[string]TrustServerFn{
 	"docker.io":   Identity("https://notary.docker.io"),
-	"quay.io":     Identity("https://quay.io:4443"),
+	"quay.io":     Identity("https://quay.io:443"),
 	"bluemix.net": IBMRegional,
+	"icr.io":      ICRRegional,
 }
