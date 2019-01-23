@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: image-policy-crds
-  namespace: ibm-system
+  namespace: {{ .Values.namespace }}
   labels:
     app: {{ template "portieris.name" . }}
     chart: {{ template "portieris.chart" . }}

@@ -3,7 +3,7 @@ apiVersion: admissionregistration.k8s.io/v1beta1
 kind: MutatingWebhookConfiguration
 metadata:
   name: image-admission-config
-  namespace: ibm-system
+  namespace: {{ .Values.namespace }}
   labels:
     app: {{ template "portieris.name" . }}
     chart: {{ template "portieris.chart" . }}
@@ -14,7 +14,7 @@ webhooks:
     clientConfig:
       service:
         name: {{ template "portieris.name" . }}
-        namespace: ibm-system
+        namespace: {{ .Values.namespace }}
         path: "/admit"
       caBundle: {{ .Files.Get "certs/caCert.pem" | b64enc }}
     rules:
