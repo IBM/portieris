@@ -16,16 +16,21 @@ package fakeregistry
 
 import (
 	"sync"
+
+	"github.com/IBM/portieris/pkg/registry"
 )
+
+var _ registry.Interface = &FakeRegistry{}
 
 // FakeRegistry .
 type FakeRegistry struct {
-	GetContentTrustTokenStub        func(registryToken, imageRepo, hostname string) (string, error)
+	GetContentTrustTokenStub        func(username, password, imageRepo, hostname string) (string, error)
 	getContentTrustTokenMutex       sync.RWMutex
 	getContentTrustTokenArgsForCall []struct {
-		registryToken string
-		imageRepo     string
-		hostname      string
+		username  string
+		password  string
+		imageRepo string
+		hostname  string
 	}
 	getContentTrustTokenReturns struct {
 		token string
@@ -34,16 +39,17 @@ type FakeRegistry struct {
 }
 
 // GetContentTrustToken ...
-func (fake *FakeRegistry) GetContentTrustToken(registryToken, imageRepo, hostname string) (string, error) {
+func (fake *FakeRegistry) GetContentTrustToken(username, password, imageRepo, hostname string) (string, error) {
 	fake.getContentTrustTokenMutex.Lock()
 	fake.getContentTrustTokenArgsForCall = append(fake.getContentTrustTokenArgsForCall, struct {
-		registryToken string
-		imageRepo     string
-		hostname      string
-	}{registryToken, imageRepo, hostname})
+		username  string
+		password  string
+		imageRepo string
+		hostname  string
+	}{username, password, imageRepo, hostname})
 	fake.getContentTrustTokenMutex.Unlock()
 	if fake.GetContentTrustTokenStub != nil {
-		return fake.GetContentTrustTokenStub(registryToken, imageRepo, hostname)
+		return fake.GetContentTrustTokenStub(username, password, imageRepo, hostname)
 	}
 	return fake.getContentTrustTokenReturns.token, fake.getContentTrustTokenReturns.err
 }

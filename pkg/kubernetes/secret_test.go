@@ -47,7 +47,8 @@ func TestWrapper_GetSecretToken(t *testing.T) {
 		namespace  string
 		secretName string
 		registry   string
-		want       string
+		wantUser   string
+		wantPass   string
 		wantErr    bool
 	}{
 		{
@@ -57,7 +58,8 @@ func TestWrapper_GetSecretToken(t *testing.T) {
 			secretName: "name",
 			namespace:  "namespace",
 			registry:   "registry.ng.bluemix.net",
-			want:       "registry-token",
+			wantUser:   "token",
+			wantPass:   "registry-token",
 		},
 		{
 			name: "should return token for old imagePullSecret format",
@@ -66,7 +68,8 @@ func TestWrapper_GetSecretToken(t *testing.T) {
 			secretName: "name",
 			namespace:  "namespace",
 			registry:   "registry.ng.bluemix.net",
-			want:       "registry-token",
+			wantUser:   "token",
+			wantPass:   "registry-token",
 		},
 		{
 			name:       "error if secret not found",
@@ -109,12 +112,13 @@ func TestWrapper_GetSecretToken(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			kubeClientset := k8sfake.NewSimpleClientset(tt.secret)
 			w := NewKubeClientsetWrapper(kubeClientset)
-			got, err := w.GetSecretToken(tt.namespace, tt.secretName, tt.registry)
+			username, password, err := w.GetSecretToken(tt.namespace, tt.secretName, tt.registry)
 			if tt.wantErr {
 				assert.Error(t, err)
 			} else {
 				assert.NoError(t, err)
-				assert.Equal(t, tt.want, got)
+				assert.Equal(t, tt.wantUser, username)
+				assert.Equal(t, tt.wantPass, password)
 			}
 		})
 	}

@@ -36,15 +36,15 @@ type RegistriesStruct map[string]struct {
 }
 
 // GetSecretToken retrieve the token (password field) for the given namespace/secret/registry
-func (w *Wrapper) GetSecretToken(namespace, secretName, registry string) (string, error) {
+func (w *Wrapper) GetSecretToken(namespace, secretName, registry string) (string, string, error) {
 	// glog.Infof("getSecretToken << : namespace(%s) secret(%s) registry(%s)", namespace, secretName, registry)
-	var token string
+	var username, password string
 
 	// Retrieve secret
 	secret, err := w.CoreV1().Secrets(namespace).Get(secretName, metav1.GetOptions{})
 	if err != nil {
 		glog.Error("Error: ", err)
-		return token, err
+		return username, password, err
 	}
 
 	// Parse the returned data.
@@ -52,26 +52,27 @@ func (w *Wrapper) GetSecretToken(namespace, secretName, registry string) (string
 	if secretData, ok := secret.Data[".dockerconfigjson"]; ok {
 		if err := json.Unmarshal(secretData, &auths); err != nil {
 			glog.Errorf("Error unmarshalling .dockerconfigjson from %s: %v", secretName, err)
-			return token, err
+			return username, password, err
 		}
 	} else if dockerCfgData, ok := secret.Data[".dockercfg"]; ok {
 		registries := RegistriesStruct{}
 		if err := json.Unmarshal(dockerCfgData, &registries); err != nil {
 			glog.Errorf("Error unmarshalling .dockercfg from %s: %v", secretName, err)
-			return token, err
+			return username, password, err
 		}
 		auths.Registries = registries
 	} else {
-		return token, fmt.Errorf("imagePullSecret %s contains neither .dockercfg nor .dockerconfigjson", secretName)
+		return username, password, fmt.Errorf("imagePullSecret %s contains neither .dockercfg nor .dockerconfigjson", secretName)
 	}
 
 	// Determine if there is a secret for the specified registry
 	registries := auths.Registries
 	if login, ok := registries[registry]; ok {
-		token = login.Password
+		username = login.Username
+		password = login.Password
 	} else {
 		err = fmt.Errorf("Secret not defined for registry: %s", registry)
 	}
 	// glog.Infof("getSecretToken >> : token(%s)", token)
-	return token, err
+	return username, password, err
 }
