@@ -1,11 +1,11 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: create-admission-webhooks
+  name: delete-admission-webhooks
   namespace: {{ .Values.namespace }}
   annotations:
-    helm.sh/hook: post-install
-    helm.sh/hook-weight: "5"
+    helm.sh/hook: pre-delete
+    helm.sh/hook-weight: "-10"
     helm.sh/hook-delete-policy: hook-succeeded
   labels:
     app: {{ template "portieris.name" . }}
@@ -15,7 +15,7 @@ metadata:
 spec:
   template:
     metadata:
-      name: create-admission-webhooks
+      name: delete-admission-webhooks
       labels:
         app: {{ template "portieris.name" . }}
         chart: {{ template "portieris.chart" . }}
@@ -27,16 +27,9 @@ spec:
         - name: hyperkube
           image: "{{ .Values.hyperkube.repository }}:{{ .Values.hyperkube.tag }}"
           command:
-            # TODO: Add a wait until portieris is healthy 
             - /kubectl
-            - apply
-            - -f
-            - /tmp/portieris/webhooks.yaml
-          volumeMounts:
-            - mountPath: "/tmp/portieris"
-              name: tmp-configmap-portieris
-      volumes:
-        - name: tmp-configmap-portieris
-          configMap:
-            name: admission-webhooks
+            - delete
+            - MutatingWebhookConfiguration
+            - image-admission-config
+            - --ignore-not-found=true
       restartPolicy: OnFailure

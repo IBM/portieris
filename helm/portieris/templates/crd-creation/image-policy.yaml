@@ -1,0 +1,18 @@
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: imagepolicies.securityenforcement.admission.cloud.ibm.com
+  annotations:
+    "helm.sh/hook": crd-install
+    "helm.sh/hook-delete-policy": "before-hook-creation"
+  labels:
+    app: {{ template "portieris.name" . }}
+spec:
+  group: securityenforcement.admission.cloud.ibm.com
+  names:
+    kind: ImagePolicy
+    listKind: ImagePolicyList
+    plural: imagepolicies
+    singular: imagepolicy
+  scope: Namespaced
+  version: v1beta1

@@ -1,12 +1,12 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: create-default-image-policies
+  name: delete-crds
   namespace: {{ .Values.namespace }}
   annotations:
-    helm.sh/hook: post-install
+    helm.sh/hook: pre-delete
+    helm.sh/hook-weight: "-8"
     helm.sh/hook-delete-policy: hook-succeeded
-    helm.sh/hook-weight: "-3"
   labels:
     app: {{ template "portieris.name" . }}
     chart: {{ template "portieris.chart" . }}
@@ -15,7 +15,7 @@ metadata:
 spec:
   template:
     metadata:
-      name: create-crds
+      name: delete-crds
       labels:
         app: {{ template "portieris.name" . }}
         chart: {{ template "portieris.chart" . }}
@@ -28,15 +28,9 @@ spec:
           image: "{{ .Values.hyperkube.repository }}:{{ .Values.hyperkube.tag }}"
           command:
             - /kubectl
-            - apply
-            - -f
-            - /tmp/portieris/default-custom-resources.yaml
-          volumeMounts:
-            - mountPath: "/tmp/portieris"
-              name: tmp-configmap-portieris
-      volumes:
-        - name: tmp-configmap-portieris
-          configMap:
-            name: default-image-policies
+            - delete
+            - crd
+            - clusterimagepolicies.securityenforcement.admission.cloud.ibm.com
+            - imagepolicies.securityenforcement.admission.cloud.ibm.com
+            - --ignore-not-found=true
       restartPolicy: OnFailure
-      

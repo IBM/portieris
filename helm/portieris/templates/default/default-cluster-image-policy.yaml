@@ -1,0 +1,16 @@
+apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
+kind: ClusterImagePolicy
+metadata:
+  name: portieris-default-cluster-image-policy
+  annotations:
+    helm.sh/hook: post-install
+    helm.sh/hook-weight: "1"
+    "helm.sh/hook-delete-policy": "before-hook-creation"
+spec:
+   repositories:
+    # This enforces that all images deployed to this cluster pass trust
+    # IMPORTANT: Review this policy and replace it with one that meets your requirements.
+    - name: "*"
+      policy:
+        trust:
+          enabled: true

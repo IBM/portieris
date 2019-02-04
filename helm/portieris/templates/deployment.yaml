@@ -14,6 +14,11 @@ spec:
     matchLabels:
       app: {{ template "portieris.name" . }}
       release: {{ .Release.Name }}
+  strategy:
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 1
+    type: RollingUpdate
   template:
     metadata:
       labels:
