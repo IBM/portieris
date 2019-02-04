@@ -120,7 +120,6 @@ func (c *Controller) mutatePodSpec(namespace, specPath string, pod corev1.PodSpe
 
 			// Make sure image sure there is a ImagePullSecret defined
 			// TODO: This prevents use of signed publically available images with publically available signing data
-			var registryToken string
 			if len(pod.ImagePullSecrets) == 0 {
 				a.StringToAdmissionResponse(fmt.Sprintf("Deny %q, no ImagePullSecret defined for %s", img.String(), img.GetHostname()))
 				continue containerLoop
@@ -128,13 +127,22 @@ func (c *Controller) mutatePodSpec(namespace, specPath string, pod corev1.PodSpe
 
 		secretLoop:
 			for _, secret := range pod.ImagePullSecrets {
-				registryToken, err = c.kubeClientsetWrapper.GetSecretToken(namespace, secret.Name, img.GetHostname())
+				notaryURL := policy.Trust.TrustServer
+				if notaryURL == "" {
+					notaryURL, err = img.GetContentTrustURL()
+					if err != nil {
+						a.StringToAdmissionResponse(fmt.Sprintf("Trust Server/Image Configuration Error: %v", err.Error()))
+						continue containerLoop
+					}
+				}
+
+				username, password, err := c.kubeClientsetWrapper.GetSecretToken(namespace, secret.Name, img.GetHostname())
 				if err != nil {
 					glog.Error(err)
 					continue secretLoop
 				}
 
-				notaryToken, err := c.cr.GetContentTrustToken(registryToken, img.NameWithoutTag(), img.GetRegistryURL())
+				notaryToken, err := c.cr.GetContentTrustToken(username, password, img.NameWithoutTag(), img.GetRegistryURL())
 				if err != nil {
 					glog.Error(err)
 					continue secretLoop
@@ -156,14 +164,6 @@ func (c *Controller) mutatePodSpec(namespace, specPath string, pod corev1.PodSpe
 				// Get image digest
 				glog.Info("getting signed image...")
 
-				notaryURL := policy.Trust.TrustServer
-				if notaryURL == "" {
-					notaryURL, err = img.GetContentTrustURL()
-					if err != nil {
-						a.StringToAdmissionResponse(fmt.Sprintf("Trust Server/Image Configuration Error: %v", err.Error()))
-						continue containerLoop
-					}
-				}
 				digest, err := c.getDigest(notaryURL, img.NameWithoutTag(), notaryToken, img.GetTag(), signers)
 				if err != nil {
 					if strings.Contains(err.Error(), "401") {

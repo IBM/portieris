@@ -30,7 +30,7 @@ var _ WrapperInterface = &Wrapper{}
 type WrapperInterface interface {
 	kubernetes.Interface
 	GetPodSpec(*v1beta1.AdmissionRequest) (string, *corev1.PodSpec, error)
-	GetSecretToken(namespace, secretName, registry string) (string, error)
+	GetSecretToken(namespace, secretName, registry string) (string, string, error)
 }
 
 // Wrapper is a wrapper around kubeclientset that includes some helper functions for applying behaviour to kube resources
