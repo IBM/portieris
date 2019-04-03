@@ -64,13 +64,13 @@ func (c Client) GetNotaryRepo(server, image, notaryToken string) (notaryclient.R
 		c.trustDir,
 		data.GUN(image),
 		server,
-		c.makeHubTransport(server, notaryToken, image),
+		c.makeHubTransport(notaryToken),
 		nil,
 		trustpinning.TrustPinConfig{},
 	)
 }
 
-func (c Client) makeHubTransport(server, notaryToken, image string) http.RoundTripper {
+func (c Client) makeHubTransport(notaryToken string) http.RoundTripper {
 	base := &http.Transport{
 		Proxy: http.ProxyFromEnvironment,
 		Dial: (&net.Dialer{
