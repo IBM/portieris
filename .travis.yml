@@ -6,8 +6,6 @@ go:
 cache:
   bundler: true
 
-sudo: required
-
 services:
   - docker
 
