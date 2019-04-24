@@ -57,16 +57,16 @@ metadata:
   name: allow-custom
 spec:
    repositories:
-    - name: "registry.bluemix.net/*"
+    - name: "icr.io/*"
       policy:
         trust:
           enabled: true
-          trustServer: "https://registry.ng.bluemix.net:4443" # Optional, custom trust server for repository
+          trustServer: "https://icr.io:4443" # Optional, custom trust server for repository
 ```  
-For more information, see the [IBM Cloud docs](https://console.bluemix.net/docs/services/Registry/registry_security_enforce.html#customize_policies).
+For more information, see the [IBM Cloud docs](https://cloud.ibm.com/docs/services/Registry?topic=registry-security_enforce#customize_policies).
 ## Configuring access controls for your security policies
 
-You can configure Kubernetes RBAC rules to define which users and applications have the ability to modify your security policies. For more information, see the [IBM Cloud docs](https://console.bluemix.net/docs/services/Registry/registry_security_enforce.html#assign_user_policy).
+You can configure Kubernetes RBAC rules to define which users and applications have the ability to modify your security policies. For more information, see the [IBM Cloud docs](https://cloud.ibm.com/docs/services/Registry?topic=registry-security_enforce#assign_user_policy).
 
 ## Reporting security issues
 
