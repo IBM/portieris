@@ -21,6 +21,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/golang/glog"
@@ -60,8 +61,39 @@ func Request(token string, repo string, username string, writeAccessRequired boo
 		actions = "pull"
 	}
 
-	resp, err := client.PostForm(hostname+"/oauth/token", url.Values{
-		"service":    {service},
+	// Github issue 51 Fix
+	req, err := http.NewRequest("GET", hostname+"/v2/", nil)
+
+	resp, err := client.Do(req)
+
+	if err != nil {
+		glog.Errorf("Failed to query v2 endpoint for hostname: %s", hostname)
+		return nil, err
+	}
+
+	// this is to fetch the value of Www-Authenticate header value
+	wwwAuthenticateHeader := resp.Header.Get("Www-Authenticate")
+
+	if wwwAuthenticateHeader == "" {
+		errorMessage := "Www-Authenticate not found in the response header"
+		glog.Errorf(errorMessage)
+		return nil, fmt.Errorf(errorMessage)
+	}
+
+	// splitting on " to get the 1st index containing realm value for oauth server
+	// eg: Bearer realm="https://auth.docker.io/token",service="notary.docker.io"
+	authServer := strings.Split(wwwAuthenticateHeader, "\"")
+
+	if len(authServer) < 2 {
+		errorMessage := "Some issue occurred fetching the oauth server url from the response header"
+		glog.Errorf(errorMessage)
+		return nil, fmt.Errorf(errorMessage)
+	}
+
+	glog.Infof("Calling oauth endpoint: %s for registry service: %s", authServer[1], authServer[3])
+
+	resp, err = client.PostForm(authServer[1], url.Values{
+		"service":    {authServer[3]},
 		"grant_type": {"password"},
 		"client_id":  {"testclient"},
 		"username":   {username},

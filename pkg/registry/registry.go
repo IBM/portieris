@@ -15,7 +15,10 @@
 package registry
 
 import (
+	"fmt"
+
 	"github.com/IBM/portieris/helpers/oauth"
+	"github.com/golang/glog"
 )
 
 // Client .
@@ -37,5 +40,15 @@ func (c Client) GetContentTrustToken(username, password, imageRepo, hostname str
 	if err != nil {
 		return "", err
 	}
-	return token.Token, nil
+	useToken := ""
+	if token.Token != "" {
+		glog.Info("Using token")
+		useToken = token.Token
+	} else if token.AccessToken != "" {
+		glog.Info("Using access token")
+		useToken = token.AccessToken
+	} else {
+		return "", fmt.Errorf("neither token or access token could be found")
+	}
+	return useToken, nil
 }
