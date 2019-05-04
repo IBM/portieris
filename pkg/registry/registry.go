@@ -36,7 +36,7 @@ func NewClient() Interface {
 
 // GetContentTrustToken .
 func (c Client) GetContentTrustToken(username, password, imageRepo, hostname string) (string, error) {
-	token, err := oauth.Request(password, imageRepo, username, false, "notary", hostname)
+	token, err := oauth.Request(password, imageRepo, username, false, hostname)
 	if err != nil {
 		return "", err
 	}
