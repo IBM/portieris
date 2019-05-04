@@ -24,7 +24,6 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/golang/glog"
@@ -81,7 +80,7 @@ func GetHTTPClient(customFile string) *http.Client {
 //   *auth.TokenResponse - Details of the type is here https://github.ibm.com/alchemy-registry/registry-types/tree/master/auth#type-tokenresponse
 //                         Token is the element you will need to forward to the registry/notary as part of a Bearer Authorization Header
 //   error
-func Request(token string, repo string, username string, writeAccessRequired bool, service string, hostname string) (*TokenResponse, error) {
+func Request(token string, repo string, username string, writeAccessRequired bool, hostname string) (*TokenResponse, error) {
 	var actions string
 	//If you want to verify if a the credential supplied has read and write access to the repo we ask oauth for pull,push and *
 	if writeAccessRequired {
@@ -102,29 +101,26 @@ func Request(token string, repo string, username string, writeAccessRequired boo
 		return nil, err
 	}
 
-	// this is to fetch the value of Www-Authenticate header value
-	wwwAuthenticateHeader := resp.Header.Get("Www-Authenticate")
+	challengeSlice := ParseAuthHeader(resp.Header)
 
-	if wwwAuthenticateHeader == "" {
-		errorMessage := "Www-Authenticate not found in the response header"
-		glog.Errorf(errorMessage)
-		return nil, fmt.Errorf(errorMessage)
+	oauthEndpoint := ""
+	service := ""
+
+	for _, challenge := range challengeSlice {
+		oauthEndpoint = challenge.Parameters["realm"]
+		service = challenge.Parameters["service"]
 	}
 
-	// splitting on " to get the 1st index containing realm value for oauth server
-	// eg: Bearer realm="https://auth.docker.io/token",service="notary.docker.io"
-	authServer := strings.Split(wwwAuthenticateHeader, "\"")
-
-	if len(authServer) < 2 {
-		errorMessage := "Some issue occurred fetching the oauth server url from the response header"
-		glog.Errorf(errorMessage)
-		return nil, fmt.Errorf(errorMessage)
+	if oauthEndpoint == "" || service == "" {
+		errMessage := "unable to fetch www-authenticate header details"
+		glog.Errorf(errMessage)
+		return nil, fmt.Errorf(errMessage)
 	}
 
-	glog.Infof("Calling oauth endpoint: %s for registry service: %s", authServer[1], authServer[3])
+	glog.Infof("Calling oauth endpoint: %s for registry service: %s", oauthEndpoint, service)
 
-	resp, err = client.PostForm(authServer[1], url.Values{
-		"service":    {authServer[3]},
+	resp, err = client.PostForm(oauthEndpoint, url.Values{
+		"service":    {service},
 		"grant_type": {"password"},
 		"client_id":  {"testclient"},
 		"username":   {username},
