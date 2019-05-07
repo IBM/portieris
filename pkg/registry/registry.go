@@ -17,8 +17,9 @@ package registry
 import (
 	"fmt"
 
-	"github.com/IBM/portieris/helpers/oauth"
 	"github.com/golang/glog"
+
+	"github.com/IBM/portieris/helpers/oauth"
 )
 
 // Client .
@@ -26,7 +27,7 @@ type Client struct{}
 
 // Interface .
 type Interface interface {
-	GetContentTrustToken(username, password, imageRepo, hostname string) (string, error)
+	GetContentTrustToken(username, password, imageRepo string, challengeSlice []oauth.Challenge) (string, error)
 }
 
 // NewClient .
@@ -35,8 +36,8 @@ func NewClient() Interface {
 }
 
 // GetContentTrustToken .
-func (c Client) GetContentTrustToken(username, password, imageRepo, hostname string) (string, error) {
-	token, err := oauth.Request(password, imageRepo, username, false, hostname)
+func (c Client) GetContentTrustToken(username, password, imageRepo string, challengeSlice []oauth.Challenge) (string, error) {
+	token, err := oauth.Request(password, imageRepo, username, false, challengeSlice)
 	if err != nil {
 		return "", err
 	}

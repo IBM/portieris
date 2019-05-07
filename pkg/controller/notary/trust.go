@@ -42,9 +42,6 @@ type foundSigner struct {
 // getDigest .
 func (c *Controller) getDigest(server, image, notaryToken, targetName string, signers []Signer) (*bytes.Buffer, error) {
 	repo, err := c.trust.GetNotaryRepo(server, image, notaryToken)
-	if err != nil {
-		return nil, err
-	}
 
 	roleNames := make([]string, len(signers))
 	for i, val := range signers {
