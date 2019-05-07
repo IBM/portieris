@@ -274,7 +274,7 @@ func Test_OperationsSucces(t *testing.T) {
 				  "spec": {
 					 "containers": [
 						{
-						   "image": "registry.bluemix.net/cise/nginx:unsigned"
+						   "image": "icr.io/cise/nginx:unsigned"
 						}
 					 ]
 				  }

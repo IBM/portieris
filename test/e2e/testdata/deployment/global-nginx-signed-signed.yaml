@@ -17,11 +17,11 @@ spec:
     spec:
       containers:
       - name: nginx-signed
-        image: registry.bluemix.net/cise/nginx:signed
+        image: icr.io/cise/nginx:signed
         ports:
         - containerPort: 80
       - name: nginx-alsosigned
-        image: registry.bluemix.net/cise/nginx:signed
+        image: icr.io/cise/nginx:signed
         ports:
         - containerPort: 81
         command: ["/bin/sh"]

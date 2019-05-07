@@ -4,7 +4,7 @@ metadata:
   name: allow-unsigned-embedded-wildcard
 spec:
    repositories:
-    - name: "registry.bluemix.net/*/nginx"
+    - name: "icr.io/*/nginx"
       policy:
         trust:
           enabled: false

@@ -16,11 +16,11 @@ spec:
     {{ if .Values.IBMContainerService }}
     # These policies allow all IBM Cloud Container Service images from the global and all regional registries to deploy in this namespace.
     # IMPORTANT: When you create your own policy in this namespace, make sure to include these repositories. If you do not, the cluster might not function properly.
-    - name: "registry*.bluemix.net/armada/*"
+    - name: "*.icr.io/armada/*"
       policy:
-    - name: "registry*.bluemix.net/armada-worker/*"
+    - name: "*.icr.io/armada-worker/*"
       policy:
-    - name: "registry*.bluemix.net/armada-master/*"
+    - name: "*.icr.io/armada-master/*"
       policy:
     {{ end }}
     # This policy prevents Portieris from blocking itself
@@ -48,11 +48,11 @@ spec:
     {{ if .Values.IBMContainerService }}   
     # These policies allow all IBM Cloud Container Service images from the global and all regional registries to deploy in this namespace.
     # IMPORTANT: When you create your own policy in this namespace, make sure to include these repositories. If you do not, the cluster might not function properly.
-    - name: "registry*.bluemix.net/armada/*"
+    - name: "*.icr.io/armada/*"
       policy:
-    - name: "registry*.bluemix.net/armada-worker/*"
+    - name: "*.icr.io/armada-worker/*"
       policy:
-    - name: "registry*.bluemix.net/armada-master/*"
+    - name: "*.icr.io/armada-master/*"
       policy:
     {{ end }}
 ---

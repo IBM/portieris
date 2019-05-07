@@ -95,8 +95,8 @@ var _ = Describe("Main", func() {
 			secretName = "regsecret"
 			secretName1 = "regsecret1"
 			secretName2 = "regsecret3"
-			registry1 = "registry.ng.bluemix.net"
-			registry2 = "registry.bluemix.net"
+			registry1 = "us.icr.io"
+			registry2 = "icr.io"
 
 			badSecretName = "badSecretName"
 
@@ -173,11 +173,11 @@ var _ = Describe("Main", func() {
 				It("should deny the image ", func() {
 					fakeEnforcer("", "")
 					updateController()
-					req := newFakeRequest("registry.ng.bluemix.net/hello")
+					req := newFakeRequest("us.icr.io/hello")
 					wh.HandleAdmissionRequest(w, req)
 					parseResponse()
 					Expect(resp.Response.Allowed).To(BeFalse())
-					Expect(resp.Response.Result.Message).To(ContainSubstring(`Deny "registry.ng.bluemix.net/hello", no image policies or cluster polices`))
+					Expect(resp.Response.Result.Message).To(ContainSubstring(`Deny "us.icr.io/hello", no image policies or cluster polices`))
 				})
 			})
 
@@ -198,7 +198,7 @@ var _ = Describe("Main", func() {
 				It("should not enforce `trust` and allow the image without mutation", func() {
 					imageRepos := `"repositories": [
 						{
-							"name": "registry.ng.bluemix.net/*",
+							"name": "us.icr.io/*",
 							"policy": {
 								"va": {
 									"enabled": false
@@ -209,7 +209,7 @@ var _ = Describe("Main", func() {
 					clusterRepos := `"repositories": []`
 					fakeEnforcer(imageRepos, clusterRepos)
 					updateController()
-					req := newFakeRequest("registry.ng.bluemix.net/hello")
+					req := newFakeRequest("us.icr.io/hello")
 					wh.HandleAdmissionRequest(w, req)
 					parseResponse()
 					Expect(resp.Response.Patch).To(BeEmpty())
@@ -221,7 +221,7 @@ var _ = Describe("Main", func() {
 				It("should not enforce `trust` and allow the image without mutation", func() {
 					imageRepos := `"repositories": [
 						{
-							"name": "registry.ng.bluemix.net/*",
+							"name": "us.icr.io/*",
 							"policy": {
 								"trust": {
 									"enabled": false
@@ -235,7 +235,7 @@ var _ = Describe("Main", func() {
 					clusterRepos := `"repositories": []`
 					fakeEnforcer(imageRepos, clusterRepos)
 					updateController()
-					req := newFakeRequest("registry.ng.bluemix.net/hello")
+					req := newFakeRequest("us.icr.io/hello")
 					wh.HandleAdmissionRequest(w, req)
 					parseResponse()
 					Expect(resp.Response.Patch).To(BeEmpty())
@@ -272,7 +272,7 @@ var _ = Describe("Main", func() {
 				It("should deny the image", func() {
 					imageRepos := `"repositories": [
 						{
-							"name": "registry.no-secret.bluemix.net/*",
+							"name": "no-secret.icr.io/*",
 							"policy": {
 								"trust": {
 									"enabled": true
@@ -286,11 +286,11 @@ var _ = Describe("Main", func() {
 					clusterRepos := `"repositories": []`
 					fakeEnforcer(imageRepos, clusterRepos)
 					updateController()
-					req := newFakeRequest("registry.no-secret.bluemix.net/hello")
+					req := newFakeRequest("no-secret.icr.io/hello")
 					wh.HandleAdmissionRequest(w, req)
 					parseResponse()
 					Expect(resp.Response.Allowed).To(BeFalse())
-					Expect(resp.Response.Result.Message).To(ContainSubstring(`Deny "registry.no-secret.bluemix.net/hello", no valid ImagePullSecret defined for registry.no-secret.bluemix.net`))
+					Expect(resp.Response.Result.Message).To(ContainSubstring(`Deny "no-secret.icr.io/hello", no valid ImagePullSecret defined for no-secret.icr.io`))
 				})
 			})
 
@@ -298,7 +298,7 @@ var _ = Describe("Main", func() {
 				It("should deny the image", func() {
 					imageRepos := `"repositories": [
 						{
-							"name": "registry.ng.bluemix.net/*",
+							"name": "us.icr.io/*",
 							"policy": {
 								"trust": {
 									"enabled": true
@@ -312,11 +312,11 @@ var _ = Describe("Main", func() {
 					clusterRepos := `"repositories": []`
 					fakeEnforcer(imageRepos, clusterRepos)
 					updateController()
-					req := newFakeRequest("registry.ng.bluemix.net/?")
+					req := newFakeRequest("us.icr.io/?")
 					wh.HandleAdmissionRequest(w, req)
 					parseResponse()
 					Expect(resp.Response.Allowed).To(BeFalse())
-					Expect(resp.Response.Result.Message).To(ContainSubstring(`Deny "registry.ng.bluemix.net/?", invalid image name`))
+					Expect(resp.Response.Result.Message).To(ContainSubstring(`Deny "us.icr.io/?", invalid image name`))
 				})
 			})
 
@@ -324,7 +324,7 @@ var _ = Describe("Main", func() {
 				It("should deny the image", func() {
 					imageRepos := `"repositories": [
 						{
-							"name": "registry.ng.bluemix.net/*",
+							"name": "us.icr.io/*",
 							"policy": {
 								"trust": {
 									"enabled": true
@@ -339,11 +339,11 @@ var _ = Describe("Main", func() {
 					fakeEnforcer(imageRepos, clusterRepos)
 					cr.GetContentTrustTokenReturns("", fmt.Errorf("FAKE_INVALID_TOKEN_ERROR"))
 					updateController()
-					req := newFakeRequest("registry.ng.bluemix.net/hello")
+					req := newFakeRequest("us.icr.io/hello")
 					wh.HandleAdmissionRequest(w, req)
 					parseResponse()
 					Expect(resp.Response.Allowed).To(BeFalse())
-					Expect(resp.Response.Result.Message).To(ContainSubstring(`Deny "registry.ng.bluemix.net/hello", no valid ImagePullSecret defined for registry.ng.bluemix.net`))
+					Expect(resp.Response.Result.Message).To(ContainSubstring(`Deny "us.icr.io/hello", no valid ImagePullSecret defined for us.icr.io`))
 				})
 			})
 
@@ -351,7 +351,7 @@ var _ = Describe("Main", func() {
 				It("should deny the image", func() {
 					imageRepos := `"repositories": [
 						{
-							"name": "registry.ng.bluemix.net/*",
+							"name": "us.icr.io/*",
 							"policy": {
 								"trust": {
 									"enabled": true
@@ -368,7 +368,7 @@ var _ = Describe("Main", func() {
 					trust = &fakenotary.FakeNotary{} // Wipe out the stubbed good notary response that fakeEnforcer sets up
 					trust.GetNotaryRepoReturns(nil, fmt.Errorf("FAKE_NO_SIGNED_IMAGE_ERROR"))
 					updateController()
-					req := newFakeRequest("registry.ng.bluemix.net/hello")
+					req := newFakeRequest("us.icr.io/hello")
 					wh.HandleAdmissionRequest(w, req)
 					parseResponse()
 					Expect(resp.Response.Allowed).To(BeFalse())
@@ -381,7 +381,7 @@ var _ = Describe("Main", func() {
 				It("should mutate and allow the image", func() {
 					imageRepos := `"repositories": [
 						{
-							"name": "registry.ng.bluemix.net/*",
+							"name": "us.icr.io/*",
 							"policy": {
 								"trust": {
 									"enabled": true
@@ -399,11 +399,11 @@ var _ = Describe("Main", func() {
 					trust.GetNotaryRepoReturns(nil, fmt.Errorf("401"))
 					fakeGetRepo()
 					updateController()
-					req := newFakeRequestMultipleValidSecrets("registry.ng.bluemix.net/hello")
+					req := newFakeRequestMultipleValidSecrets("us.icr.io/hello")
 					wh.HandleAdmissionRequest(w, req)
 					parseResponse()
 					Expect(resp.Response.Allowed).To(BeTrue())
-					Expect(string(resp.Response.Patch)).To(ContainSubstring("registry.ng.bluemix.net/hello:latest@sha256:31323334353637383930"))
+					Expect(string(resp.Response.Patch)).To(ContainSubstring("us.icr.io/hello:latest@sha256:31323334353637383930"))
 				})
 			})
 
@@ -411,7 +411,7 @@ var _ = Describe("Main", func() {
 				It("should mutate and allow the image", func() {
 					imageRepos := `"repositories": [
 							{
-								"name": "registry.ng.bluemix.net/*",
+								"name": "us.icr.io/*",
 								"policy": {
 									"trust": {
 										"enabled": true
@@ -425,10 +425,10 @@ var _ = Describe("Main", func() {
 					clusterRepos := `"repositories": []`
 					fakeEnforcer(imageRepos, clusterRepos)
 					updateController()
-					req := newFakeRequest("registry.ng.bluemix.net/hello")
+					req := newFakeRequest("us.icr.io/hello")
 					wh.HandleAdmissionRequest(w, req)
 					parseResponse()
-					Expect(string(resp.Response.Patch)).To(ContainSubstring("registry.ng.bluemix.net/hello:latest@sha256:31323334353637383930"))
+					Expect(string(resp.Response.Patch)).To(ContainSubstring("us.icr.io/hello:latest@sha256:31323334353637383930"))
 					Expect(resp.Response.Allowed).To(BeTrue())
 				})
 			})
@@ -437,7 +437,7 @@ var _ = Describe("Main", func() {
 				It("should break on first success", func() {
 					imageRepos := `"repositories": [
 							{
-								"name": "registry.ng.bluemix.net/*",
+								"name": "us.icr.io/*",
 								"policy": {
 									"trust": {
 										"enabled": true
@@ -451,10 +451,10 @@ var _ = Describe("Main", func() {
 					clusterRepos := `"repositories": []`
 					fakeEnforcer(imageRepos, clusterRepos)
 					updateController()
-					req := newFakeRequestMulitpleSecretsBadSecond("registry.ng.bluemix.net/hello")
+					req := newFakeRequestMulitpleSecretsBadSecond("us.icr.io/hello")
 					wh.HandleAdmissionRequest(w, req)
 					parseResponse()
-					Expect(string(resp.Response.Patch)).To(ContainSubstring("registry.ng.bluemix.net/hello:latest@sha256:31323334353637383930"))
+					Expect(string(resp.Response.Patch)).To(ContainSubstring("us.icr.io/hello:latest@sha256:31323334353637383930"))
 					Expect(resp.Response.Allowed).To(BeTrue())
 				})
 			})
@@ -463,7 +463,7 @@ var _ = Describe("Main", func() {
 				It("should try all imagePullSecrets until successful ", func() {
 					imageRepos := `"repositories": [
 							{
-								"name": "registry.ng.bluemix.net/*",
+								"name": "us.icr.io/*",
 								"policy": {
 									"trust": {
 										"enabled": true
@@ -477,10 +477,10 @@ var _ = Describe("Main", func() {
 					clusterRepos := `"repositories": []`
 					fakeEnforcer(imageRepos, clusterRepos)
 					updateController()
-					req := newFakeRequestMulitpleSecrets("registry.ng.bluemix.net/hello")
+					req := newFakeRequestMulitpleSecrets("us.icr.io/hello")
 					wh.HandleAdmissionRequest(w, req)
 					parseResponse()
-					Expect(string(resp.Response.Patch)).To(ContainSubstring("registry.ng.bluemix.net/hello:latest@sha256:31323334353637383930"))
+					Expect(string(resp.Response.Patch)).To(ContainSubstring("us.icr.io/hello:latest@sha256:31323334353637383930"))
 					Expect(resp.Response.Allowed).To(BeTrue())
 				})
 			})
@@ -489,7 +489,7 @@ var _ = Describe("Main", func() {
 				It("should correctly mutate the podspec inside the deployment", func() {
 					imageRepos := `"repositories": [
 							{
-								"name": "registry.ng.bluemix.net/*",
+								"name": "us.icr.io/*",
 								"policy": {
 									"trust": {
 										"enabled": true
@@ -503,10 +503,10 @@ var _ = Describe("Main", func() {
 					clusterRepos := `"repositories": []`
 					fakeEnforcer(imageRepos, clusterRepos)
 					updateController()
-					req := newFakeRequestDeployment("registry.ng.bluemix.net/hello")
+					req := newFakeRequestDeployment("us.icr.io/hello")
 					wh.HandleAdmissionRequest(w, req)
 					parseResponse()
-					Expect(string(resp.Response.Patch)).To(ContainSubstring("registry.ng.bluemix.net/hello:latest@sha256:31323334353637383930"))
+					Expect(string(resp.Response.Patch)).To(ContainSubstring("us.icr.io/hello:latest@sha256:31323334353637383930"))
 					Expect(resp.Response.Allowed).To(BeTrue())
 				})
 			})
@@ -515,7 +515,7 @@ var _ = Describe("Main", func() {
 				It("should allow but not mutate the podspec", func() {
 					imageRepos := `"repositories": [
 							{
-								"name": "registry.ng.bluemix.net/*",
+								"name": "us.icr.io/*",
 								"policy": {
 									"trust": {
 										"enabled": true
@@ -529,10 +529,10 @@ var _ = Describe("Main", func() {
 					clusterRepos := `"repositories": []`
 					fakeEnforcer(imageRepos, clusterRepos)
 					updateController()
-					req := newFakeRequestWithParents("registry.ng.bluemix.net/hello")
+					req := newFakeRequestWithParents("us.icr.io/hello")
 					wh.HandleAdmissionRequest(w, req)
 					parseResponse()
-					Expect(string(resp.Response.Patch)).NotTo(ContainSubstring("registry.ng.bluemix.net/hello:latest@sha256:31323334353637383930"))
+					Expect(string(resp.Response.Patch)).NotTo(ContainSubstring("us.icr.io/hello:latest@sha256:31323334353637383930"))
 					Expect(resp.Response.Allowed).To(BeTrue())
 				})
 			})
@@ -541,7 +541,7 @@ var _ = Describe("Main", func() {
 				It("should allow but not mutate the podspec", func() {
 					imageRepos := `"repositories": [
 							{
-								"name": "registry.ng.bluemix.net/*",
+								"name": "us.icr.io/*",
 								"policy": {
 									"trust": {
 										"enabled": true
@@ -555,10 +555,10 @@ var _ = Describe("Main", func() {
 					clusterRepos := `"repositories": []`
 					fakeEnforcer(imageRepos, clusterRepos)
 					updateController()
-					req := newFakeRequestDeploymentWithZeroReplicas("registry.ng.bluemix.net/hello")
+					req := newFakeRequestDeploymentWithZeroReplicas("us.icr.io/hello")
 					wh.HandleAdmissionRequest(w, req)
 					parseResponse()
-					Expect(string(resp.Response.Patch)).NotTo(ContainSubstring("registry.ng.bluemix.net/hello:latest@sha256:31323334353637383930"))
+					Expect(string(resp.Response.Patch)).NotTo(ContainSubstring("us.icr.io/hello:latest@sha256:31323334353637383930"))
 					Expect(resp.Response.Allowed).To(BeTrue())
 				})
 			})
@@ -567,7 +567,7 @@ var _ = Describe("Main", func() {
 				It("should fail immediately", func() {
 					imageRepos := `"repositories": [
 							{
-								"name": "registry.ng.bluemix.net/*",
+								"name": "us.icr.io/*",
 								"policy": {
 									"trust": {
 										"enabled": true
@@ -583,13 +583,13 @@ var _ = Describe("Main", func() {
 					trust = &fakenotary.FakeNotary{} // Wipe out the stubbed good notary response that fakeEnforcer sets up
 					trust.GetNotaryRepoReturns(nil, store.ErrServerUnavailable{})
 					updateController()
-					req := newFakeRequestMultiContainer("registry.ng.bluemix.net/hello", "registry.ng.bluemix.net/goodbye")
+					req := newFakeRequestMultiContainer("us.icr.io/hello", "us.icr.io/goodbye")
 					wh.HandleAdmissionRequest(w, req)
 					parseResponse()
 					Expect(len(trust.GetNotaryRepoArgsForCall)).To(Equal(1))
-					Expect(trust.GetNotaryRepoArgsForCall[0].Server).To(Equal("https://registry.ng.bluemix.net:4443"))
+					Expect(trust.GetNotaryRepoArgsForCall[0].Server).To(Equal("https://us.icr.io:4443"))
 					Expect(resp.Response.Allowed).To(BeFalse())
-					Expect(resp.Response.Result.Message).To(BeIdenticalTo("\n" + `Deny "registry.ng.bluemix.net/hello", failed to get content trust information: unable to reach trust server at this time: 0.`))
+					Expect(resp.Response.Result.Message).To(BeIdenticalTo("\n" + `Deny "us.icr.io/hello", failed to get content trust information: unable to reach trust server at this time: 0.`))
 				})
 			})
 
@@ -597,7 +597,7 @@ var _ = Describe("Main", func() {
 				It("should fail immediately", func() {
 					imageRepos := `"repositories": [
 							{
-								"name": "registry.ng.bluemix.net/*",
+								"name": "us.icr.io/*",
 								"policy": {
 									"trust": {
 										"enabled": true,
@@ -614,13 +614,13 @@ var _ = Describe("Main", func() {
 					trust = &fakenotary.FakeNotary{} // Wipe out the stubbed good notary response that fakeEnforcer sets up
 					trust.GetNotaryRepoReturns(nil, store.ErrServerUnavailable{})
 					updateController()
-					req := newFakeRequestMultiContainer("registry.ng.bluemix.net/hello", "registry.ng.bluemix.net/goodbye")
+					req := newFakeRequestMultiContainer("us.icr.io/hello", "us.icr.io/goodbye")
 					wh.HandleAdmissionRequest(w, req)
 					parseResponse()
 					Expect(len(trust.GetNotaryRepoArgsForCall)).To(Equal(1))
 					Expect(trust.GetNotaryRepoArgsForCall[0].Server).To(Equal("https://some-trust-server.com:4443"))
 					Expect(resp.Response.Allowed).To(BeFalse())
-					Expect(resp.Response.Result.Message).To(BeIdenticalTo("\n" + `Deny "registry.ng.bluemix.net/hello", failed to get content trust information: unable to reach trust server at this time: 0.`))
+					Expect(resp.Response.Result.Message).To(BeIdenticalTo("\n" + `Deny "us.icr.io/hello", failed to get content trust information: unable to reach trust server at this time: 0.`))
 				})
 			})
 
@@ -628,7 +628,7 @@ var _ = Describe("Main", func() {
 				It("should return all failures", func() {
 					imageRepos := `"repositories": [
 							{
-								"name": "registry.ng.bluemix.net/*",
+								"name": "us.icr.io/*",
 								"policy": {
 									"trust": {
 										"enabled": true
@@ -645,15 +645,15 @@ var _ = Describe("Main", func() {
 					trust.GetNotaryRepoReturns(nil, fmt.Errorf("FAKE_NO_SIGNED_IMAGE_ERROR"))
 					trust.GetNotaryRepoReturns(nil, fmt.Errorf("FAKE_NO_SIGNED_IMAGE_ERROR"))
 					updateController()
-					req := newFakeRequestMultiContainer("registry.ng.bluemix.net/hello", "registry.ng.bluemix.net/goodbye")
+					req := newFakeRequestMultiContainer("us.icr.io/hello", "us.icr.io/goodbye")
 					wh.HandleAdmissionRequest(w, req)
 					parseResponse()
 					Expect(len(trust.GetNotaryRepoArgsForCall)).To(Equal(2))
-					Expect(trust.GetNotaryRepoArgsForCall[0].Server).To(Equal("https://registry.ng.bluemix.net:4443"))
-					Expect(trust.GetNotaryRepoArgsForCall[1].Server).To(Equal("https://registry.ng.bluemix.net:4443"))
+					Expect(trust.GetNotaryRepoArgsForCall[0].Server).To(Equal("https://us.icr.io:4443"))
+					Expect(trust.GetNotaryRepoArgsForCall[1].Server).To(Equal("https://us.icr.io:4443"))
 					Expect(resp.Response.Allowed).To(BeFalse())
-					Expect(resp.Response.Result.Message).To(ContainSubstring(`Deny "registry.ng.bluemix.net/hello", failed to get content trust information: FAKE_NO_SIGNED_IMAGE_ERROR`))
-					Expect(resp.Response.Result.Message).To(ContainSubstring(`Deny "registry.ng.bluemix.net/goodbye", failed to get content trust information: FAKE_NO_SIGNED_IMAGE_ERROR`))
+					Expect(resp.Response.Result.Message).To(ContainSubstring(`Deny "us.icr.io/hello", failed to get content trust information: FAKE_NO_SIGNED_IMAGE_ERROR`))
+					Expect(resp.Response.Result.Message).To(ContainSubstring(`Deny "us.icr.io/goodbye", failed to get content trust information: FAKE_NO_SIGNED_IMAGE_ERROR`))
 				})
 			})
 
@@ -661,7 +661,7 @@ var _ = Describe("Main", func() {
 				It("should return all failures", func() {
 					imageRepos := `"repositories": [
 							{
-								"name": "registry.ng.bluemix.net/*",
+								"name": "us.icr.io/*",
 								"policy": {
 									"trust": {
 										"enabled": true,
@@ -679,15 +679,15 @@ var _ = Describe("Main", func() {
 					trust.GetNotaryRepoReturns(nil, fmt.Errorf("FAKE_NO_SIGNED_IMAGE_ERROR"))
 					trust.GetNotaryRepoReturns(nil, fmt.Errorf("FAKE_NO_SIGNED_IMAGE_ERROR"))
 					updateController()
-					req := newFakeRequestMultiContainer("registry.ng.bluemix.net/hello", "registry.ng.bluemix.net/goodbye")
+					req := newFakeRequestMultiContainer("us.icr.io/hello", "us.icr.io/goodbye")
 					wh.HandleAdmissionRequest(w, req)
 					parseResponse()
 					Expect(len(trust.GetNotaryRepoArgsForCall)).To(Equal(2))
 					Expect(trust.GetNotaryRepoArgsForCall[0].Server).To(Equal("https://some-trust-server.com:4443"))
 					Expect(trust.GetNotaryRepoArgsForCall[1].Server).To(Equal("https://some-trust-server.com:4443"))
 					Expect(resp.Response.Allowed).To(BeFalse())
-					Expect(resp.Response.Result.Message).To(ContainSubstring(`Deny "registry.ng.bluemix.net/hello", failed to get content trust information: FAKE_NO_SIGNED_IMAGE_ERROR`))
-					Expect(resp.Response.Result.Message).To(ContainSubstring(`Deny "registry.ng.bluemix.net/goodbye", failed to get content trust information: FAKE_NO_SIGNED_IMAGE_ERROR`))
+					Expect(resp.Response.Result.Message).To(ContainSubstring(`Deny "us.icr.io/hello", failed to get content trust information: FAKE_NO_SIGNED_IMAGE_ERROR`))
+					Expect(resp.Response.Result.Message).To(ContainSubstring(`Deny "us.icr.io/goodbye", failed to get content trust information: FAKE_NO_SIGNED_IMAGE_ERROR`))
 				})
 			})
 
@@ -695,7 +695,7 @@ var _ = Describe("Main", func() {
 				It("should allow the image", func() {
 					imageRepos := `"repositories": [
 						{
-							"name": "registry.bluemix.net/*",
+							"name": "icr.io/*",
 							"policy": {
 								"trust": {
 									"enabled": false
@@ -706,7 +706,7 @@ var _ = Describe("Main", func() {
 							}
 						},
 						{
-							"name": "registry.ng.bluemix.net/*",
+							"name": "us.icr.io/*",
 							"policy": {
 								"trust": {
 									"enabled": true
@@ -722,11 +722,11 @@ var _ = Describe("Main", func() {
 					trust = &fakenotary.FakeNotary{} // Wipe out the stubbed good notary response that fakeEnforcer sets up
 					trust.GetNotaryRepoReturns(nil, fmt.Errorf("FAKE_NO_SIGNED_IMAGE_ERROR"))
 					updateController()
-					req := newFakeRequestMultiContainer("registry.ng.bluemix.net/hello", "registry.bluemix.net/goodbye")
+					req := newFakeRequestMultiContainer("us.icr.io/hello", "icr.io/goodbye")
 					wh.HandleAdmissionRequest(w, req)
 					parseResponse()
 					Expect(len(trust.GetNotaryRepoArgsForCall)).To(Equal(1))
-					Expect(trust.GetNotaryRepoArgsForCall[0].Server).To(Equal("https://registry.ng.bluemix.net:4443"))
+					Expect(trust.GetNotaryRepoArgsForCall[0].Server).To(Equal("https://us.icr.io:4443"))
 					Expect(resp.Response.Allowed).To(BeFalse())
 				})
 			})
@@ -735,7 +735,7 @@ var _ = Describe("Main", func() {
 				It("should allow the image", func() {
 					imageRepos := `"repositories": [
 						{
-							"name": "registry.ng.bluemix.net/hello",
+							"name": "us.icr.io/hello",
 							"policy": {
 								"trust": {
 									"enabled": true
@@ -746,7 +746,7 @@ var _ = Describe("Main", func() {
 							}
 						},
 						{
-							"name": "registry.bluemix.net/goodbye",
+							"name": "icr.io/goodbye",
 							"policy": {
 								"trust": {
 									"enabled": true,
@@ -764,14 +764,14 @@ var _ = Describe("Main", func() {
 					trust.GetNotaryRepoReturns(nil, fmt.Errorf("some error"))
 					trust.GetNotaryRepoReturns(nil, fmt.Errorf("some error"))
 					updateController()
-					req := newFakeRequestMultiContainerMultiSecret("registry.ng.bluemix.net/hello", "registry.bluemix.net/goodbye")
+					req := newFakeRequestMultiContainerMultiSecret("us.icr.io/hello", "icr.io/goodbye")
 					wh.HandleAdmissionRequest(w, req)
 					parseResponse()
 					Expect(len(trust.GetNotaryRepoArgsForCall)).To(Equal(2))
-					Expect(trust.GetNotaryRepoArgsForCall[0].Server).To(Equal("https://registry.ng.bluemix.net:4443"))
-					Expect(trust.GetNotaryRepoArgsForCall[0].Image).To(Equal("registry.ng.bluemix.net/hello"))
+					Expect(trust.GetNotaryRepoArgsForCall[0].Server).To(Equal("https://us.icr.io:4443"))
+					Expect(trust.GetNotaryRepoArgsForCall[0].Image).To(Equal("us.icr.io/hello"))
 					Expect(trust.GetNotaryRepoArgsForCall[1].Server).To(Equal("https://some-trust-server.com:4443"))
-					Expect(trust.GetNotaryRepoArgsForCall[1].Image).To(Equal("registry.bluemix.net/goodbye"))
+					Expect(trust.GetNotaryRepoArgsForCall[1].Image).To(Equal("icr.io/goodbye"))
 					Expect(resp.Response.Allowed).To(BeFalse())
 				})
 			})
@@ -780,7 +780,7 @@ var _ = Describe("Main", func() {
 				It("should deny the admission of the request", func() {
 					imageRepos := `"repositories": [
 						{
-							"name": "registry.ng.bluemix.net/*",
+							"name": "us.icr.io/*",
 							"policy": {
 								"trust": {
 									"enabled": false
@@ -794,7 +794,7 @@ var _ = Describe("Main", func() {
 					clusterRepos := `"repositories": []`
 					fakeEnforcer(imageRepos, clusterRepos)
 					updateController()
-					req := newFakeRequestInitContainer("registry.bluemix.net/hello", "registry.ng.bluemix.net/goodbye")
+					req := newFakeRequestInitContainer("icr.io/hello", "us.icr.io/goodbye")
 					wh.HandleAdmissionRequest(w, req)
 					parseResponse()
 					Expect(resp.Response.Allowed).To(BeFalse())
@@ -805,7 +805,7 @@ var _ = Describe("Main", func() {
 				It("should correctly mutate the initContainer field in the podspec", func() {
 					imageRepos := `"repositories": [
                             {
-								"name": "registry.bluemix.net/*",
+								"name": "icr.io/*",
 								"policy": {
 									"trust": {
 										"enabled": false
@@ -816,7 +816,7 @@ var _ = Describe("Main", func() {
 								}
 							},
 							{
-								"name": "registry.ng.bluemix.net/*",
+								"name": "us.icr.io/*",
 								"policy": {
 									"trust": {
 										"enabled": true
@@ -831,10 +831,10 @@ var _ = Describe("Main", func() {
 					fakeEnforcer(imageRepos, clusterRepos)
 					fakeGetRepo()
 					updateController()
-					req := newFakeRequestInitContainer("registry.ng.bluemix.net/hello", "registry.bluemix.net/nosign")
+					req := newFakeRequestInitContainer("us.icr.io/hello", "icr.io/nosign")
 					wh.HandleAdmissionRequest(w, req)
 					parseResponse()
-					Expect(string(resp.Response.Patch)).To(ContainSubstring("registry.ng.bluemix.net/hello:latest@sha256:31323334353637383930"))
+					Expect(string(resp.Response.Patch)).To(ContainSubstring("us.icr.io/hello:latest@sha256:31323334353637383930"))
 					// Check if added patch contains patch to initContainers
 					Expect(string(resp.Response.Patch)).To(ContainSubstring("initContainers"))
 					Expect(resp.Response.Allowed).To(BeTrue())

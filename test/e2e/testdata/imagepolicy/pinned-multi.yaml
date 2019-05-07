@@ -4,7 +4,7 @@ metadata:
   name: pinned-multi
 spec:
    repositories:
-    - name: "registry.bluemix.net/cise/nginx"
+    - name: "icr.io/cise/nginx"
       policy:
         trust:
           enabled: true
