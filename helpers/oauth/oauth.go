@@ -80,7 +80,7 @@ func GetHTTPClient(customFile string) *http.Client {
 //   *auth.TokenResponse - Details of the type is here https://github.ibm.com/alchemy-registry/registry-types/tree/master/auth#type-tokenresponse
 //                         Token is the element you will need to forward to the registry/notary as part of a Bearer Authorization Header
 //   error
-func Request(token string, repo string, username string, writeAccessRequired bool, hostname string) (*TokenResponse, error) {
+func Request(token string, repo string, username string, writeAccessRequired bool, challengeSlice []Challenge) (*TokenResponse, error) {
 	var actions string
 	//If you want to verify if a the credential supplied has read and write access to the repo we ask oauth for pull,push and *
 	if writeAccessRequired {
@@ -106,31 +106,45 @@ func Request(token string, repo string, username string, writeAccessRequired boo
 	oauthEndpoint := ""
 	service := ""
 
+	if challengeSlice == nil {
+		errMessage := "unable to fetch www-authenticate header details"
+		glog.Errorf(errMessage)
+		return nil, fmt.Errorf(errMessage)
+	}
+
 	for _, challenge := range challengeSlice {
 		oauthEndpoint = challenge.Parameters["realm"]
 		service = challenge.Parameters["service"]
 	}
 
 	if oauthEndpoint == "" || service == "" {
-		errMessage := "unable to fetch www-authenticate header details"
+		errMessage := "unable to fetch oauth realm and service header details"
 		glog.Errorf(errMessage)
 		return nil, fmt.Errorf(errMessage)
 	}
 
 	glog.Infof("Calling oauth endpoint: %s for registry service: %s", oauthEndpoint, service)
-
-	resp, err = client.PostForm(oauthEndpoint, url.Values{
-		"service":    {service},
-		"grant_type": {"password"},
-		"client_id":  {"testclient"},
-		"username":   {username},
-		"password":   {token},
-		"scope":      {"repository:" + repo + ":" + actions},
-	})
-
-	if err != nil {
-		glog.Errorf("Error sending request to registry-oauth: %v", err)
-		return nil, err
+	var resp *http.Response
+	var err error
+	if oauthEndpoint == "https://auth.docker.io/token" {
+		resp, err = client.Get(oauthEndpoint)
+		if err != nil {
+			glog.Errorf("Error sending GET request to registry-oauth: %v", err)
+			return nil, err
+		}
+	} else {
+		resp, err = client.PostForm(oauthEndpoint, url.Values{
+			"service":    {service},
+			"grant_type": {"password"},
+			"client_id":  {"testclient"},
+			"username":   {username},
+			"password":   {token},
+			"scope":      {"repository:" + repo + ":" + actions},
+		})
+		if err != nil {
+			glog.Errorf("Error sending POST request to registry-oauth: %v", err)
+			return nil, err
+		}
 	}
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
@@ -152,4 +166,20 @@ func Request(token string, repo string, username string, writeAccessRequired boo
 	}
 
 	return &tokenResponse, nil
+}
+
+// CheckAuthRequired - checks if the given image needs to be authenticated to fetch metadata or not and returns the response
+func CheckAuthRequired(notaryURL, hostName, repoName string) (*http.Response, error) {
+	glog.Infof("Notary URL: %s Hostname %s RepoName %s", notaryURL, hostName, repoName)
+	// Github issue 51 Fix
+	req, err := http.NewRequest("GET", notaryURL+"/v2/"+hostName+"/"+repoName+"/_trust/tuf/root.json", nil)
+
+	resp, err := client.Do(req)
+
+	if err != nil {
+		glog.Errorf("Failed to query v2 tuf endpoint for notaryURL: %s", notaryURL)
+		return nil, err
+	}
+
+	return resp, nil
 }
