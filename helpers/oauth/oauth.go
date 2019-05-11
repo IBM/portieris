@@ -81,13 +81,13 @@ func GetHTTPClient(customFile string) *http.Client {
 //                         Token is the element you will need to forward to the registry/notary as part of a Bearer Authorization Header
 //   error
 func Request(token string, repo string, username string, writeAccessRequired bool, challengeSlice []Challenge) (*TokenResponse, error) {
-	var actions string
-	//If you want to verify if a the credential supplied has read and write access to the repo we ask oauth for pull,push and *
-	if writeAccessRequired {
-		actions = "pull,push,*"
-	} else {
-		actions = "pull"
-	}
+	// var actions string
+	// //If you want to verify if a the credential supplied has read and write access to the repo we ask oauth for pull,push and *
+	// if writeAccessRequired {
+	// 	actions = "pull,push,*"
+	// } else {
+	// 	actions = "pull"
+	// }
 
 	client := GetHTTPClient("/etc/certs/ca.pem")
 
@@ -105,6 +105,7 @@ func Request(token string, repo string, username string, writeAccessRequired boo
 
 	oauthEndpoint := ""
 	service := ""
+	scope := ""
 
 	if challengeSlice == nil {
 		errMessage := "unable to fetch www-authenticate header details"
@@ -115,6 +116,7 @@ func Request(token string, repo string, username string, writeAccessRequired boo
 	for _, challenge := range challengeSlice {
 		oauthEndpoint = challenge.Parameters["realm"]
 		service = challenge.Parameters["service"]
+		scope = challenge.Parameters["scope"]
 	}
 
 	if oauthEndpoint == "" || service == "" {
@@ -123,11 +125,12 @@ func Request(token string, repo string, username string, writeAccessRequired boo
 		return nil, fmt.Errorf(errMessage)
 	}
 
-	glog.Infof("Calling oauth endpoint: %s for registry service: %s", oauthEndpoint, service)
+	glog.Infof("Calling oauth endpoint: %s for registry service: %s and scope %s", oauthEndpoint, service, scope)
 	var resp *http.Response
 	var err error
 	if oauthEndpoint == "https://auth.docker.io/token" {
-		resp, err = client.Get(oauthEndpoint)
+		glog.Info("Calling: " + oauthEndpoint + "?service=" + service + "&scope=" + scope)
+		resp, err = client.Get(oauthEndpoint + "?service=" + service + "&scope=" + scope)
 		if err != nil {
 			glog.Errorf("Error sending GET request to registry-oauth: %v", err)
 			return nil, err
@@ -136,10 +139,11 @@ func Request(token string, repo string, username string, writeAccessRequired boo
 		resp, err = client.PostForm(oauthEndpoint, url.Values{
 			"service":    {service},
 			"grant_type": {"password"},
-			"client_id":  {"testclient"},
+			"client_id":  {"portieris-client"},
 			"username":   {username},
 			"password":   {token},
-			"scope":      {"repository:" + repo + ":" + actions},
+			"scope":      {scope},
+			// "scope":      {"repository:" + repo + ":" + actions},
 		})
 		if err != nil {
 			glog.Errorf("Error sending POST request to registry-oauth: %v", err)
@@ -172,7 +176,13 @@ func Request(token string, repo string, username string, writeAccessRequired boo
 func CheckAuthRequired(notaryURL, hostName, repoName string) (*http.Response, error) {
 	glog.Infof("Notary URL: %s Hostname %s RepoName %s", notaryURL, hostName, repoName)
 	// Github issue 51 Fix
-	req, err := http.NewRequest("GET", notaryURL+"/v2/"+hostName+"/"+repoName+"/_trust/tuf/root.json", nil)
+	var req *http.Request
+	var err error
+	if hostName == "docker.io" {
+		req, err = http.NewRequest("GET", notaryURL+"/v2/"+hostName+"/library/"+repoName+"/_trust/tuf/root.json", nil)
+	} else {
+		req, err = http.NewRequest("GET", notaryURL+"/v2/"+hostName+"/"+repoName+"/_trust/tuf/root.json", nil)
+	}
 
 	resp, err := client.Do(req)
 
