@@ -173,12 +173,12 @@ func Request(token string, repo string, username string, writeAccessRequired boo
 }
 
 // CheckAuthRequired - checks if the given image needs to be authenticated to fetch metadata or not and returns the response
-func CheckAuthRequired(notaryURL, hostName, repoName string) (*http.Response, error) {
+func CheckAuthRequired(notaryURL, hostName, repoName string, official bool) (*http.Response, error) {
 	glog.Infof("Notary URL: %s Hostname %s RepoName %s", notaryURL, hostName, repoName)
 	// Github issue 51 Fix
 	var req *http.Request
 	var err error
-	if hostName == "docker.io" {
+	if hostName == "docker.io" && official {
 		req, err = http.NewRequest("GET", notaryURL+"/v2/"+hostName+"/library/"+repoName+"/_trust/tuf/root.json", nil)
 	} else {
 		req, err = http.NewRequest("GET", notaryURL+"/v2/"+hostName+"/"+repoName+"/_trust/tuf/root.json", nil)
