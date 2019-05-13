@@ -51,7 +51,7 @@ func NewReference(name string) (*Reference, error) {
 	}
 
 	// Get the hostname
-	hostname, repoName := reference.SplitHostname(ref)
+	hostname, reponame := reference.SplitHostname(ref)
 	if hostname == "" {
 		// If no domain found, treat it as docker.io
 		hostname = "docker.io"
@@ -83,7 +83,7 @@ func NewReference(name string) (*Reference, error) {
 		digest:   digest,
 		hostname: u.Hostname(),
 		port:     u.Port(),
-		repo:     repoName,
+		repo:     reponame,
 	}, nil
 }
 
@@ -152,7 +152,7 @@ func (r Reference) NameWithoutTag() string {
 	return r.name
 }
 
-// RepoName returns the repo name
+// RepoName returns the image name without the tag.
 func (r Reference) RepoName() string {
 	return r.repo
 }

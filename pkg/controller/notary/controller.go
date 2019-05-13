@@ -129,7 +129,9 @@ func (c *Controller) mutatePodSpec(namespace, specPath string, pod corev1.PodSpe
 				}
 			}
 
-			resp, err1 := oauth.CheckAuthRequired(notaryURL, img.GetHostname(), img.RepoName())
+			official := !strings.ContainsRune(img.NameWithoutTag(), '/')
+
+			resp, err1 := oauth.CheckAuthRequired(notaryURL, img.GetHostname(), img.RepoName(), official)
 
 			if err1 != nil {
 				glog.Error(err)
@@ -198,9 +200,16 @@ func (c *Controller) mutatePodSpec(namespace, specPath string, pod corev1.PodSpe
 			}
 
 			// Get image digest
-			glog.Info("getting signed image...")
+			glog.Infof("getting signed image... %v", img.RepoName())
 			// notaryToken will be blank for unauthorized calls
-			digest, err := c.getDigest(notaryURL, img.NameWithoutTag(), notaryToken, img.GetTag(), signers)
+			var image string
+			if official {
+				image = "docker.io/library/" + img.RepoName()
+			} else {
+				image = img.NameWithoutTag()
+			}
+			glog.Infof("Image: %v", image)
+			digest, err := c.getDigest(notaryURL, image, notaryToken, img.GetTag(), signers)
 
 			if err != nil {
 				if strings.Contains(err.Error(), "401") {

@@ -41,11 +41,12 @@ type foundSigner struct {
 
 // getDigest .
 func (c *Controller) getDigest(server, image, notaryToken, targetName string, signers []Signer) (*bytes.Buffer, error) {
+	glog.Infof("Fetching repo for image %v with tag %v", image, targetName)
 	repo, err := c.trust.GetNotaryRepo(server, image, notaryToken)
 	if err != nil {
 		return nil, err
 	}
-
+	glog.Infof("Repo %v", repo)
 	roleNames := make([]string, len(signers))
 	for i, val := range signers {
 		roleNames[i] = path.Join(data.CanonicalTargetsRole.String(), val.signer)
