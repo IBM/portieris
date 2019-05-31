@@ -17,6 +17,7 @@ package kubernetes
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 
 	"github.com/golang/glog"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -52,9 +53,24 @@ func (w *Wrapper) GetSecretKey(namespace, secretName string) ([]byte, error) {
 }
 
 // GetSecretToken retrieve the token (password field) for the given namespace/secret/registry
-func (w *Wrapper) GetSecretToken(namespace, secretName, registry string) (string, string, error) {
+func (w *Wrapper) GetSecretToken(namespace, secretName, registry string, defaultPull bool) (string, string, error) {
 	// glog.Infof("getSecretToken << : namespace(%s) secret(%s) registry(%s)", namespace, secretName, registry)
 	var username, password string
+
+	// TODO remove hard coded value after local testing
+	if defaultPull {
+		if os.Getenv("NAMESPACE") == "" || os.Getenv("SECRETNAME") == "" {
+			errMessage := "Default namespace and/or secretname details not present to fetch token"
+			glog.Errorf(errMessage)
+			return username, password, fmt.Errorf(errMessage)
+		}
+		// fetching the default namespace and secret name for image pull secrets if nothing has been mentioned and relying on the
+		// dockerconfig file of the host system
+		namespace = os.Getenv("NAMESPACE")
+		secretName = os.Getenv("SECRETNAME")
+	}
+
+	glog.Infof("getSecretToken << : namespace(%s) secret(%s) registry(%s)", namespace, secretName, registry)
 
 	// Retrieve secret
 	secret, err := w.CoreV1().Secrets(namespace).Get(secretName, metav1.GetOptions{})

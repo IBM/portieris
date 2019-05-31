@@ -45,7 +45,7 @@ func (v *Verifier) getDigest(server, image, notaryToken, targetName string, sign
 	if err != nil {
 		return nil, err
 	}
-	glog.Infof("Repo %v", repo)
+
 	roleNames := make([]string, len(signers))
 	for i, val := range signers {
 		roleNames[i] = path.Join(data.CanonicalTargetsRole.String(), val.signer)
