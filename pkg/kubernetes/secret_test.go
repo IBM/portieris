@@ -112,7 +112,7 @@ func TestWrapper_GetSecretToken(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			kubeClientset := k8sfake.NewSimpleClientset(tt.secret)
 			w := NewKubeClientsetWrapper(kubeClientset)
-			username, password, err := w.GetSecretToken(tt.namespace, tt.secretName, tt.registry)
+			username, password, err := w.GetSecretToken(tt.namespace, tt.secretName, tt.registry, false)
 			if tt.wantErr {
 				assert.Error(t, err)
 			} else {

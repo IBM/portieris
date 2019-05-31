@@ -160,18 +160,21 @@ func (c *Controller) mutatePodSpec(namespace, specPath string, pod corev1.PodSpe
 				}
 			}
 
+			defaultPull := false
+
 			// Make sure image sure there is a ImagePullSecret defined
 			// TODO: This prevents use of signed publically available images with publically available signing data
 			// You need image pull secrets if the endpoint is an authorized endpoint
 			if len(pod.ImagePullSecrets) == 0 && resp.StatusCode == http.StatusUnauthorized && notaryToken == "" {
-				a.StringToAdmissionResponse(fmt.Sprintf("Deny %q, no ImagePullSecret defined for %s", img.String(), img.GetHostname()))
-				continue containerLoop
+				// a.StringToAdmissionResponse(fmt.Sprintf("Deny %q, no ImagePullSecret defined for %s", img.String(), img.GetHostname()))
+				// continue containerLoop
+				defaultPull = true
 			}
 
 		secretLoop:
 			for _, secret := range pod.ImagePullSecrets {
 
-				username, password, err := c.kubeClientsetWrapper.GetSecretToken(namespace, secret.Name, img.GetHostname())
+				username, password, err := c.kubeClientsetWrapper.GetSecretToken(namespace, secret.Name, img.GetHostname(), defaultPull)
 				if err != nil {
 					glog.Error(err)
 					continue secretLoop
@@ -184,6 +187,18 @@ func (c *Controller) mutatePodSpec(namespace, specPath string, pod corev1.PodSpe
 				}
 
 				break secretLoop
+			}
+
+			if defaultPull {
+				username, password, err := c.kubeClientsetWrapper.GetSecretToken("", "", img.GetHostname(), defaultPull)
+				if err != nil {
+					glog.Error(err)
+				}
+
+				notaryToken, err = c.cr.GetContentTrustToken(username, password, img.NameWithoutTag(), challengeSlice)
+				if err != nil {
+					glog.Error(err)
+				}
 			}
 
 			var signers []Signer

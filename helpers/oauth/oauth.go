@@ -44,21 +44,13 @@ var client = &http.Client{
 //   token               - Auth token being used for the request
 //   repo                - Repo you are requesting access too e.g. bainsy88/busybox
 //   username            - Username for the OAuth request, identifies the type of token being passed in. Valid usernames are token (for registry token), iambearer, iamapikey, bearer (UAA bearer (legacy)), iamrefresh
-//   writeAccessRequired - Whether or not you require write (push and delete) access as well as read (pull)
 //   service             - The service you are retrieving the OAuth token for. Current services are either "notary" or "registry"
 //   hostname            - Hostname of the registry you wish to call e.g. https://icr.io
 // Returns:
 //   *auth.TokenResponse - Details of the type is here https://github.ibm.com/alchemy-registry/registry-types/tree/master/auth#type-tokenresponse
 //                         Token is the element you will need to forward to the registry/notary as part of a Bearer Authorization Header
 //   error
-func Request(token string, repo string, username string, writeAccessRequired bool, challengeSlice []Challenge) (*TokenResponse, error) {
-	// var actions string
-	// //If you want to verify if a the credential supplied has read and write access to the repo we ask oauth for pull,push and *
-	// if writeAccessRequired {
-	// 	actions = "pull,push,*"
-	// } else {
-	// 	actions = "pull"
-	// }
+func Request(token string, repo string, username string, challengeSlice []Challenge) (*TokenResponse, error) {
 
 	oauthEndpoint := ""
 	service := ""
@@ -100,7 +92,6 @@ func Request(token string, repo string, username string, writeAccessRequired boo
 			"username":   {username},
 			"password":   {token},
 			"scope":      {scope},
-			// "scope":      {"repository:" + repo + ":" + actions},
 		})
 		if err != nil {
 			glog.Errorf("Error sending POST request to registry-oauth: %v", err)
