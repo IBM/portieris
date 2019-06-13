@@ -4,6 +4,7 @@
 
 replicaCount: 3
 namespace: ibm-system
+defaultSecret: portierisdefault
 
 image:
   host:

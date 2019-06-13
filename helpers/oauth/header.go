@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+// Referenced from https://github.com/docker/distribution/blob/master/registry/client/auth/challenge/authchallenge.go
 
 package oauth
 
@@ -71,8 +72,18 @@ func init() {
 	}
 }
 
-// ParseAuthHeader takes the header info from a response and gives back realm and service information
-func ParseAuthHeader(header http.Header) []Challenge {
+// ResponseChallenges takes in the response anf it is unauthorized returns a challenge containing realm and service information
+func ResponseChallenges(resp *http.Response) []Challenge {
+	if resp.StatusCode == http.StatusUnauthorized {
+		// Parse the WWW-Authenticate Header and store the challenges
+		// on this endpoint object.
+		return parseAuthHeader(resp.Header)
+	}
+	return nil
+}
+
+// parseAuthHeader takes the header info from a response and gives back realm and service information
+func parseAuthHeader(header http.Header) []Challenge {
 	challenges := []Challenge{}
 	for _, h := range header[http.CanonicalHeaderKey("WWW-Authenticate")] {
 		v, p := parseValueAndParams(h)
