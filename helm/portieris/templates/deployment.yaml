@@ -34,6 +34,12 @@ spec:
             readOnly: true
             mountPath: "/etc/certs"
           env:
+            - name: "SECRETNAME"
+              value: {{ .Values.defaultSecret }}
+            - name: "NAMESPACE"
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
           resources:
 {{ toYaml .Values.resources | indent 12 }}
     {{- with .Values.nodeSelector }}
