@@ -16,6 +16,7 @@ package oauth
 
 import (
 	"net/http"
+	"strings"
 	"testing"
 )
 
@@ -63,7 +64,8 @@ func TestSadPathWithAuth(t *testing.T) {
 	_, err := CheckAuthRequired(notaryURL, hostName, repoName, official)
 
 	if err != nil {
-		if expected := "Get https://invalid.docker.io/v2/docker.io/library/nginx/_trust/tuf/root.json: dial tcp: lookup invalid.docker.io: no such host"; err.Error() != expected {
+		expected := "https://invalid.docker.io/v2/docker.io/library/nginx/_trust/tuf/root.json: dial tcp: lookup invalid.docker.io"
+		if !strings.Contains(err.Error(), expected) {
 			t.Fatalf("Unexpected error message: %v, expected: %v", err.Error(), expected)
 		}
 	}
