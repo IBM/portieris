@@ -77,24 +77,33 @@ func Request(token string, repo string, username string, challengeSlice []Challe
 	glog.Infof("Calling oauth endpoint: %s for registry service: %s and scope %s", oauthEndpoint, service, scope)
 	var resp *http.Response
 	var err error
-	if oauthEndpoint == "https://auth.docker.io/token" {
+	resp, err = client.PostForm(oauthEndpoint, url.Values{
+		"service":    {service},
+		"grant_type": {"password"},
+		"client_id":  {"portieris-client"},
+		"username":   {username},
+		"password":   {token},
+		"scope":      {scope},
+	})
+	if err != nil {
+		glog.Errorf("Error sending POST request to registry-oauth: %v", err)
+		return nil, err
+	}
+
+	// TODO: confirm if status code of 405 needs to be handled in the below block
+	if resp.StatusCode == 404 || resp.StatusCode == 405 {
 		glog.Info("Calling: " + oauthEndpoint + "?service=" + service + "&scope=" + scope)
-		resp, err = client.Get(oauthEndpoint + "?service=" + service + "&scope=" + scope)
+		getURL, err := url.Parse(oauthEndpoint)
 		if err != nil {
-			glog.Errorf("Error sending GET request to registry-oauth: %v", err)
 			return nil, err
 		}
-	} else {
-		resp, err = client.PostForm(oauthEndpoint, url.Values{
-			"service":    {service},
-			"grant_type": {"password"},
-			"client_id":  {"portieris-client"},
-			"username":   {username},
-			"password":   {token},
-			"scope":      {scope},
-		})
+		q := getURL.Query()
+		q.Set("service", service)
+		q.Set("scope", scope)
+		getURL.RawQuery = q.Encode()
+		resp, err = client.Get(getURL.String())
 		if err != nil {
-			glog.Errorf("Error sending POST request to registry-oauth: %v", err)
+			glog.Errorf("Error sending GET request to registry-oauth: %v", err)
 			return nil, err
 		}
 	}

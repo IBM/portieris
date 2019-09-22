@@ -152,7 +152,7 @@ func (r Reference) NameWithoutTag() string {
 	return r.name
 }
 
-// RepoName returns the image name without the tag.
+// RepoName returns the image name without the tag and doesn't contain the server/host detals.
 func (r Reference) RepoName() string {
 	return r.repo
 }

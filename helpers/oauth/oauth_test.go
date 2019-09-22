@@ -29,11 +29,11 @@ func TestHappyPathWithAuth(t *testing.T) {
 	resp, err := CheckAuthRequired(notaryURL, hostName, repoName, official)
 
 	if err != nil {
-		t.Fatalf("Some error occurred: %s", err.Error())
+		t.Errorf("Some error occurred: %s", err.Error())
 	}
 
 	if expected := http.StatusUnauthorized; resp.StatusCode != expected {
-		t.Fatalf("Unexpected status code: %v, expected: %v", resp.StatusCode, expected)
+		t.Errorf("Unexpected status code: %v, expected: %v", resp.StatusCode, expected)
 	}
 }
 
@@ -47,11 +47,11 @@ func TestHappyPathWithAuthUnofficial(t *testing.T) {
 	resp, err := CheckAuthRequired(notaryURL, hostName, repoName, official)
 
 	if err != nil {
-		t.Fatalf("Some error occurred: %s", err.Error())
+		t.Errorf("Some error occurred: %s", err.Error())
 	}
 
 	if expected := http.StatusUnauthorized; resp.StatusCode != expected {
-		t.Fatalf("Unexpected status code: %v, expected: %v", resp.StatusCode, expected)
+		t.Errorf("Unexpected status code: %v, expected: %v", resp.StatusCode, expected)
 	}
 }
 
@@ -66,7 +66,7 @@ func TestSadPathWithAuth(t *testing.T) {
 	if err != nil {
 		expected := "https://invalid.docker.io/v2/docker.io/library/nginx/_trust/tuf/root.json: dial tcp: lookup invalid.docker.io"
 		if !strings.Contains(err.Error(), expected) {
-			t.Fatalf("Unexpected error message: %v, expected: %v", err.Error(), expected)
+			t.Errorf("Unexpected error message: %v, expected: %v", err.Error(), expected)
 		}
 	}
 }
@@ -88,11 +88,11 @@ func TestHappyPathWithRequest(t *testing.T) {
 	token, err := Request(password, repo, username, challengeSlice)
 
 	if err != nil {
-		t.Fatalf("Some error occurred: %s", err.Error())
+		t.Errorf("Some error occurred: %s", err.Error())
 	}
 
 	if token.AccessToken == "" && token.Token == "" {
-		t.Fatalf("Token not found. Expected access token or token from the response")
+		t.Errorf("Token not found. Expected access token or token from the response")
 	}
 }
 
@@ -128,7 +128,7 @@ func TestSadPathWithRequestInvalidURL(t *testing.T) {
 
 	if err != nil {
 		if expected := "Get https://usa.icr.io:4443/v2/us.icr.io/molepigeon/testimage/_trust/tuf/root.json: x509: certificate is valid for icr.io, va.icr.io, registry.bluemix.net, va.bluemix.net, cp.icr.io, not usa.icr.io"; err.Error() != expected {
-			t.Fatalf("Unexpected error message: %v, expected: %v", err.Error(), expected)
+			t.Errorf("Unexpected error message: %v, expected: %v", err.Error(), expected)
 		}
 	}
 
@@ -154,7 +154,7 @@ func TestSadPathWithRequestMissingWWWAuthenticate(t *testing.T) {
 
 	if err != nil {
 		if expected := "unable to fetch www-authenticate header details"; err.Error() != expected {
-			t.Fatalf("Unexpected error message: %v, expected: %v", err.Error(), expected)
+			t.Errorf("Unexpected error message: %v, expected: %v", err.Error(), expected)
 		}
 	}
 }
@@ -181,7 +181,7 @@ func TestSadPathWithRequestMissingRealmAndServiceMissing(t *testing.T) {
 
 	if err != nil {
 		if expected := "unable to fetch oauth realm and service header details"; err.Error() != expected {
-			t.Fatalf("Unexpected error message: %v, expected: %v", err.Error(), expected)
+			t.Errorf("Unexpected error message: %v, expected: %v", err.Error(), expected)
 		}
 	}
 }

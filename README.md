@@ -26,8 +26,14 @@ To install Portieris:
 
 * Clone the Portieris Git repository to your workstation.
 * Change directory into the Portieris Git repository.
+<<<<<<< HEAD
 * Run `./helm/portieris/gencerts <namespace>`. The `gencerts` script generates new SSL certificates and keys for Portieris. Portieris presents this certificates to the Kubernetes API server when the API server makes admission requests. If you do not generate new certificates, it could be possible for an attacker to spoof Portieris in your cluster.
 * Run `helm upgrade --install --name portieris -n portieris --set namespace=<namespace> helm/portieris` (when using `helm3`, the namespace has to exist before running the command).
+=======
+* Run `./helm/portieris/gencerts`. The `gencerts` script generates new SSL certificates and keys for Portieris. Portieris presents this certificates to the Kubernetes API server when the API server makes admission requests. If you do not generate new certificates, it could be possible for an attacker to spoof Portieris in your cluster.
+* [Future feature] If your environment uses dockerconfig at the host to authenticate to your private repository, update the value of secrets.yaml under helm/templates directory
+* Run `helm install -n portieris helm/portieris`.
+>>>>>>> Issue 51:
 
 ## Uninstalling Portieris
 
