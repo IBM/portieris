@@ -72,7 +72,7 @@ func init() {
 	}
 }
 
-// ResponseChallenges takes in the response anf it is unauthorized returns a challenge containing realm and service information
+// ResponseChallenges takes in the response and it is unauthorized returns a challenge containing realm and service information
 func ResponseChallenges(resp *http.Response) []Challenge {
 	if resp.StatusCode == http.StatusUnauthorized {
 		// Parse the WWW-Authenticate Header and store the challenges
