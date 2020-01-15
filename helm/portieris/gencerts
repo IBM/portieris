@@ -1,9 +1,14 @@
 #! /bin/bash -e
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SERVICE_NAME=$(yq r $SCRIPT_DIR/Chart.yaml name)
-NAMESPACE=${1:-ibm-system}    
+# Updates:
+# ID10032019: Fixed 'yq' command syntax issue.
+#
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# SERVICE_NAME=$(yq r $SCRIPT_DIR/Chart.yaml name) ID10032019.o
+SERVICE_NAME=$(yq -r .name $SCRIPT_DIR/Chart.yaml)
+NAMESPACE=${1:-ibm-system}
 
 echo "Using $SERVICE_NAME as the service name"
 echo "Using $NAMESPACE as the namespace"
