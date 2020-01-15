@@ -5,10 +5,13 @@
 #
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # SERVICE_NAME=$(yq r $SCRIPT_DIR/Chart.yaml name) ID10032019.o
 SERVICE_NAME=$(yq -r .name $SCRIPT_DIR/Chart.yaml)
+NAMESPACE=${1:-ibm-system}
 
 echo "Using $SERVICE_NAME as the service name"
+echo "Using $NAMESPACE as the namespace"
 
 CERT_DIR=$SCRIPT_DIR/certs
 
@@ -33,7 +36,8 @@ openssl req -x509 -new -nodes -key $CERT_DIR/caKey.pem -days 100000 -out $CERT_D
 # Create a server certiticate
 openssl genrsa -out $CERT_DIR/serverKey.pem 2048
 # Note the CN is the DNS name of the service of the webhook.
-openssl req -new -key $CERT_DIR/serverKey.pem -out $CERT_DIR/server.csr -subj "/CN=${SERVICE_NAME}.ibm-system.svc" -config $CERT_DIR/server.conf
+openssl req -new -key $CERT_DIR/serverKey.pem -out $CERT_DIR/server.csr -subj "/CN=${SERVICE_NAME}.${NAMESPACE}.svc" -config $CERT_DIR/server.conf
 openssl x509 -req -in $CERT_DIR/server.csr -CA $CERT_DIR/caCert.pem -CAkey $CERT_DIR/caKey.pem -CAcreateserial -out $CERT_DIR/serverCert.pem -days 100000 -extensions v3_req -extfile $CERT_DIR/server.conf
 
 rm $CERT_DIR/caKey.pem $CERT_DIR/server.conf $CERT_DIR/server.csr
+
