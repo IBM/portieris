@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: registry.bluemix.net/cise/nginx:signed
+        image: icr.io/cise/nginx:signed
         ports:
         - containerPort: 80

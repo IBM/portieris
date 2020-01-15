@@ -39,19 +39,19 @@ If you're deploying onto a generic cluster Portieris automatically creates a pol
 helm install -n portieris . --set IBMContainerService=false --debug
 ```
 
-For full installation instructions, see [Installing security enforcement in your cluster](https://console.bluemix.net/docs/services/Registry/registry_security_enforce.html#sec_enforcer_install).
+For full installation instructions, see [Installing security enforcement in your cluster](https://cloud.ibm.com/docs/services/Registry?topic=registry-security_enforce#sec_enforcer_install).
 
 ## Default security policies
 
-This chart installs default security policies in your cluster. You should modify the default policies or replace them with your own. For more information, see [Default policies](https://console.bluemix.net/docs/services/Registry/registry_security_enforce.html#default_policies).
+This chart installs default security policies in your cluster. You should modify the default policies or replace them with your own. For more information, see [Default policies](https://cloud.ibm.com/docs/services/Registry?topic=registry-security_enforce#default_policies).
 
-You should apply access control policies to limit who can modify Portieris policies in your cluster. See [Controlling who can customize policies](https://console.bluemix.net/docs/services/Registry/registry_security_enforce.html#assign_user_policy).
+You should apply access control policies to limit who can modify Portieris policies in your cluster. See [Controlling who can customize policies](https://cloud.ibm.com/docs/services/Registry?topic=registry-security_enforce#assign_user_policy).
 
 ## Customizing security policies
 
 You can add your own security policies, scoped to a Kubernetes namespace or the entire cluster. Cluster policies are used when no namespace scoped policies exist in the Kubernetes namespace you are deploying to.
 
-For information about configuring security policies, and an explanation of the security policy resources, see [Customizing policies](https://console.bluemix.net/docs/services/Registry/registry_security_enforce.html#customize_policies).
+For information about configuring security policies, and an explanation of the security policy resources, see [Customizing policies](https://cloud.ibm.com/docs/services/Registry?topic=registry-security_enforce#customize_policies).
 
 ## Removing the chart
 

@@ -46,7 +46,7 @@ var client = &http.Client{
 //   username            - Username for the OAuth request, identifies the type of token being passed in. Valid usernames are token (for registry token), iambearer, iamapikey, bearer (UAA bearer (legacy)), iamrefresh
 //   writeAccessRequired - Whether or not you require write (push and delete) access as well as read (pull)
 //   service             - The service you are retrieving the OAuth token for. Current services are either "notary" or "registry"
-//   hostname            - Hostname of the registry you wish to call e.g. https://registry.ng.bluemix.net
+//   hostname            - Hostname of the registry you wish to call e.g. https://icr.io
 // Returns:
 //   *auth.TokenResponse - Details of the type is here https://github.ibm.com/alchemy-registry/registry-types/tree/master/auth#type-tokenresponse
 //                         Token is the element you will need to forward to the registry/notary as part of a Bearer Authorization Header

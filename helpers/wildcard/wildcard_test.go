@@ -102,15 +102,15 @@ var _ = Describe("Main", func() {
 			Expect(match).To(Equal(true))
 		})
 		It("should match if pattern has a wildcard at namespace level", func() {
-			match := CompareAnyTag("registry.eu-gb.bluemix.net/*", "registry.eu-gb.bluemix.net/imagesec-demo/alpinegood:demo")
+			match := CompareAnyTag("uk.icr.io/*", "uk.icr.io/imagesec-demo/alpinegood:demo")
 			Expect(match).To(Equal(true))
 		})
 		It("should match if pattern has a wildcard at image level", func() {
-			match := CompareAnyTag("registry.eu-gb.bluemix.net/imagesec-demo/*", "registry.eu-gb.bluemix.net/imagesec-demo/alpinegood:demo")
+			match := CompareAnyTag("uk.icr.io/imagesec-demo/*", "uk.icr.io/imagesec-demo/alpinegood:demo")
 			Expect(match).To(Equal(true))
 		})
 		It("should match if pattern doesn't have the tag", func() {
-			match := CompareAnyTag("registry.eu-gb.bluemix.net/imagesec-demo/alpinegood", "registry.eu-gb.bluemix.net/imagesec-demo/alpinegood:demo")
+			match := CompareAnyTag("uk.icr.io/imagesec-demo/alpinegood", "uk.icr.io/imagesec-demo/alpinegood:demo")
 			Expect(match).To(Equal(true))
 		})
 		It("should not match if base in incorrect", func() {

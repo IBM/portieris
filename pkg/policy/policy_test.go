@@ -59,10 +59,10 @@ var (
 		},
 	}
 
-	helloWorldRepositoryTrustEnabled  = securityenforcementv1beta1.Repository{Name: "registry.bluemix.net/hello/world", Policy: enabledTrustPolicy}
-	helloWorldRepositoryTrustDisabled = securityenforcementv1beta1.Repository{Name: "registry.bluemix.net/hello/world", Policy: disabledTrustPolicy}
-	helloEarthRepositoryTrustEnabled  = securityenforcementv1beta1.Repository{Name: "registry.bluemix.net/hello/earth", Policy: enabledTrustPolicy}
-	helloEarthRepositoryTrustDisabled = securityenforcementv1beta1.Repository{Name: "registry.bluemix.net/hello/earth", Policy: disabledTrustPolicy}
+	helloWorldRepositoryTrustEnabled  = securityenforcementv1beta1.Repository{Name: "icr.io/hello/world", Policy: enabledTrustPolicy}
+	helloWorldRepositoryTrustDisabled = securityenforcementv1beta1.Repository{Name: "icr.io/hello/world", Policy: disabledTrustPolicy}
+	helloEarthRepositoryTrustEnabled  = securityenforcementv1beta1.Repository{Name: "icr.io/hello/earth", Policy: enabledTrustPolicy}
+	helloEarthRepositoryTrustDisabled = securityenforcementv1beta1.Repository{Name: "icr.io/hello/earth", Policy: disabledTrustPolicy}
 
 	enabledTrustPolicy  = securityenforcementv1beta1.Policy{Trust: securityenforcementv1beta1.Trust{Enabled: &trueBool}}
 	disabledTrustPolicy = securityenforcementv1beta1.Policy{Trust: securityenforcementv1beta1.Trust{Enabled: &falseBool}}
@@ -105,27 +105,27 @@ func TestClient_GetPolicyToEnforce(t *testing.T) {
 	}{
 		{
 			name:      "No Image policy, but relevant cluster policy: return cluster policy",
-			image:     "registry.bluemix.net/hello/world",
+			image:     "icr.io/hello/world",
 			namespace: "default",
 			policies:  []runtime.Object{createClusterImagePolicy("policy-one", []securityenforcementv1beta1.Repository{helloWorldRepositoryTrustEnabled})},
 			want:      &enabledTrustPolicy,
 		},
 		{
 			name:      "No Image policy, cluster policy has no repo match: return error",
-			image:     "registry.bluemix.net/hello/world",
+			image:     "icr.io/hello/world",
 			namespace: "default",
 			policies:  []runtime.Object{createClusterImagePolicy("policy-one", []securityenforcementv1beta1.Repository{helloEarthRepositoryTrustEnabled})},
-			wantErr:   errors.New(`Deny "registry.bluemix.net/hello/world", no matching repositories in ClusterImagePolicy and no ImagePolicies in the "default" namespace`),
+			wantErr:   errors.New(`Deny "icr.io/hello/world", no matching repositories in ClusterImagePolicy and no ImagePolicies in the "default" namespace`),
 		},
 		{
 			name:      "No Image policy or cluster policy: return error",
-			image:     "registry.bluemix.net/hello/world",
+			image:     "icr.io/hello/world",
 			namespace: "default",
-			wantErr:   errors.New(`Deny "registry.bluemix.net/hello/world", no image policies or cluster polices`),
+			wantErr:   errors.New(`Deny "icr.io/hello/world", no image policies or cluster polices`),
 		},
 		{
 			name:      "No Image policy, but multiple cluster policy: return cluster policy",
-			image:     "registry.bluemix.net/hello/world",
+			image:     "icr.io/hello/world",
 			namespace: "default",
 			policies: []runtime.Object{
 				createClusterImagePolicy("policy-one", []securityenforcementv1beta1.Repository{helloEarthRepositoryTrustDisabled}),
@@ -135,7 +135,7 @@ func TestClient_GetPolicyToEnforce(t *testing.T) {
 		},
 		{
 			name:      "No Image policy, but multiple repos in a single cluster policy: return cluster policy",
-			image:     "registry.bluemix.net/hello/world",
+			image:     "icr.io/hello/world",
 			namespace: "default",
 			policies: []runtime.Object{
 				createClusterImagePolicy("policy-one", []securityenforcementv1beta1.Repository{helloEarthRepositoryTrustDisabled, helloWorldRepositoryTrustEnabled}),
@@ -144,7 +144,7 @@ func TestClient_GetPolicyToEnforce(t *testing.T) {
 		},
 		{
 			name:      "Relevant Image policy and cluster policy: return image policy",
-			image:     "registry.bluemix.net/hello/world",
+			image:     "icr.io/hello/world",
 			namespace: "default",
 			policies: []runtime.Object{
 				createClusterImagePolicy("policy-one", []securityenforcementv1beta1.Repository{helloWorldRepositoryTrustDisabled}),
@@ -154,7 +154,7 @@ func TestClient_GetPolicyToEnforce(t *testing.T) {
 		},
 		{
 			name:      "Relevant Image policies in different namspaces: return correct image policy",
-			image:     "registry.bluemix.net/hello/world",
+			image:     "icr.io/hello/world",
 			namespace: "default",
 			policies: []runtime.Object{
 				createImagePolicy("policy-one", "nonDefault", []securityenforcementv1beta1.Repository{helloWorldRepositoryTrustDisabled}),
@@ -164,26 +164,26 @@ func TestClient_GetPolicyToEnforce(t *testing.T) {
 		},
 		{
 			name:      "Image policies without relevant repository: return error",
-			image:     "registry.bluemix.net/hello/world",
+			image:     "icr.io/hello/world",
 			namespace: "default",
 			policies: []runtime.Object{
 				createImagePolicy("policy-one", "default", []securityenforcementv1beta1.Repository{helloEarthRepositoryTrustDisabled}),
 			},
-			wantErr: errors.New(`Deny "registry.bluemix.net/hello/world", no matching repositories in the ImagePolicies`),
+			wantErr: errors.New(`Deny "icr.io/hello/world", no matching repositories in the ImagePolicies`),
 		},
 		{
 			name:      "Image policies without relevant repository but matching cluster policy: return error",
-			image:     "registry.bluemix.net/hello/world",
+			image:     "icr.io/hello/world",
 			namespace: "default",
 			policies: []runtime.Object{
 				createImagePolicy("policy-one", "default", []securityenforcementv1beta1.Repository{helloEarthRepositoryTrustEnabled}),
 				createClusterImagePolicy("policy-one", []securityenforcementv1beta1.Repository{helloWorldRepositoryTrustEnabled}),
 			},
-			wantErr: errors.New(`Deny "registry.bluemix.net/hello/world", no matching repositories in the ImagePolicies`),
+			wantErr: errors.New(`Deny "icr.io/hello/world", no matching repositories in the ImagePolicies`),
 		},
 		{
 			name:      "Multiple Image policies in the same namespace: return relevant image policy",
-			image:     "registry.bluemix.net/hello/world",
+			image:     "icr.io/hello/world",
 			namespace: "default",
 			policies: []runtime.Object{
 				createImagePolicy("policy-one", "default", []securityenforcementv1beta1.Repository{helloEarthRepositoryTrustDisabled}),
@@ -193,7 +193,7 @@ func TestClient_GetPolicyToEnforce(t *testing.T) {
 		},
 		{
 			name:      "Image policies with multiple repos: return relevant image policy",
-			image:     "registry.bluemix.net/hello/world",
+			image:     "icr.io/hello/world",
 			namespace: "default",
 			policies: []runtime.Object{
 				createImagePolicy("policy-one", "default", []securityenforcementv1beta1.Repository{helloEarthRepositoryTrustDisabled, helloWorldRepositoryTrustEnabled}),
