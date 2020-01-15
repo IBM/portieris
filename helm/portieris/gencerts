@@ -1,7 +1,12 @@
 #! /bin/bash -e
 
+# Updates:
+# ID10032019: Fixed 'yq' command syntax issue.
+#
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SERVICE_NAME=$(yq r $SCRIPT_DIR/Chart.yaml name)
+# SERVICE_NAME=$(yq r $SCRIPT_DIR/Chart.yaml name) ID10032019.o
+SERVICE_NAME=$(yq -r .name $SCRIPT_DIR/Chart.yaml)
 
 echo "Using $SERVICE_NAME as the service name"
 
