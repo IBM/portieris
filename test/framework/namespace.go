@@ -60,13 +60,13 @@ func (f *Framework) WaitForNamespace(name string, timeout time.Duration) error {
 }
 
 // CreateNamespaceWithIPS creates a namespace, service account and IPS to pull from the IBM Cloud Container Registry Global region
-// It uses the bluemix-default-secret-international imagePullSecret from the default namespace
+// It uses the default-icr-io imagePullSecret from the default namespace
 func (f *Framework) CreateNamespaceWithIPS(name string) (*corev1.Namespace, error) {
 	namespace, err := f.CreateNamespace(name)
 	if err != nil {
 		return nil, fmt.Errorf("error creating namespace: %v", err)
 	}
-	ips, err := f.KubeClient.CoreV1().Secrets("default").Get("bluemix-default-secret-international", metav1.GetOptions{})
+	ips, err := f.KubeClient.CoreV1().Secrets("default").Get("default-icr-io", metav1.GetOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("error getting imagePullSecret: %v", err)
 	}
@@ -77,7 +77,7 @@ func (f *Framework) CreateNamespaceWithIPS(name string) (*corev1.Namespace, erro
 	}
 	sa := generateServiceAccount("default")
 	sa.ImagePullSecrets = []corev1.LocalObjectReference{
-		{Name: "bluemix-default-secret-international"},
+		{Name: "default-icr-io"},
 	}
 	if _, err := f.KubeClient.CoreV1().ServiceAccounts(namespace.Name).Update(sa); err != nil {
 		return nil, fmt.Errorf("error adding imagePullSecret to ServiceAccount: %v", err)
