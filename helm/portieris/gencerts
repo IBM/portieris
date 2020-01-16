@@ -1,13 +1,8 @@
 #! /bin/bash -e
 
-# Updates:
-# ID10032019: Fixed 'yq' command syntax issue.
-#
-
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# SERVICE_NAME=$(yq r $SCRIPT_DIR/Chart.yaml name) ID10032019.o
-SERVICE_NAME=$(yq -r .name $SCRIPT_DIR/Chart.yaml)
+SERVICE_NAME=$(yq r $SCRIPT_DIR/Chart.yaml name)
 NAMESPACE=${1:-ibm-system}
 
 echo "Using $SERVICE_NAME as the service name"
@@ -40,4 +35,3 @@ openssl req -new -key $CERT_DIR/serverKey.pem -out $CERT_DIR/server.csr -subj "/
 openssl x509 -req -in $CERT_DIR/server.csr -CA $CERT_DIR/caCert.pem -CAkey $CERT_DIR/caKey.pem -CAcreateserial -out $CERT_DIR/serverCert.pem -days 100000 -extensions v3_req -extfile $CERT_DIR/server.conf
 
 rm $CERT_DIR/caKey.pem $CERT_DIR/server.conf $CERT_DIR/server.csr
-
