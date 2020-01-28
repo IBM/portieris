@@ -1,24 +1,13 @@
 GOFILES=$(shell find . -type f -name '*.go' -not -path "./vendor/*")
 GOPACKAGES=$(shell go list ./... | grep -v /vendor/ | grep -v test/ | grep -v pkg/apis/)
 
-dep:
-	@go get -u github.com/golang/dep/cmd/dep
-
-build-deps: dep
-	@dep ensure -v -vendor-only
-
-test-deps: build-deps
-	@go get github.com/stretchr/testify/assert
-	@go get golang.org/x/lint/golint
-	@go get github.com/pierrre/gotestcover
-	@go get github.com/onsi/ginkgo/ginkgo
-	@go get github.com/onsi/gomega/...
-
-push:
+image: 
 	docker build -t $(HUB)/portieris:$(TAG) .
+
+push: image
 	docker push $(HUB)/portieris:$(TAG)
 
-test: test-deps
+test: fmt lint vet copyright-check
 	$(GOPATH)/bin/gotestcover -v -coverprofile=cover.out ${GOPACKAGES}
 
 copyright:
@@ -50,7 +39,7 @@ helm.clean:
 	-helm/cleanup.sh portieris
 
 e2e:
-	-helm package install/helm/portieris
+	-helm package helm/portieris
 	@go test -v ./test/e2e --helmChart $$(pwd)/portieris-0.5.3.tgz
 
 e2e.local: helm.install.local e2e.quick
