@@ -9,9 +9,6 @@ cache:
 services:
   - docker
 
-before_script:
-  - make test-deps
-
 script:
   - make vet
   - make fmt

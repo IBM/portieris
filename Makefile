@@ -1,11 +1,15 @@
 GOFILES=$(shell find . -type f -name '*.go' -not -path "./vendor/*")
 GOPACKAGES=$(shell go list ./... | grep -v /vendor/ | grep -v test/ | grep -v pkg/apis/)
 
+.PHONY: test
+
 image: 
 	docker build -t $(HUB)/portieris:$(TAG) .
 
 push: image
 	docker push $(HUB)/portieris:$(TAG)
+
+alltests: fmt lint vet copyright-check test
 
 test: fmt lint vet copyright-check
 	$(GOPATH)/bin/gotestcover -v -coverprofile=cover.out ${GOPACKAGES}
