@@ -24,6 +24,7 @@ fmt:
 	@if [ -n "$$(gofmt -l ${GOFILES})" ]; then echo 'Please run gofmt -l -w on your code.' && exit 1; fi
 
 lint:
+	@go get golang.org/x/lint/golint
 	@set -e; for LINE in ${GOPACKAGES}; do golint -set_exit_status=true $${LINE} ; done
 
 vet:
