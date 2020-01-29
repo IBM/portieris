@@ -10,8 +10,4 @@ services:
   - docker
 
 script:
-  - make vet
-  - make fmt
-  - make copyright-check
-  - make test
-  - make lint
+  - make alltests

@@ -9,9 +9,13 @@ image:
 push: image
 	docker push $(HUB)/portieris:$(TAG)
 
-alltests: fmt lint vet copyright-check test
+test-deps:
+	@go get golang.org/x/lint/golint
+	@go get github.com/pierrre/gotestcover
 
-test: fmt lint vet copyright-check
+alltests: test-deps fmt lint vet copyright-check test
+
+test: 
 	$(GOPATH)/bin/gotestcover -v -coverprofile=cover.out ${GOPACKAGES}
 
 copyright:
@@ -24,7 +28,6 @@ fmt:
 	@if [ -n "$$(gofmt -l ${GOFILES})" ]; then echo 'Please run gofmt -l -w on your code.' && exit 1; fi
 
 lint:
-	@go get golang.org/x/lint/golint
 	@set -e; for LINE in ${GOPACKAGES}; do golint -set_exit_status=true $${LINE} ; done
 
 vet:
