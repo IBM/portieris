@@ -36,7 +36,7 @@ var (
 )
 
 const (
-	ChartName            = "ibmcloud-image-enforcement"
+	ChartName            = "portieris"
 	MutatingWebhookName  = "image-admission-config"
 	AdmissionWebhookName = "image-admission-config"
 )
@@ -72,8 +72,9 @@ func TestMain(m *testing.M) {
 
 	if !noInstall {
 		// Check for deployment
-		if err := framework.WaitForDeployment(fmt.Sprintf("%v-%v", framework.HelmRelease, ChartName), framework.Namespace, time.Minute); err != nil {
-			log.Printf("error waiting for deployment to appear: %v\n", err)
+		deploymentName := fmt.Sprintf("%v-%v", framework.HelmRelease, ChartName)
+		if err := framework.WaitForDeployment(deploymentName, framework.Namespace, time.Minute); err != nil {
+			log.Printf("error waiting for deployment %s in %s to appear: %v\n", deploymentName, framework.Namespace, err)
 			os.Exit(1)
 		}
 
