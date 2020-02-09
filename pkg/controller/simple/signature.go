@@ -14,7 +14,7 @@
 
 // Implementation of verify against signature interface (doesnt seem to have policy flexibility)
 
-package atomic
+package simple
 
 import (
 	"fmt"

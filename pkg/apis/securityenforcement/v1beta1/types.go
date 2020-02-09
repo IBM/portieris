@@ -91,8 +91,9 @@ type Repository struct {
 
 // Policy .
 type Policy struct {
-	Trust Trust `json:"trust,omitempty"`
-	Va    VA    `json:"va,omitempty"`
+	Trust  Trust   `json:"trust,omitempty"`
+	Simple *Simple `json:"simple,omitempty"`
+	Va     VA      `json:"va,omitempty"`
 }
 
 // Trust .
@@ -105,6 +106,21 @@ type Trust struct {
 // Signer .
 type Signer struct {
 	Name string `json:"name"`
+}
+
+// Simple .
+type Simple struct {
+	Type           string              `json:"type"`
+	KeyType        string              `json:"keyType,omitEmpty"`
+	KeyData        string              `json:"keyData,omitEmpty"`
+	SignedIdentity IdentityRequirement `json:"signedIdentity,omitEmpty"`
+}
+
+// IdentityRequirement .
+type IdentityRequirement struct {
+	Type             string `json:"type"`
+	DockerReference  string `json:"dockerReference,omitEmpty"`
+	DockerRepository string `json:"dockerRepository,omitEmpty"`
 }
 
 // VA .

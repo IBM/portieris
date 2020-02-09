@@ -24,7 +24,7 @@ import (
 	versioned "github.com/IBM/portieris/pkg/apis/securityenforcement/client/clientset/versioned"
 	internalinterfaces "github.com/IBM/portieris/pkg/apis/securityenforcement/client/informers/externalversions/internalinterfaces"
 	v1beta1 "github.com/IBM/portieris/pkg/apis/securityenforcement/client/listers/securityenforcement/v1beta1"
-	securityenforcement_v1beta1 "github.com/IBM/portieris/pkg/apis/securityenforcement/v1beta1"
+	securityenforcementv1beta1 "github.com/IBM/portieris/pkg/apis/securityenforcement/v1beta1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"
@@ -69,7 +69,7 @@ func NewFilteredClusterImagePolicyInformer(client versioned.Interface, resyncPer
 				return client.SecurityenforcementV1beta1().ClusterImagePolicies().Watch(options)
 			},
 		},
-		&securityenforcement_v1beta1.ClusterImagePolicy{},
+		&securityenforcementv1beta1.ClusterImagePolicy{},
 		resyncPeriod,
 		indexers,
 	)
@@ -80,7 +80,7 @@ func (f *clusterImagePolicyInformer) defaultInformer(client versioned.Interface,
 }
 
 func (f *clusterImagePolicyInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&securityenforcement_v1beta1.ClusterImagePolicy{}, f.defaultInformer)
+	return f.factory.InformerFor(&securityenforcementv1beta1.ClusterImagePolicy{}, f.defaultInformer)
 }
 
 func (f *clusterImagePolicyInformer) Lister() v1beta1.ClusterImagePolicyLister {

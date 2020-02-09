@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Implementation of verify against image policy interface
+// Implementation of verify against containers/image policy interface
 
-package atomic
+package simple
 
 import (
 	"context"
@@ -22,40 +22,53 @@ import (
 
 	"github.com/containers/image/v5/docker"
 	"github.com/containers/image/v5/image"
+	"github.com/containers/image/v5/manifest"
 	"github.com/containers/image/v5/signature"
 	"github.com/containers/image/v5/types"
 )
 
-// VerifyByPolicy ...
-func VerifyByPolicy(imageToVerify string, policyJSON string) error {
+// VerifyByPolicy returns the verified digest or the verification error
+func VerifyByPolicy(imageToVerify string, policy *signature.Policy, username, password string) (string, error) {
+
+	dockerAuth := &types.DockerAuthConfig{
+		Username: username,
+		Password: password,
+	}
+	systemContext := &types.SystemContext{
+		RootForImplicitAbsolutePaths: "/nowhere", // read nothing from files
+		DockerAuthConfig:             dockerAuth,
+		DockerRegistryUserAgent:      "portieris",
+	}
+
 	imageReference, err := docker.ParseReference(`//` + imageToVerify)
 	if err != nil {
-		return err
+		return "", err
 	}
-	systemContext := &types.SystemContext{}
-
 	imageSource, err := imageReference.NewImageSource(context.Background(), systemContext)
 	if err != nil {
-		return err
+		return "", err
 	}
 	unparsedImage := image.UnparsedInstance(imageSource, nil)
 
-	policy, err := signature.NewPolicyFromBytes([]byte(policyJSON))
-	if err != nil {
-		return err
-	}
-
 	policyContext, err := signature.NewPolicyContext(policy)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	allowed, err := policyContext.IsRunningImageAllowed(context.Background(), unparsedImage)
 	if err != nil {
-		return err
+		return "", err
 	}
+	// redundant?
 	if !allowed {
-		return fmt.Errorf("not allowed")
+		return "", fmt.Errorf("not allowed")
 	}
-	return nil
+
+	// get the digest
+	m, _, err := unparsedImage.Manifest(context.Background())
+	digest, err := manifest.Digest(m)
+	if err != nil {
+		return "", err
+	}
+	return digest.String(), nil
 }

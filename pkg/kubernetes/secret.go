@@ -71,7 +71,7 @@ func (w *Wrapper) GetSecretToken(namespace, secretName, registry string) (string
 		username = login.Username
 		password = login.Password
 	} else {
-		err = fmt.Errorf("Secret not defined for registry: %s", registry)
+		err = fmt.Errorf("Secret %s not defined for registry: %s", secretName, registry)
 	}
 	// glog.Infof("getSecretToken >> : token(%s)", token)
 	return username, password, err

@@ -19,6 +19,8 @@ limitations under the License.
 package v1beta1
 
 import (
+	"time"
+
 	scheme "github.com/IBM/portieris/pkg/apis/securityenforcement/client/clientset/versioned/scheme"
 	v1beta1 "github.com/IBM/portieris/pkg/apis/securityenforcement/v1beta1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -72,10 +74,15 @@ func (c *clusterImagePolicies) Get(name string, options v1.GetOptions) (result *
 
 // List takes label and field selectors, and returns the list of ClusterImagePolicies that match those selectors.
 func (c *clusterImagePolicies) List(opts v1.ListOptions) (result *v1beta1.ClusterImagePolicyList, err error) {
+	var timeout time.Duration
+	if opts.TimeoutSeconds != nil {
+		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
+	}
 	result = &v1beta1.ClusterImagePolicyList{}
 	err = c.client.Get().
 		Resource("clusterimagepolicies").
 		VersionedParams(&opts, scheme.ParameterCodec).
+		Timeout(timeout).
 		Do().
 		Into(result)
 	return
@@ -83,10 +90,15 @@ func (c *clusterImagePolicies) List(opts v1.ListOptions) (result *v1beta1.Cluste
 
 // Watch returns a watch.Interface that watches the requested clusterImagePolicies.
 func (c *clusterImagePolicies) Watch(opts v1.ListOptions) (watch.Interface, error) {
+	var timeout time.Duration
+	if opts.TimeoutSeconds != nil {
+		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
+	}
 	opts.Watch = true
 	return c.client.Get().
 		Resource("clusterimagepolicies").
 		VersionedParams(&opts, scheme.ParameterCodec).
+		Timeout(timeout).
 		Watch()
 }
 
@@ -125,9 +137,14 @@ func (c *clusterImagePolicies) Delete(name string, options *v1.DeleteOptions) er
 
 // DeleteCollection deletes a collection of objects.
 func (c *clusterImagePolicies) DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error {
+	var timeout time.Duration
+	if listOptions.TimeoutSeconds != nil {
+		timeout = time.Duration(*listOptions.TimeoutSeconds) * time.Second
+	}
 	return c.client.Delete().
 		Resource("clusterimagepolicies").
 		VersionedParams(&listOptions, scheme.ParameterCodec).
+		Timeout(timeout).
 		Body(options).
 		Do().
 		Error()

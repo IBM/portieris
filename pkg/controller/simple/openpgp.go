@@ -15,8 +15,9 @@
 // Implementation of Verify against openpgp directly without use of containers/image
 // library, but copy a lot of it for flexibility but more work
 // will need to import (or copy) some defs of signature at least
+// incomplete
 
-package atomic
+package simple
 
 import (
 	"bytes"

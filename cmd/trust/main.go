@@ -19,7 +19,7 @@ import (
 	"os"
 
 	kube "github.com/IBM/portieris/helpers/kube"
-	notaryController "github.com/IBM/portieris/pkg/controller/notary"
+	simpleController "github.com/IBM/portieris/pkg/controller/simple"
 	"github.com/IBM/portieris/pkg/kubernetes"
 	notaryClient "github.com/IBM/portieris/pkg/notary"
 	registryclient "github.com/IBM/portieris/pkg/registry"
@@ -58,7 +58,10 @@ func main() {
 	}
 
 	cr := registryclient.NewClient()
-	controller := notaryController.NewController(kubeWrapper, policyClient, trust, cr)
-	webhook := webhook.NewServer("notary", controller, serverCert, serverKey)
+	//controller := notaryController.NewController(kubeWrapper, policyClient, trust, cr)
+	//webhook := webhook.NewServer("notary", controller, serverCert, serverKey)
+	controller := simpleController.NewController(kubeWrapper, policyClient, trust, cr)
+	webhook := webhook.NewServer("simple", controller, serverCert, serverKey)
+
 	webhook.Run()
 }
