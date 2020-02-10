@@ -30,16 +30,15 @@ import (
 // VerifyByPolicy returns the verified digest or the verification error
 func VerifyByPolicy(imageToVerify string, policy *signature.Policy, username, password string) (string, error) {
 
-	dockerAuth := &types.DockerAuthConfig{
+	dockerAuthConfig := &types.DockerAuthConfig{
 		Username: username,
 		Password: password,
 	}
 	systemContext := &types.SystemContext{
 		RootForImplicitAbsolutePaths: "/nowhere", // read nothing from files
-		DockerAuthConfig:             dockerAuth,
+		DockerAuthConfig:             dockerAuthConfig,
 		DockerRegistryUserAgent:      "portieris",
 	}
-
 	imageReference, err := docker.ParseReference(`//` + imageToVerify)
 	if err != nil {
 		return "", err
@@ -49,12 +48,10 @@ func VerifyByPolicy(imageToVerify string, policy *signature.Policy, username, pa
 		return "", err
 	}
 	unparsedImage := image.UnparsedInstance(imageSource, nil)
-
 	policyContext, err := signature.NewPolicyContext(policy)
 	if err != nil {
 		return "", err
 	}
-
 	allowed, err := policyContext.IsRunningImageAllowed(context.Background(), unparsedImage)
 	if err != nil {
 		return "", err
@@ -63,7 +60,6 @@ func VerifyByPolicy(imageToVerify string, policy *signature.Policy, username, pa
 	if !allowed {
 		return "", fmt.Errorf("not allowed")
 	}
-
 	// get the digest
 	m, _, err := unparsedImage.Manifest(context.Background())
 	digest, err := manifest.Digest(m)
