@@ -48,12 +48,6 @@ spec:
             initialDelaySeconds: 10
             timeoutSeconds: 10
           env:
-            - name: "SECRETNAME"
-              value: {{ .Values.defaultSecret }}
-            - name: "NAMESPACE"
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
           resources:
 {{ toYaml .Values.resources | indent 12 }}
     {{- with .Values.nodeSelector }}
