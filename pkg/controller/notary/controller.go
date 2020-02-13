@@ -30,6 +30,7 @@ import (
 	registryclient "github.com/IBM/portieris/pkg/registry"
 	"github.com/IBM/portieris/pkg/webhook"
 	"github.com/IBM/portieris/types"
+	"github.com/docker/distribution/registry/client/auth/challenge"
 	"github.com/golang/glog"
 	store "github.com/theupdateframework/notary/storage"
 	admissionv1beta1 "k8s.io/api/admission/v1beta1"
@@ -149,7 +150,7 @@ func (c *Controller) mutatePodSpec(namespace, specPath string, pod corev1.PodSpe
 
 			glog.Infof("Status code: %v returned for repo: %v", resp.StatusCode, img.NameWithoutTag())
 
-			var challengeSlice []oauth.Challenge
+			var challengeSlice []challenge.Challenge
 			notaryToken := ""
 
 			if resp.StatusCode == http.StatusUnauthorized {

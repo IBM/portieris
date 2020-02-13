@@ -17,6 +17,7 @@ package registry
 import (
 	"fmt"
 
+	"github.com/docker/distribution/registry/client/auth/challenge"
 	"github.com/golang/glog"
 
 	"github.com/IBM/portieris/helpers/oauth"
@@ -27,7 +28,7 @@ type Client struct{}
 
 // Interface .
 type Interface interface {
-	GetContentTrustToken(username, password, imageRepo string, challengeSlice []oauth.Challenge) (string, error)
+	GetContentTrustToken(username, password, imageRepo string, challengeSlice []challenge.Challenge) (string, error)
 }
 
 // NewClient .
@@ -36,7 +37,7 @@ func NewClient() Interface {
 }
 
 // GetContentTrustToken .
-func (c Client) GetContentTrustToken(username, password, imageRepo string, challengeSlice []oauth.Challenge) (string, error) {
+func (c Client) GetContentTrustToken(username, password, imageRepo string, challengeSlice []challenge.Challenge) (string, error) {
 	token, err := oauth.Request(password, imageRepo, username, challengeSlice)
 	if err != nil {
 		return "", err

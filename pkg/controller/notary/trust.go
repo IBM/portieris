@@ -41,7 +41,6 @@ type foundSigner struct {
 
 // getDigest .
 func (c *Controller) getDigest(server, image, notaryToken, targetName string, signers []Signer) (*bytes.Buffer, error) {
-	glog.Infof("Fetching repo for image %v with tag %v", image, targetName)
 	repo, err := c.trust.GetNotaryRepo(server, image, notaryToken)
 	if err != nil {
 		return nil, err

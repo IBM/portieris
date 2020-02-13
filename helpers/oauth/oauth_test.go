@@ -18,6 +18,8 @@ import (
 	"net/http"
 	"strings"
 	"testing"
+
+	challenge "github.com/docker/distribution/registry/client/auth/challenge"
 )
 
 func TestHappyPathWithAuth(t *testing.T) {
@@ -83,7 +85,7 @@ func TestHappyPathWithRequest(t *testing.T) {
 
 	resp, _ := CheckAuthRequired(notaryURL, hostName, repoName, official)
 
-	challengeSlice := ResponseChallenges(resp)
+	challengeSlice := challenge.ResponseChallenges(resp)
 
 	token, err := Request(password, repo, username, challengeSlice)
 
@@ -146,7 +148,7 @@ func TestSadPathWithRequestMissingWWWAuthenticate(t *testing.T) {
 
 	resp, _ := CheckAuthRequired(notaryURL, hostName, repoName, official)
 
-	challengeSlice := ResponseChallenges(resp)
+	challengeSlice := challenge.ResponseChallenges(resp)
 
 	challengeSlice = nil
 
@@ -164,18 +166,7 @@ func TestSadPathWithRequestMissingRealmAndServiceMissing(t *testing.T) {
 	username := ""
 	repo := "nginx"
 
-	notaryURL := "https://notary.docker.io"
-	hostName := "docker.io"
-	repoName := "nginx"
-	official := true
-
-	resp, _ := CheckAuthRequired(notaryURL, hostName, repoName, official)
-
-	challengeSlice := ResponseChallenges(resp)
-
-	challengeSlice = nil
-
-	challengeSlice = append(challengeSlice, Challenge{Scheme: "test", Parameters: nil})
+	challengeSlice := []challenge.Challenge{challenge.Challenge{Scheme: "test", Parameters: nil}}
 
 	_, err := Request(password, repo, username, challengeSlice)
 

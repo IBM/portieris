@@ -23,6 +23,7 @@ import (
 	"net/url"
 	"time"
 
+	challenge "github.com/docker/distribution/registry/client/auth/challenge"
 	"github.com/golang/glog"
 )
 
@@ -50,7 +51,7 @@ var client = &http.Client{
 //   *auth.TokenResponse - Details of the type is here https://github.ibm.com/alchemy-registry/registry-types/tree/master/auth#type-tokenresponse
 //                         Token is the element you will need to forward to the registry/notary as part of a Bearer Authorization Header
 //   error
-func Request(token string, repo string, username string, challengeSlice []Challenge) (*TokenResponse, error) {
+func Request(token string, repo string, username string, challengeSlice []challenge.Challenge) (*TokenResponse, error) {
 
 	oauthEndpoint := ""
 	service := ""
