@@ -175,7 +175,7 @@ func (c *Controller) mutatePodSpec(namespace, specPath string, pod corev1.PodSpe
 		secretLoop:
 			for _, secret := range pod.ImagePullSecrets {
 
-				username, password, err := c.kubeClientsetWrapper.GetSecretToken(namespace, secret.Name, img.GetHostname(), defaultPull)
+				username, password, err := c.kubeClientsetWrapper.GetSecretToken(namespace, secret.Name, img.GetHostname())
 				if err != nil {
 					glog.Error(err)
 					continue secretLoop
@@ -191,7 +191,7 @@ func (c *Controller) mutatePodSpec(namespace, specPath string, pod corev1.PodSpe
 			}
 
 			if defaultPull {
-				username, password, err := c.kubeClientsetWrapper.GetSecretToken("", "", img.GetHostname(), defaultPull)
+				username, password, err := c.kubeClientsetWrapper.GetSecretToken("", "", img.GetHostname())
 				if err != nil {
 					glog.Error(err)
 				}
