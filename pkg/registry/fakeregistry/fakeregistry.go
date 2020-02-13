@@ -18,21 +18,21 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/IBM/portieris/helpers/oauth"
 	"github.com/IBM/portieris/pkg/registry"
+	"github.com/docker/distribution/registry/client/auth/challenge"
 )
 
 var _ registry.Interface = &FakeRegistry{}
 
 // FakeRegistry .
 type FakeRegistry struct {
-	GetContentTrustTokenStub        func(username, password, imageRepo string, challengeSlice []oauth.Challenge) (string, error)
+	GetContentTrustTokenStub        func(username, password, imageRepo string, challengeSlice []challenge.Challenge) (string, error)
 	getContentTrustTokenMutex       sync.RWMutex
 	getContentTrustTokenArgsForCall []struct {
 		username       string
 		password       string
 		imageRepo      string
-		challengeSlice []oauth.Challenge
+		challengeSlice []challenge.Challenge
 	}
 	getContentTrustTokenReturns struct {
 		token string
@@ -41,13 +41,13 @@ type FakeRegistry struct {
 }
 
 // GetContentTrustToken ...
-func (fake *FakeRegistry) GetContentTrustToken(username, password, imageRepo string, challengeSlice []oauth.Challenge) (string, error) {
+func (fake *FakeRegistry) GetContentTrustToken(username, password, imageRepo string, challengeSlice []challenge.Challenge) (string, error) {
 	fake.getContentTrustTokenMutex.Lock()
 	fake.getContentTrustTokenArgsForCall = append(fake.getContentTrustTokenArgsForCall, struct {
 		username       string
 		password       string
 		imageRepo      string
-		challengeSlice []oauth.Challenge
+		challengeSlice []challenge.Challenge
 	}{username, password, imageRepo, challengeSlice})
 	fake.getContentTrustTokenMutex.Unlock()
 	if fake.GetContentTrustTokenStub != nil {
