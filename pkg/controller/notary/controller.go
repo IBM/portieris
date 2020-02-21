@@ -138,27 +138,25 @@ func (c *Controller) mutatePodSpec(namespace, specPath string, pod corev1.PodSpe
 				continue containerLoop
 			}
 
-			if resp.StatusCode == http.StatusUnauthorized {
+			var challengeSlice []challenge.Challenge
+			notaryToken := ""
+
+			switch resp.StatusCode {
+			case http.StatusUnauthorized:
 				glog.Infof("Need to get token for %s to fetch target metadata", notaryURL)
-			} else if resp.StatusCode == http.StatusOK {
+				challengeSlice = challenge.ResponseChallenges(resp)
+				notaryToken, err = c.cr.GetContentTrustToken("", "", img.NameWithoutTag(), challengeSlice)
+				if err != nil {
+					glog.Error(err)
+				}
+			case http.StatusOK:
 				glog.Infof("No need to fetch token for %s to get the target metadata", notaryURL)
-			} else {
+			default:
 				glog.Infof("Status code: %v was returned", resp.StatusCode)
 				continue containerLoop
 			}
 
 			glog.Infof("Status code: %v returned for repo: %v", resp.StatusCode, img.NameWithoutTag())
-
-			var challengeSlice []challenge.Challenge
-			notaryToken := ""
-
-			if resp.StatusCode == http.StatusUnauthorized {
-				challengeSlice = oauth.ResponseChallenges(resp)
-				notaryToken, err = c.cr.GetContentTrustToken("", "", img.NameWithoutTag(), challengeSlice)
-				if err != nil {
-					glog.Error(err)
-				}
-			}
 
 			defaultPull := false
 
