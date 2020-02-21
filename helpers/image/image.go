@@ -50,8 +50,8 @@ func NewReference(name string) (*Reference, error) {
 		return nil, err
 	}
 
-	// Get the hostname
-	hostname, reponame := reference.SplitHostname(ref)
+	hostname := reference.Domain(ref)
+	repo := reference.Path(ref)
 	if hostname == "" {
 		// If no domain found, treat it as docker.io
 		hostname = "docker.io"

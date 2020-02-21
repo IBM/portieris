@@ -5,7 +5,7 @@ go 1.12
 require (
 	github.com/agl/ed25519 v0.0.0-20170116200512-5312a6153412
 	github.com/davecgh/go-spew v1.1.1
-	github.com/docker/distribution v2.6.2+incompatible
+	github.com/docker/distribution v2.7.1+incompatible
 	github.com/docker/go v1.5.1-1
 	github.com/ghodss/yaml v1.0.0
 	github.com/gogo/protobuf v1.1.1
