@@ -132,9 +132,8 @@ func (c *Controller) mutatePodSpec(namespace, specPath string, pod corev1.PodSpe
 
 			official := !strings.ContainsRune(img.NameWithoutTag(), '/')
 
-			resp, err1 := oauth.CheckAuthRequired(notaryURL, img.GetHostname(), img.RepoName(), official)
-
-			if err1 != nil {
+			resp, err := oauth.CheckAuthRequired(notaryURL, img.GetHostname(), img.RepoName(), official)
+			if err != nil {
 				glog.Error(err)
 				continue containerLoop
 			}
