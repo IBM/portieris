@@ -61,7 +61,7 @@ func TestSadPathWithAuth(t *testing.T) {
 	_, err := CheckAuthRequired(notaryURL, *img)
 
 	if err != nil {
-		expected := "https://invalid.docker.io/v2/docker.io/library/nginx/_trust/tuf/root.json: dial tcp: lookup invalid.docker.io"
+		expected := "Get https://invalid.docker.io/v2/docker.io/library/docker.io/library/nginx/_trust/tuf/root.json: dial tcp: lookup invalid.docker.io: no such host"
 		if !strings.Contains(err.Error(), expected) {
 			t.Errorf("Unexpected error message: %v, expected: %v", err.Error(), expected)
 		}
@@ -119,7 +119,7 @@ func TestSadPathWithRequestInvalidURL(t *testing.T) {
 	_, err := CheckAuthRequired(notaryURL, *img)
 
 	if err != nil {
-		if expected := "Get https://usa.icr.io:4443/v2/us.icr.io/molepigeon/testimage/_trust/tuf/root.json: x509: certificate is valid for icr.io, va.icr.io, registry.bluemix.net, va.bluemix.net, cp.icr.io, not usa.icr.io"; err.Error() != expected {
+		if expected := "Get https://usa.icr.io:4443/v2/us.icr.io/molepigeon/us.icr.io/molepigeon/testimage/_trust/tuf/root.json: x509: certificate is valid for icr.io, va.icr.io, registry.bluemix.net, va.bluemix.net, cp.icr.io, registry.marketplace.redhat.com, not usa.icr.io"; err.Error() != expected {
 			t.Errorf("Unexpected error message: %v, expected: %v", err.Error(), expected)
 		}
 	}
