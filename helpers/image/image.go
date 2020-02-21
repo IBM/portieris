@@ -89,7 +89,11 @@ func NewReference(name string) (*Reference, error) {
 
 // GetHostname returns the repository hostname of an image
 func (r Reference) GetHostname() string {
-	return r.hostname
+	host := r.hostname
+	if r.port != "" {
+		host = fmt.Sprintf("%s:%s", host, r.port)
+	}
+	return host
 }
 
 // GetPort returns the port of the hostname.
