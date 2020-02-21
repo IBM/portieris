@@ -34,6 +34,7 @@ func TestReference(t *testing.T) {
 		NameWithTag     string
 		NameWithoutTag  string
 		String          string
+		Namespace       string
 	}
 	tests := []struct {
 		name   string
@@ -60,6 +61,7 @@ func TestReference(t *testing.T) {
 				NameWithoutTag:  "test.com/namespace/name",
 				String:          "test.com/namespace/name",
 				RegistryURL:     "https://test.com",
+				Namespace:       "namespace",
 				ContentTrustErr: true,
 			},
 		},
@@ -76,6 +78,7 @@ func TestReference(t *testing.T) {
 				NameWithoutTag:  "test.com:8080/namespace/name",
 				String:          "test.com:8080/namespace/name@sha256:1234567890",
 				RegistryURL:     "https://test.com:8080",
+				Namespace:       "namespace",
 				ContentTrustErr: true,
 			},
 		},
@@ -92,6 +95,7 @@ func TestReference(t *testing.T) {
 				NameWithoutTag:  "test.com/namespace/name",
 				String:          "test.com/namespace/name:v1",
 				RegistryURL:     "https://test.com",
+				Namespace:       "namespace",
 				ContentTrustErr: true,
 			},
 		},
@@ -108,6 +112,7 @@ func TestReference(t *testing.T) {
 				NameWithoutTag:  "test.com:8080/namespace/name",
 				String:          "test.com:8080/namespace/name:v1@sha256:1234567890",
 				RegistryURL:     "https://test.com:8080",
+				Namespace:       "namespace",
 				ContentTrustErr: true,
 			},
 		},
@@ -124,6 +129,7 @@ func TestReference(t *testing.T) {
 				NameWithoutTag:  "docker.io/namespace/name",
 				String:          "namespace/name:v1@sha256:1234567890",
 				RegistryURL:     "https://docker.io",
+				Namespace:       "namespace",
 				ContentTrustErr: false,
 				ContentTrustURL: "https://notary.docker.io",
 			},
@@ -141,6 +147,7 @@ func TestReference(t *testing.T) {
 				NameWithoutTag:  "docker.io/library/ubuntu",
 				String:          "ubuntu:v1@sha256:1234567890",
 				RegistryURL:     "https://docker.io",
+				Namespace:       "library",
 				ContentTrustErr: false,
 				ContentTrustURL: "https://notary.docker.io",
 			},
@@ -158,6 +165,7 @@ func TestReference(t *testing.T) {
 				NameWithoutTag:  "us.icr.io/namespace/name",
 				String:          "us.icr.io/namespace/name",
 				RegistryURL:     "https://us.icr.io",
+				Namespace:       "namespace",
 				ContentTrustErr: false,
 				ContentTrustURL: "https://us.icr.io:4443",
 			},
@@ -175,6 +183,7 @@ func TestReference(t *testing.T) {
 				NameWithoutTag:  "quay.io/namespace/name",
 				String:          "quay.io/namespace/name",
 				RegistryURL:     "https://quay.io",
+				Namespace:       "namespace",
 				ContentTrustErr: false,
 				ContentTrustURL: "https://quay.io:443",
 			},
@@ -192,6 +201,7 @@ func TestReference(t *testing.T) {
 				NameWithoutTag:  "us.icr.io/namespace/name",
 				String:          "us.icr.io/namespace/name",
 				RegistryURL:     "https://us.icr.io",
+				Namespace:       "namespace",
 				ContentTrustErr: false,
 				ContentTrustURL: "https://us.icr.io:4443",
 			},
@@ -209,6 +219,7 @@ func TestReference(t *testing.T) {
 				NameWithoutTag:  "stg.icr.io/namespace/name",
 				String:          "stg.icr.io/namespace/name",
 				RegistryURL:     "https://stg.icr.io",
+				Namespace:       "namespace",
 				ContentTrustErr: false,
 				ContentTrustURL: "https://stg.icr.io:4443",
 			},
@@ -226,6 +237,7 @@ func TestReference(t *testing.T) {
 				NameWithoutTag:  "de.icr.io:8080/namespace/name",
 				String:          "de.icr.io:8080/namespace/name",
 				RegistryURL:     "https://de.icr.io:8080",
+				Namespace:       "namespace",
 				ContentTrustErr: false,
 				ContentTrustURL: "https://de.icr.io:4443",
 			},
@@ -256,6 +268,7 @@ func TestReference(t *testing.T) {
 				assert.Equal(t, tt.expect.NameWithTag, image.NameWithTag(), "NameWithTag")
 				assert.Equal(t, tt.expect.NameWithoutTag, image.NameWithoutTag(), "NameWithoutTag")
 				assert.Equal(t, tt.expect.String, image.String(), "String")
+				assert.Equal(t, tt.expect.Namespace, image.GetNamespace(), "Repo")
 			}
 		})
 	}

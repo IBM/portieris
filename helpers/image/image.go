@@ -25,13 +25,13 @@ import (
 
 // Reference .
 type Reference struct {
-	original string
-	name     string
-	tag      string
-	digest   string
-	hostname string
-	port     string
-	repo     string
+	original  string
+	name      string
+	tag       string
+	digest    string
+	hostname  string
+	port      string
+	namespace string
 }
 
 // NewReference parses the image name and returns an error if the name is invalid.
@@ -143,9 +143,19 @@ func (r Reference) NameWithoutTag() string {
 	return r.name
 }
 
-// RepoName returns the image name without the tag and doesn't contain the server/host detals.
-func (r Reference) RepoName() string {
-	return r.repo
+// GetNamespace returns the image namespace.
+func (r Reference) GetNamespace() string {
+	return r.namespace
+}
+
+// GetNamespace returns the image namespace.
+func (r Reference) GetRepoWithoutTag() string {
+	return r.namespace + "/" + r.NameWithoutTag()
+}
+
+// GetNamespace returns the image namespace.
+func (r Reference) GetRepoWithTag() string {
+	return r.namespace + "/" + r.NameWithTag()
 }
 
 // String returns the original image name.
