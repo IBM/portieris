@@ -53,9 +53,7 @@ var client = &http.Client{
 //   error
 func Request(token string, repo string, username string, challengeSlice []challenge.Challenge) (*TokenResponse, error) {
 
-	oauthEndpoint := ""
-	service := ""
-	scope := ""
+	var oauthEndpoint, service, scope string
 
 	if challengeSlice == nil {
 		errMessage := "unable to fetch www-authenticate header details"
