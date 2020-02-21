@@ -19,16 +19,15 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/IBM/portieris/helpers/image"
 	challenge "github.com/docker/distribution/registry/client/auth/challenge"
 )
 
 func TestHappyPathWithAuth(t *testing.T) {
 	notaryURL := "https://notary.docker.io"
-	hostName := "docker.io"
-	repoName := "nginx"
-	official := true
+	img, _ := image.NewReference("nginx")
 
-	resp, err := CheckAuthRequired(notaryURL, hostName, repoName, official)
+	resp, err := CheckAuthRequired(notaryURL, *img)
 
 	if err != nil {
 		t.Errorf("Some error occurred: %s", err.Error())
@@ -42,11 +41,9 @@ func TestHappyPathWithAuth(t *testing.T) {
 // TODO: find an endpoint which allows notary tuf info without auth
 func TestHappyPathWithAuthUnofficial(t *testing.T) {
 	notaryURL := "https://notary.docker.io"
-	hostName := "docker.io"
-	repoName := "library/nginx"
-	official := false
+	img, _ := image.NewReference("docker.io/library/nginx")
 
-	resp, err := CheckAuthRequired(notaryURL, hostName, repoName, official)
+	resp, err := CheckAuthRequired(notaryURL, *img)
 
 	if err != nil {
 		t.Errorf("Some error occurred: %s", err.Error())
@@ -59,11 +56,9 @@ func TestHappyPathWithAuthUnofficial(t *testing.T) {
 
 func TestSadPathWithAuth(t *testing.T) {
 	notaryURL := "https://invalid.docker.io"
-	hostName := "docker.io"
-	repoName := "library/nginx"
-	official := false
+	img, _ := image.NewReference("docker.io/library/nginx")
 
-	_, err := CheckAuthRequired(notaryURL, hostName, repoName, official)
+	_, err := CheckAuthRequired(notaryURL, *img)
 
 	if err != nil {
 		expected := "https://invalid.docker.io/v2/docker.io/library/nginx/_trust/tuf/root.json: dial tcp: lookup invalid.docker.io"
@@ -79,11 +74,9 @@ func TestHappyPathWithRequest(t *testing.T) {
 	repo := "nginx"
 
 	notaryURL := "https://notary.docker.io"
-	hostName := "docker.io"
-	repoName := "nginx"
-	official := true
+	img, _ := image.NewReference("nginx")
 
-	resp, _ := CheckAuthRequired(notaryURL, hostName, repoName, official)
+	resp, _ := CheckAuthRequired(notaryURL, *img)
 
 	challengeSlice := challenge.ResponseChallenges(resp)
 
@@ -104,17 +97,16 @@ func TestSadPathWithRequest(t *testing.T) {
 	repo := "nginx"
 
 	notaryURL := "https://us.icr.io:4443"
-	hostName := "us.icr.io"
-	repoName := "molepigeon/testimage"
-	official := false
+	img, _ := image.NewReference("us.icr.io/molepigeon/testimage")
 
-	resp, _ := CheckAuthRequired(notaryURL, hostName, repoName, official)
+	resp, _ := CheckAuthRequired(notaryURL, *img)
 
-	challengeSlice := ResponseChallenges(resp)
+	challengeSlice := challenge.ResponseChallenges(resp)
 
 	_, err := Request(password, repo, username, challengeSlice)
 
 	if err != nil {
+		//todo(chaosaffe): Actually check that we get the expected error
 		// do nothing as we are expecting error of 401
 	}
 
@@ -122,11 +114,9 @@ func TestSadPathWithRequest(t *testing.T) {
 
 func TestSadPathWithRequestInvalidURL(t *testing.T) {
 	notaryURL := "https://usa.icr.io:4443"
-	hostName := "us.icr.io"
-	repoName := "molepigeon/testimage"
-	official := false
+	img, _ := image.NewReference("us.icr.io/molepigeon/testimage")
 
-	_, err := CheckAuthRequired(notaryURL, hostName, repoName, official)
+	_, err := CheckAuthRequired(notaryURL, *img)
 
 	if err != nil {
 		if expected := "Get https://usa.icr.io:4443/v2/us.icr.io/molepigeon/testimage/_trust/tuf/root.json: x509: certificate is valid for icr.io, va.icr.io, registry.bluemix.net, va.bluemix.net, cp.icr.io, not usa.icr.io"; err.Error() != expected {
@@ -142,11 +132,9 @@ func TestSadPathWithRequestMissingWWWAuthenticate(t *testing.T) {
 	repo := "nginx"
 
 	notaryURL := "https://notary.docker.io"
-	hostName := "docker.io"
-	repoName := "nginx"
-	official := true
+	img, _ := image.NewReference("nginx")
 
-	resp, _ := CheckAuthRequired(notaryURL, hostName, repoName, official)
+	resp, _ := CheckAuthRequired(notaryURL, *img)
 
 	challengeSlice := challenge.ResponseChallenges(resp)
 
