@@ -96,9 +96,7 @@ func Request(token string, repo string, username string, challengeSlice []challe
 
 	challengeSlice := ParseAuthHeader(resp.Header)
 
-	oauthEndpoint := ""
-	service := ""
-	scope := ""
+	var oauthEndpoint, service, scope string
 
 	if challengeSlice == nil {
 		errMessage := "unable to fetch www-authenticate header details"
