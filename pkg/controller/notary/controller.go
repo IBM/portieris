@@ -130,9 +130,8 @@ func (c *Controller) mutatePodSpec(namespace, specPath string, pod corev1.PodSpe
 				}
 			}
 
-			official := !strings.ContainsRune(img.NameWithoutTag(), '/')
+			resp, err := oauth.CheckAuthRequired(notaryURL, *img)
 
-			resp, err := oauth.CheckAuthRequired(notaryURL, img.GetHostname(), img.RepoName(), official)
 			if err != nil {
 				glog.Error(err)
 				continue containerLoop
@@ -200,29 +199,20 @@ func (c *Controller) mutatePodSpec(namespace, specPath string, pod corev1.PodSpe
 			}
 
 			var signers []Signer
-			if policy.Trust.SignerSecrets != nil {
-				// Generate a []Singer with the values for each signerSecret
-				signers = make([]Signer, len(policy.Trust.SignerSecrets))
-				for i, secretName := range policy.Trust.SignerSecrets {
-					signers[i], err = c.getSignerSecret(namespace, secretName.Name)
-					if err != nil {
-						a.StringToAdmissionResponse(fmt.Sprintf("Deny %q, could not get signerSecret from your cluster, %s", img.String(), err.Error()))
-						continue containerLoop
-					}
+			// Generate a []Signer with the values for each signerSecret
+			signers = make([]Signer, len(policy.Trust.SignerSecrets))
+			for i, secretName := range policy.Trust.SignerSecrets {
+				signers[i], err = c.getSignerSecret(namespace, secretName.Name)
+				if err != nil {
+					a.StringToAdmissionResponse(fmt.Sprintf("Deny %q, could not get signerSecret from your cluster, %s", img.String(), err.Error()))
+					continue containerLoop
 				}
 			}
 
 			// Get image digest
-			glog.Infof("getting signed image... %v", img.RepoName())
-			// notaryToken will be blank for unauthorized calls
-			var image string
-			if official {
-				image = "docker.io/library/" + img.RepoName()
-			} else {
-				image = img.NameWithoutTag()
-			}
-			glog.Infof("Image: %v", image)
-			digest, err := c.getDigest(notaryURL, image, notaryToken, img.GetTag(), signers)
+			glog.Infof("getting signed image... %v", img.GetRepoWithTag())
+			// notaryToken will be empty for unauthorized calls
+			digest, err := c.getDigest(notaryURL, img.GetRepoWithoutTag(), notaryToken, img.GetTag(), signers)
 
 			if err != nil {
 				if strings.Contains(err.Error(), "401") {
