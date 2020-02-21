@@ -23,6 +23,11 @@ import (
 	"github.com/docker/distribution/reference"
 )
 
+const (
+	dockerHub               = "docker.io"
+	dockerOfficialNamespace = "library"
+)
+
 // Reference .
 type Reference struct {
 	original string
@@ -54,11 +59,12 @@ func NewReference(name string) (*Reference, error) {
 	repo := reference.Path(ref)
 	if hostname == "" {
 		// If no domain found, treat it as docker.io
-		hostname = "docker.io"
+		hostname = dockerHub
 	}
 	if !strings.Contains(hostname, ".") {
 		// Fix SplitHostname wrongly splitting repositories like molepigeon/wibble
-		hostname = "docker.io"
+		repo = hostname
+		hostname = dockerHub
 	}
 	// Make sure it can be used to build a valid URL
 	u, err := url.Parse("http://" + hostname)
