@@ -10,7 +10,7 @@ image:
 	docker build -t portieris:$(TAG) .
 
 push: image
-        docker tag portieris:$(TAG) $(HUB)/portieris:$(TAG)
+	docker tag portieris:$(TAG) $(HUB)/portieris:$(TAG)
 	docker push $(HUB)/portieris:$(TAG)
 
 test-deps:
@@ -19,7 +19,10 @@ test-deps:
 alltests: test-deps fmt lint vet copyright-check test
 
 test: 
-	echo 'mode: atomic' > cover.out && go list ./... | xargs -n1 -I{} sh -c 'go test --tags containers_image_openpgp -covermode=atomic -coverprofile=cover.tmp {} && tail -n +2 cover.tmp >> cover.out' && rm cover.tmp
+	echo 'mode: atomic' > cover.out
+	go list ./... | xargs -n1 -I{} sh -c 'go test --tags containers_image_openpgp -covermode=atomic -coverprofile=cover.tmp {} && tail -n +2 cover.tmp >> cover.out'
+	rm cover.tmp
+	$(GOPATH)/bin/gotestcover -v -coverprofile=cover.out ${GOPACKAGES}
 
 copyright:
 	@${GOPATH}/src/github.com/IBM/portieris/scripts/copyright.sh
