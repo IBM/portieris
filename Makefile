@@ -3,6 +3,7 @@ GOPACKAGES=$(shell go list ./... | grep -v /vendor/ | grep -v test/ | grep -v pk
 
 VERSION=simple-alpha
 TAG=$(VERSION)
+GOTAGS='containers_image_openpgp'
 
 .PHONY: test
 
@@ -20,7 +21,7 @@ alltests: test-deps fmt lint vet copyright-check test
 
 test: 
 	echo 'mode: atomic' > cover.out
-	go list ./... | xargs -n1 -I{} sh -c 'go test --tags containers_image_openpgp -covermode=atomic -coverprofile=cover.tmp {} && tail -n +2 cover.tmp >> cover.out'
+	go list ./... | xargs -n1 -I{} sh -c 'go test --tags $(GOTAGS)  -covermode=atomic -coverprofile=cover.tmp {} && tail -n +2 cover.tmp >> cover.out'
 	rm cover.tmp
 
 copyright:
@@ -36,7 +37,7 @@ lint:
 	@set -e; for LINE in ${GOPACKAGES}; do golint -set_exit_status=true $${LINE} ; done
 
 vet:
-	@set -e; for LINE in ${GOPACKAGES}; do go vet $${LINE} ; done
+	@set -e; for LINE in ${GOPACKAGES}; do go vet --tags $(GOTAGS) $${LINE} ; done
 
 helm.install.local: push
 	-rm $$(pwd)/portieris-$(VERSION).tgz
