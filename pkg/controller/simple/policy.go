@@ -40,6 +40,9 @@ func TransformPolicy(inPolicy *v1beta1.Simple) (*signature.Policy, error) {
 		if err != nil {
 			return nil, err
 		}
+		if len(keyData) == 0 {
+			return nil, fmt.Errorf("keyData zero length")
+		}
 		signedIdentity, err := policySignedIdentity(inPolicy)
 		if err != nil {
 			return nil, err

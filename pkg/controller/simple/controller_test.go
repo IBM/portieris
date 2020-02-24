@@ -18,6 +18,5 @@ import (
 	"testing"
 )
 
-func TestPolicyTransformer_good1(t *testing.T) {
-
+func TestAdmit(t *testing.T) {
 }

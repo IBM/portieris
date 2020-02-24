@@ -59,3 +59,99 @@ func TestTransformPolicySignedByType(t *testing.T) {
 	assert.NotNil(t, policy, "unexpected")
 	assert.Nil(t, err, "expected")
 }
+
+func TestTransformPolicySignedByTypeInvalidKey(t *testing.T) {
+	simplePolicy := &v1beta1.Simple{
+		Type:           "signedBy",
+		KeyType:        "GPGKey",
+		KeyData:        "******",
+		SignedIdentity: v1beta1.IdentityRequirement{},
+	}
+	policy, err := TransformPolicy(simplePolicy)
+	assert.Nil(t, policy, "unexpected")
+	assert.Error(t, err, "expected")
+}
+
+func TestTransformPolicySignedByTypeEmptyKey(t *testing.T) {
+	simplePolicy := &v1beta1.Simple{
+		Type:           "signedBy",
+		KeyType:        "GPGKey",
+		KeyData:        "",
+		SignedIdentity: v1beta1.IdentityRequirement{},
+	}
+	policy, err := TransformPolicy(simplePolicy)
+	assert.Nil(t, policy, "unexpected")
+	assert.Error(t, err, "expected")
+}
+
+func TestTransformPolicySignedByTypeInvalidSignedId(t *testing.T) {
+	simplePolicy := &v1beta1.Simple{
+		Type:    "signedBy",
+		KeyType: "GPGKey",
+		KeyData: "somedata",
+		SignedIdentity: v1beta1.IdentityRequirement{
+			Type: "invalid",
+		},
+	}
+	policy, err := TransformPolicy(simplePolicy)
+	assert.Nil(t, policy, "unexpected")
+	assert.Error(t, err, "expected")
+}
+
+func TestTransformPolicySignedByTypeMatchExact(t *testing.T) {
+	simplePolicy := &v1beta1.Simple{
+		Type:    "signedBy",
+		KeyType: "GPGKey",
+		KeyData: "somedata",
+		SignedIdentity: v1beta1.IdentityRequirement{
+			Type: "matchExact",
+		},
+	}
+	policy, err := TransformPolicy(simplePolicy)
+	assert.NotNil(t, policy, "expected")
+	assert.Nil(t, err, "no error")
+}
+
+func TestTransformPolicySignedByTypeMatchRepository(t *testing.T) {
+	simplePolicy := &v1beta1.Simple{
+		Type:    "signedBy",
+		KeyType: "GPGKey",
+		KeyData: "somedata",
+		SignedIdentity: v1beta1.IdentityRequirement{
+			Type: "matchRepository",
+		},
+	}
+	policy, err := TransformPolicy(simplePolicy)
+	assert.NotNil(t, policy, "expected")
+	assert.Nil(t, err, "no error")
+}
+
+func TestTransformPolicySignedByTypeMatchExactRepository(t *testing.T) {
+	simplePolicy := &v1beta1.Simple{
+		Type:    "signedBy",
+		KeyType: "GPGKey",
+		KeyData: "somedata",
+		SignedIdentity: v1beta1.IdentityRequirement{
+			Type:             "matchExactRepository",
+			DockerRepository: "repository",
+		},
+	}
+	policy, err := TransformPolicy(simplePolicy)
+	assert.NotNil(t, policy, "expected")
+	assert.Nil(t, err, "no error")
+}
+
+func TestTransformPolicySignedByTypeMatchExactReference(t *testing.T) {
+	simplePolicy := &v1beta1.Simple{
+		Type:    "signedBy",
+		KeyType: "GPGKey",
+		KeyData: "somedata",
+		SignedIdentity: v1beta1.IdentityRequirement{
+			Type:            "matchExactReference",
+			DockerReference: "reg.io/image:tag",
+		},
+	}
+	policy, err := TransformPolicy(simplePolicy)
+	assert.NotNil(t, policy, "expected")
+	assert.Nil(t, err, "no error")
+}
