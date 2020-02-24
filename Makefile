@@ -1,7 +1,7 @@
 GOFILES=$(shell find . -type f -name '*.go' -not -path "./vendor/*")
 GOPACKAGES=$(shell go list ./... | grep -v /vendor/ | grep -v test/ | grep -v pkg/apis/)
 
-VERSION=0.6.0-simple
+VERSION=simple-alpha
 TAG=$(VERSION)
 
 .PHONY: test

@@ -6,9 +6,9 @@ replicaCount: 3
 namespace: ibm-system
 
 image:
-  host: uk.icr.io/stuarts
+  host: docker.io/ibmcom
   image: portieris
-  tag: 0.6.0-simple
+  tag: simpla-alphae
   pullPolicy: Always
 
 service:
