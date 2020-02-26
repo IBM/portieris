@@ -5,7 +5,7 @@ go 1.12
 require (
 	github.com/agl/ed25519 v0.0.0-20170116200512-5312a6153412
 	github.com/davecgh/go-spew v1.1.1
-	github.com/docker/distribution v2.6.2+incompatible
+	github.com/docker/distribution v2.7.1+incompatible
 	github.com/docker/go v1.5.1-1
 	github.com/ghodss/yaml v1.0.0
 	github.com/gogo/protobuf v1.1.1
@@ -26,6 +26,7 @@ require (
 	github.com/modern-go/reflect2 v0.0.0-20180701023420-4b7aa43c6742
 	github.com/onsi/ginkgo v1.7.0
 	github.com/onsi/gomega v1.4.3
+	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
 	github.com/petar/GoLLRB v0.0.0-20130427215148-53be0d36a84c
 	github.com/peterbourgon/diskv v2.0.1+incompatible
 	github.com/pmezard/go-difflib v1.0.0
