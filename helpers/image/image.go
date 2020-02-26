@@ -35,54 +35,42 @@ type Reference struct {
 
 // NewReference parses the image name and returns an error if the name is invalid.
 func NewReference(name string) (*Reference, error) {
-	var digest string
-	original := name
+	result := &Reference{}
+	result.original = name
 	// Remove the digest so `ParseNamed` doesn't fail, it can't handle short digests.
 	if strings.Contains(name, "@sha256:") {
 		fields := strings.Split(name, "@sha256:")
 		name = fields[0]
-		digest = fields[1]
+		result.digest = fields[1]
 	}
+
 	// Get image name
-	ref, err := reference.ParseNamed(name)
+	ref, err := reference.ParseNormalizedNamed(name)
 	if err != nil {
 		return nil, err
 	}
+	result.name = ref.Name()
 
 	// Get the hostname
-	hostname, _ := reference.SplitHostname(ref)
-	if hostname == "" {
-		// If no domain found, treat it as docker.io
-		hostname = "docker.io"
-	}
-	if !strings.Contains(hostname, ".") {
-		// Fix SplitHostname wrongly splitting repositories like molepigeon/wibble
-		hostname = "docker.io"
-	}
+	hostname := reference.Domain(ref)
+
 	// Make sure it can be used to build a valid URL
 	u, err := url.Parse("http://" + hostname)
 	if err != nil {
 		return nil, err
 	}
+	result.hostname = u.Hostname()
+	result.port = u.Port()
 
 	// if the image does not have a tag, use `latest` so we can parse it again.
 	image := strings.Replace(name, hostname, "", 1)
 	if !strings.Contains(image, ":") {
-		name += ":latest"
+		result.tag = "latest"
+	} else {
+		result.tag = ref.(reference.Tagged).Tag()
 	}
 
-	// Parse the name again including the tag so we can have a reference.taggedReference object
-	// we ommit the error here since we already parsed the original string above.
-	ref, _ = reference.ParseNamed(name)
-
-	return &Reference{
-		original: original,
-		name:     ref.Name(),
-		tag:      ref.(reference.Tagged).Tag(),
-		digest:   digest,
-		hostname: u.Hostname(),
-		port:     u.Port(),
-	}, nil
+	return result, nil
 }
 
 // GetHostname returns the repository hostname of an image
