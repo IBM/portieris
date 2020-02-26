@@ -1,5 +1,5 @@
 GOFILES=$(shell find . -type f -name '*.go' -not -path "./vendor/*")
-GOPACKAGES=$(shell go list ./... | grep -v /vendor/ | grep -v test/ | grep -v pkg/apis/)
+GOPACKAGES=$(shell go list ./... | grep -v test/ | grep -v pkg/apis/)
 
 VERSION=simple-alpha
 TAG=$(VERSION)
@@ -21,7 +21,7 @@ alltests: test-deps fmt lint vet copyright-check test
 
 test: 
 	echo 'mode: atomic' > cover.out
-	go list ./... | xargs -n1 -I{} sh -c 'go test --tags $(GOTAGS)  -covermode=atomic -coverprofile=cover.tmp {} && tail -n +2 cover.tmp >> cover.out'
+	for LINE in ${GOPACKAGES}; do sh -c "go test --tags $(GOTAGS)  -covermode=atomic -coverprofile=cover.tmp $${LINE} && tail -n +2 cover.tmp >> cover.out"; done
 	rm cover.tmp
 
 copyright:
