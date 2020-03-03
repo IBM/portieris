@@ -24,8 +24,8 @@ import (
 	"github.com/containers/image/v5/signature"
 )
 
-// TransformPolicy .
-func TransformPolicy(inPolicy *v1beta1.Simple) (*signature.Policy, error) {
+// transformPolicy ...
+func transformPolicy(inPolicy *v1beta1.Simple) (*signature.Policy, error) {
 	var policyRequirement signature.PolicyRequirement
 
 	switch inPolicy.Type {

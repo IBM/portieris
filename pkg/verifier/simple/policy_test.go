@@ -25,7 +25,7 @@ func TestTransformPolicyInvalidType(t *testing.T) {
 	simplePolicy := &v1beta1.Simple{
 		Type: "invalid",
 	}
-	policy, err := TransformPolicy(simplePolicy)
+	policy, err := transformPolicy(simplePolicy)
 	assert.Nil(t, policy, "unexpected")
 	assert.Error(t, err, "expected")
 }
@@ -34,7 +34,7 @@ func TestTransformPolicyRejectType(t *testing.T) {
 	simplePolicy := &v1beta1.Simple{
 		Type: "reject",
 	}
-	policy, err := TransformPolicy(simplePolicy)
+	policy, err := transformPolicy(simplePolicy)
 	assert.NotNil(t, policy, "unexpected")
 	assert.Nil(t, err, "expected")
 }
@@ -43,7 +43,7 @@ func TestTransformPolicyAcceptType(t *testing.T) {
 	simplePolicy := &v1beta1.Simple{
 		Type: "insecureAcceptAnything",
 	}
-	policy, err := TransformPolicy(simplePolicy)
+	policy, err := transformPolicy(simplePolicy)
 	assert.NotNil(t, policy, "unexpected")
 	assert.Nil(t, err, "expected")
 }
@@ -55,7 +55,7 @@ func TestTransformPolicySignedByType(t *testing.T) {
 		KeyData:        "somedata",
 		SignedIdentity: v1beta1.IdentityRequirement{},
 	}
-	policy, err := TransformPolicy(simplePolicy)
+	policy, err := transformPolicy(simplePolicy)
 	assert.NotNil(t, policy, "unexpected")
 	assert.Nil(t, err, "expected")
 }
@@ -67,7 +67,7 @@ func TestTransformPolicySignedByTypeInvalidKey(t *testing.T) {
 		KeyData:        "******",
 		SignedIdentity: v1beta1.IdentityRequirement{},
 	}
-	policy, err := TransformPolicy(simplePolicy)
+	policy, err := transformPolicy(simplePolicy)
 	assert.Nil(t, policy, "unexpected")
 	assert.Error(t, err, "expected")
 }
@@ -79,7 +79,7 @@ func TestTransformPolicySignedByTypeEmptyKey(t *testing.T) {
 		KeyData:        "",
 		SignedIdentity: v1beta1.IdentityRequirement{},
 	}
-	policy, err := TransformPolicy(simplePolicy)
+	policy, err := transformPolicy(simplePolicy)
 	assert.Nil(t, policy, "unexpected")
 	assert.Error(t, err, "expected")
 }
@@ -93,7 +93,7 @@ func TestTransformPolicySignedByTypeInvalidSignedId(t *testing.T) {
 			Type: "invalid",
 		},
 	}
-	policy, err := TransformPolicy(simplePolicy)
+	policy, err := transformPolicy(simplePolicy)
 	assert.Nil(t, policy, "unexpected")
 	assert.Error(t, err, "expected")
 }
@@ -107,7 +107,7 @@ func TestTransformPolicySignedByTypeMatchExact(t *testing.T) {
 			Type: "matchExact",
 		},
 	}
-	policy, err := TransformPolicy(simplePolicy)
+	policy, err := transformPolicy(simplePolicy)
 	assert.NotNil(t, policy, "expected")
 	assert.Nil(t, err, "no error")
 }
@@ -121,7 +121,7 @@ func TestTransformPolicySignedByTypeMatchRepository(t *testing.T) {
 			Type: "matchRepository",
 		},
 	}
-	policy, err := TransformPolicy(simplePolicy)
+	policy, err := transformPolicy(simplePolicy)
 	assert.NotNil(t, policy, "expected")
 	assert.Nil(t, err, "no error")
 }
@@ -136,7 +136,7 @@ func TestTransformPolicySignedByTypeMatchExactRepository(t *testing.T) {
 			DockerRepository: "repository",
 		},
 	}
-	policy, err := TransformPolicy(simplePolicy)
+	policy, err := transformPolicy(simplePolicy)
 	assert.NotNil(t, policy, "expected")
 	assert.Nil(t, err, "no error")
 }
@@ -151,7 +151,7 @@ func TestTransformPolicySignedByTypeMatchExactReference(t *testing.T) {
 			DockerReference: "reg.io/image:tag",
 		},
 	}
-	policy, err := TransformPolicy(simplePolicy)
+	policy, err := transformPolicy(simplePolicy)
 	assert.NotNil(t, policy, "expected")
 	assert.Nil(t, err, "no error")
 }

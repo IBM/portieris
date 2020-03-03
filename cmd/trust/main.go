@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018,2020 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,10 +15,14 @@
 package main
 
 import (
+	"flag"
 	"io/ioutil"
+	"os"
+
+	notaryclient "github.com/IBM/portieris/pkg/notary"
 
 	kube "github.com/IBM/portieris/helpers/kube"
-	simpleController "github.com/IBM/portieris/pkg/controller/simple"
+	"github.com/IBM/portieris/pkg/controller/multi"
 	"github.com/IBM/portieris/pkg/kubernetes"
 	registryclient "github.com/IBM/portieris/pkg/registry"
 	"github.com/IBM/portieris/pkg/webhook"
@@ -26,6 +30,7 @@ import (
 )
 
 func main() {
+	flag.Parse() // glog flags
 	kubeClientset := kube.GetKubeClient()
 	kubeWrapper := kubernetes.NewKubeClientsetWrapper(kubeClientset)
 	policyClient, err := kube.GetPolicyClient()
@@ -33,18 +38,18 @@ func main() {
 		glog.Fatal("Could not get policy client", err)
 	}
 
-	// ca, err := ioutil.ReadFile("/etc/certs/ca.pem")
-	// if err != nil {
-	// 	if os.IsNotExist(err) {
-	// 		glog.Info("CA not provided at /etc/certs/ca.pem, will use default system pool")
-	// 	} else {
-	// 		glog.Fatal("Could not read /etc/certs/ca.pem", err)
-	// 	}
-	// }
-	// trust, err := notaryClient.NewClient(".trust", ca)
-	// if err != nil {
-	// 	glog.Fatal("Could not get trust client", err)
-	// }
+	ca, err := ioutil.ReadFile("/etc/certs/ca.pem")
+	if err != nil {
+		if os.IsNotExist(err) {
+			glog.Info("CA not provided at /etc/certs/ca.pem, will use default system pool")
+		} else {
+			glog.Fatal("Could not read /etc/certs/ca.pem", err)
+		}
+	}
+	trust, err := notaryclient.NewClient(".trust", ca)
+	if err != nil {
+		glog.Fatal("Could not get trust client", err)
+	}
 
 	serverCert, err := ioutil.ReadFile("/etc/certs/serverCert.pem")
 	if err != nil {
@@ -56,10 +61,7 @@ func main() {
 	}
 
 	cr := registryclient.NewClient()
-	//controller := notaryController.NewController(kubeWrapper, policyClient, trust, cr)
-	//webhook := webhook.NewServer("notary", controller, serverCert, serverKey)
-	controller := simpleController.NewController(kubeWrapper, policyClient, cr)
-	webhook := webhook.NewServer("simple", controller, serverCert, serverKey)
-
+	controller := multi.NewController(kubeWrapper, policyClient, trust, cr)
+	webhook := webhook.NewServer("policy", controller, serverCert, serverKey)
 	webhook.Run()
 }
