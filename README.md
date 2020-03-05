@@ -20,21 +20,18 @@ Portieris' Admission Webhook is configured to fail closed. Three instances of Po
 
 ## Installing Portieris
 
-Portieris is installed using a Helm chart. Before you begin, make sure that you have Kubernetes 1.9 or above, and Helm 2.8 or above installed in your cluster.
+Portieris is installed using a Helm chart. Before you begin, make sure that you have Kubernetes 1.9 or above, and Helm 2.8 or above (not Helm 3.x) installed in your cluster.
 
 To install Portieris:
 
 * Clone the Portieris Git repository to your workstation.
 * Change directory into the Portieris Git repository.
 * Run `./helm/portieris/gencerts <namespace>`. The `gencerts` script generates new SSL certificates and keys for Portieris. Portieris presents this certificates to the Kubernetes API server when the API server makes admission requests. If you do not generate new certificates, it could be possible for an attacker to spoof Portieris in your cluster.
-* Run `helm upgrade --install portieris --set namespace=<namespace> helm/portieris` (when using `helm3`, the namespace has to exist before running the command).
+* Run `helm upgrade --install portieris --set namespace=<namespace> helm/portieris`.
 
 ## Uninstalling Portieris
 
-You can uninstall Portieris at any time. Note that all your image security policies are deleted when you uninstall Portieris.
-
-If you have Helm 2.x, run `helm delete --purge portieris`.
-If you have Helm 3.x or later, run `helm delete portieris`.
+You can uninstall Portieris at any time by running `helm delete --purge portieris`. Note that all your image security policies are deleted when you uninstall Portieris.
 
 ## Image security policies
 
