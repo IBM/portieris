@@ -31,7 +31,7 @@ To install Portieris:
 
 ## Uninstalling Portieris
 
-You can uninstall Portieris at any time using. Note that all your image security policies are deleted when you uninstall Portieris.
+You can uninstall Portieris at any time. Note that all your image security policies are deleted when you uninstall Portieris.
 
 If you have Helm 2.x, run `helm delete --purge portieris`.
 If you have Helm 3.x or later, run `helm delete portieris`.
