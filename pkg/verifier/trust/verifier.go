@@ -51,8 +51,8 @@ func NewVerifier(kubeWrapper kubernetes.WrapperInterface, trust notary.Interface
 	}
 }
 
-// VerifyByPolicy1 ...
-func (v *Verifier) VerifyByPolicy1(namespace string, img *image.Reference, credentials [][]string, policy *securityenforcementv1beta1.Policy) (*bytes.Buffer, error, error) {
+// VerifyByPolicy ...
+func (v *Verifier) VerifyByPolicy(namespace string, img *image.Reference, credentials [][]string, policy *securityenforcementv1beta1.Policy) (*bytes.Buffer, error, error) {
 	notaryURL := policy.Trust.TrustServer
 	var err error
 	if notaryURL == "" {

@@ -29,8 +29,8 @@ import (
 	"github.com/containers/image/v5/types"
 )
 
-// VerifyByPolicy1 ...
-func VerifyByPolicy1(imageToVerify string, credentials [][]string, portierisPolicy *v1beta1.Policy) (*bytes.Buffer, error, error) {
+// VerifyByPolicy verifies the image according to the supplied policy and returns the verified digest, verify error or processing error
+func VerifyByPolicy(imageToVerify string, credentials [][]string, portierisPolicy *v1beta1.Policy) (*bytes.Buffer, error, error) {
 
 	simplePolicy, err := transformPolicy(portierisPolicy.Simple)
 	if err != nil {
@@ -45,8 +45,8 @@ func VerifyByPolicy1(imageToVerify string, credentials [][]string, portierisPoli
 		return nil, nil, err
 	}
 	systemContext := &types.SystemContext{
-		RootForImplicitAbsolutePaths: "/nowhere", // read nothing from files
-		DockerRegistryUserAgent:      "portieris",
+		RootForImplicitAbsolutePaths: "/nowhere",  // read nothing from files
+		DockerRegistryUserAgent:      "portieris", // add version?
 	}
 
 	for _, cred := range credentials {
@@ -60,18 +60,14 @@ func VerifyByPolicy1(imageToVerify string, credentials [][]string, portierisPoli
 			return nil, nil, err
 		}
 		unparsedImage := image.UnparsedInstance(imageSource, nil)
-		allowed, deny := policyContext.IsRunningImageAllowed(context.Background(), unparsedImage)
-		if err != nil {
-			switch err.(type) {
+		_, deny := policyContext.IsRunningImageAllowed(context.Background(), unparsedImage)
+		if deny != nil {
+			switch deny.(type) {
 			case *docker.ErrUnauthorizedForCredentials:
 				continue
 			default:
 				return nil, deny, nil
 			}
-		}
-		// redundant?
-		if !allowed {
-			return nil, fmt.Errorf("not allowed"), nil
 		}
 		// get the digest
 		m, _, err := unparsedImage.Manifest(context.Background())

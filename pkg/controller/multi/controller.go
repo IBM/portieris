@@ -1,4 +1,4 @@
-// Copyright 2020 Portieris Authors.
+// Copyright 2018,2020 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -111,7 +111,7 @@ func (c *Controller) mutatePodSpec(namespace, specPath string, pod corev1.PodSpe
 			containerPolicy, err := c.policyClient.GetPolicyToEnforce(namespace, img.String())
 			if err != nil {
 				a.ToAdmissionResponse(err)
-				return a.Flush()
+				continue
 			}
 
 			credentialCandidates := c.getPodCredentials(namespace, img, pod)
@@ -179,7 +179,7 @@ func (c *Controller) getPodCredentials(namespace string, img *image.Reference, p
 
 func (c *Controller) verifiedDigestByPolicy(namespace string, img *image.Reference, credentials [][]string, policy *securityenforcementv1beta1.Policy) (*bytes.Buffer, error, error) {
 
-	// no policy means admission allowed
+	// no policy means admission allowed, no mutation
 	if policy == nil {
 		return nil, nil, nil
 	}
@@ -187,14 +187,15 @@ func (c *Controller) verifiedDigestByPolicy(namespace string, img *image.Referen
 	var digest *bytes.Buffer
 	var deny, err error
 	if policy.Simple != nil {
-		digest, deny, err = simpleverifier.VerifyByPolicy1(img.String(), credentials, policy)
+		digest, deny, err = simpleverifier.VerifyByPolicy(img.String(), credentials, policy)
 		if err != nil || deny != nil {
 			return nil, deny, err
 		}
 	}
 
 	if policy.Trust.Enabled != nil && *policy.Trust.Enabled == true {
-		notaryDigest, deny, err := c.nv.VerifyByPolicy1(namespace, img, credentials, policy)
+		var notaryDigest *bytes.Buffer
+		notaryDigest, deny, err = c.nv.VerifyByPolicy(namespace, img, credentials, policy)
 		if err != nil || deny != nil {
 			return nil, deny, err
 		}

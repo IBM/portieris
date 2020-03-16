@@ -8,7 +8,7 @@ namespace: ibm-system
 image:
   host: docker.io/ibmcom
   image: portieris
-  tag: simpla-alphae
+  tag: 0.6.0
   pullPolicy: Always
 
 service:
