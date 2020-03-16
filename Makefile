@@ -1,7 +1,7 @@
 GOFILES=$(shell find . -type f -name '*.go' -not -path "./vendor/*")
 GOPACKAGES=$(shell go list ./... | grep -v test/ | grep -v pkg/apis/)
 
-VERSION=simple-alpha
+VERSION=0.6.0
 TAG=$(VERSION)
 GOTAGS='containers_image_openpgp'
 
@@ -39,14 +39,14 @@ lint:
 vet:
 	@set -e; for LINE in ${GOPACKAGES}; do go vet --tags $(GOTAGS) $${LINE} ; done
 
-helm.install.local: push
+helm.package:
 	-rm $$(pwd)/portieris-$(VERSION).tgz
 	helm package helm/portieris
-	helm install -n portieris $$(pwd)/portieris-$(VERSION).tgz --set image.host=$(HUB) --set image.tag=$(TAG)
 
-helm.install:
-	-rm $$(pwd)/portieris-$(VERSION).tgz
-	helm package helm/portieris
+helm.install.local: helm.package
+	helm install -n portieris $$(pwd)/portieris-$(VERSION).tgz --set image.host=$(HUB) --set image.tag=$(TAG) --set image.pullSecret=$(PULLSECRET) 
+
+helm.install: helm.package
 	helm install -n portieris $$(pwd)/portieris-$(VERSION).tgz
 
 helm.clean:
