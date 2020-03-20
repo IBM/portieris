@@ -44,11 +44,13 @@ func VerifyByPolicy(imageToVerify string, credentials [][]string, portierisPolic
 	if err != nil {
 		return nil, nil, err
 	}
+	// if expensive, make instance
 	systemContext := &types.SystemContext{
 		RootForImplicitAbsolutePaths: "/nowhere",  // read nothing from files
 		DockerRegistryUserAgent:      "portieris", // add version?
 	}
 
+	// support no-auth ?
 	for _, cred := range credentials {
 		dockerAuthConfig := &types.DockerAuthConfig{
 			Username: cred[0],

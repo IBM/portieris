@@ -179,7 +179,7 @@ func (c *Controller) getPodCredentials(namespace string, img *image.Reference, p
 
 func (c *Controller) verifiedDigestByPolicy(namespace string, img *image.Reference, credentials [][]string, policy *securityenforcementv1beta1.Policy) (*bytes.Buffer, error, error) {
 
-	// no policy means admission allowed, no mutation
+	// no policy indicates admission should be allowed, without mutation
 	if policy == nil {
 		return nil, nil, nil
 	}
