@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: global-busybox-simple-signed
+  labels:
+    app: global-busybox-simple-signed
+    test: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: global-busybox-simple-signed
+  template:
+    metadata:
+      labels:
+        app: global-busybox-simple-signed
+    spec:
+      containers:
+      - name: busybox-signed
+        image: icr.io/obs/admittest/busybox:sig
+        command: ["/bin/sleep"]
+        args: ["3600"]
+        resources:
+            limits:
+              memory: 50Mi
+              cpu: 100m

@@ -20,6 +20,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/IBM/portieris/pkg/apis/securityenforcement/v1beta1"
 	"github.com/containers/image/v5/docker"
@@ -77,7 +78,7 @@ func VerifyByPolicy(imageToVerify string, credentials [][]string, portierisPolic
 		if err != nil {
 			return nil, nil, err
 		}
-		return bytes.NewBufferString(digest.String()), nil, nil
+		return bytes.NewBufferString(strings.TrimPrefix(digest.String(), "sha256:")), nil, nil
 	}
 	return nil, nil, fmt.Errorf("Deny %q, no valid ImagePullSecret defined for %s", imageToVerify, imageToVerify)
 }

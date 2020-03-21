@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018,2020 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ var (
 
 	noInstall bool
 
-	testTrustImagePolicy, testTrustClusterImagePolicy, testArmada, testVAImagePolicy, testVAClusterImagePolicy, testWildcardImagePolicy, testGeneric bool
+	testTrustImagePolicy, testTrustClusterImagePolicy, testArmada, testVAImagePolicy, testVAClusterImagePolicy, testWildcardImagePolicy, testGeneric, testSimpleImagePolicy bool
 )
 
 const (
@@ -51,6 +51,7 @@ func TestMain(m *testing.M) {
 	flag.BoolVar(&testVAClusterImagePolicy, "va-cluster-image-policy", false, "runs va tests for cluster image policies")
 	flag.BoolVar(&testWildcardImagePolicy, "wildcards-image-policy", false, "runs tests for wildcards in image policies")
 	flag.BoolVar(&testGeneric, "generic", false, "runs generic enforment tests")
+	flag.BoolVar(&testSimpleImagePolicy, "simple-image-policy", false, "runs tests for simple signing policies")
 
 	flag.Parse()
 

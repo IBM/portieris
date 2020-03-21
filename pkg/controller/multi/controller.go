@@ -131,6 +131,7 @@ func (c *Controller) mutatePodSpec(namespace, specPath string, pod corev1.PodSpe
 				// convert digest to patch
 				glog.Infof("Mutation #: %s %d  Image name: %s", containerType, containerIndex, img.String())
 				if strings.Contains(container.Image, img.String()) {
+					// TODO: seems odd to have both tag and digest
 					glog.Infof("Mutated to: %s@sha256:%s", img.NameWithTag(), digest.String())
 					patch := types.JSONPatch{
 						Op:    "replace",
@@ -186,6 +187,7 @@ func (c *Controller) verifiedDigestByPolicy(namespace string, img *image.Referen
 
 	var digest *bytes.Buffer
 	var deny, err error
+	glog.Infof("policy.Simple %v", policy.Simple)
 	if policy.Simple != nil {
 		digest, deny, err = simpleverifier.VerifyByPolicy(img.String(), credentials, policy)
 		if err != nil || deny != nil {
@@ -193,12 +195,15 @@ func (c *Controller) verifiedDigestByPolicy(namespace string, img *image.Referen
 		}
 	}
 
+	glog.Infof("simple digest: %v", digest)
+
 	if policy.Trust.Enabled != nil && *policy.Trust.Enabled == true {
 		var notaryDigest *bytes.Buffer
 		notaryDigest, deny, err = c.nv.VerifyByPolicy(namespace, img, credentials, policy)
 		if err != nil || deny != nil {
 			return nil, deny, err
 		}
+		glog.Infof("DCT digest: %v", notaryDigest)
 		if notaryDigest != nil {
 			if digest != nil && notaryDigest != digest {
 				return nil, fmt.Errorf("Notary signs conflicting digest: %v simple: %v", notaryDigest, digest), nil

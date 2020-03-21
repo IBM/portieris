@@ -86,6 +86,10 @@ e2e.quick.generic:
 	go test -v ./test/e2e --no-install --generic --helmChart $$(pwd)/portieris-$(VERSION).tgz
 	-kubectl delete namespace $$(kubectl get namespaces | grep -v ibm | grep -v kube | grep -v default | awk '{ print $$1 }' | grep -v NAME)
 
+e2e.quick.simple.imagepolicy:
+	@go test -v ./test/e2e --no-install --simple-image-policy --helmChart $$(pwd)/portieris-$(VERSION).tgz
+	-kubectl delete namespace $$(kubectl get namespaces | grep -v ibm | grep -v kube | grep -v default | awk '{ print $$1 }' | grep -v NAME)
+
 e2e.helm:
 	kubectl apply -f test/helm/tiller-rbac.yaml
 	helm init --service-account tiller
