@@ -91,9 +91,9 @@ type Repository struct {
 
 // Policy .
 type Policy struct {
-	Trust  Trust   `json:"trust,omitempty"`
-	Simple *Simple `json:"simple,omitempty"`
-	Va     VA      `json:"va,omitempty"`
+	Trust  Trust    `json:"trust,omitempty"`
+	Simple []Simple `json:"simple,omitempty"`
+	Va     VA       `json:"va,omitempty"`
 }
 
 // Trust .

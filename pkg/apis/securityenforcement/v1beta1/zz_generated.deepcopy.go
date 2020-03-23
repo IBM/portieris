@@ -164,7 +164,11 @@ func (in *ImagePolicyList) DeepCopyObject() runtime.Object {
 func (in *Policy) DeepCopyInto(out *Policy) {
 	*out = *in
 	in.Trust.DeepCopyInto(&out.Trust)
-	out.Simple = in.Simple
+	if in.Simple != nil {
+		in, out := &in.Simple, &out.Simple
+		*out = make([]Simple, len(*in))
+		copy(*out, *in)
+	}
 	in.Va.DeepCopyInto(&out.Va)
 	return
 }

@@ -33,7 +33,7 @@ import (
 // VerifyByPolicy verifies the image according to the supplied policy and returns the verified digest, verify error or processing error
 func VerifyByPolicy(imageToVerify string, credentials [][]string, portierisPolicy *v1beta1.Policy) (*bytes.Buffer, error, error) {
 
-	simplePolicy, err := transformPolicy(portierisPolicy.Simple)
+	simplePolicy, err := transformPolicies(portierisPolicy.Simple)
 	if err != nil {
 		return nil, nil, err
 	}

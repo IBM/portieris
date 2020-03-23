@@ -24,29 +24,28 @@ import (
 )
 
 var policyBad = &v1beta1.Policy{
-	Simple: &v1beta1.Simple{
+	Simple: []v1beta1.Simple{{
 		Type: "invalid",
-	},
+	}},
 }
 
 var policyInsecure = &v1beta1.Policy{
-	Simple: &v1beta1.Simple{
+	Simple: []v1beta1.Simple{{
 		Type: "insecureAcceptAnything",
-	},
+	}},
 }
 
 // Cover error paths - good path is covered in e2e tests
 func TestVerifyByPolicy(t *testing.T) {
 	tests := []struct {
-		name         string
-		nockRegistry bool
-		image        string
-		credentials  [][]string
-		policies     *v1beta1.Policy
-		wantErr      bool
-		errMsg       string
-		wantDeny     bool
-		denyMsg      string
+		name        string
+		image       string
+		credentials [][]string
+		policies    *v1beta1.Policy
+		wantErr     bool
+		errMsg      string
+		wantDeny    bool
+		denyMsg     string
 	}{
 		{
 			name:        "bad policy",
@@ -54,7 +53,7 @@ func TestVerifyByPolicy(t *testing.T) {
 			credentials: [][]string{},
 			policies:    policyBad,
 			wantErr:     true,
-			errMsg:      "policy unexpected type",
+			errMsg:      "policy invalid",
 		},
 		{
 			name:        "bad image",
@@ -73,13 +72,12 @@ func TestVerifyByPolicy(t *testing.T) {
 			errMsg:      "no valid ImagePullSecret",
 		},
 		{
-			name:         "bad registry",
-			nockRegistry: true,
-			image:        "nonsuch.io/library/busybox",
-			credentials:  [][]string{{"user", "password"}},
-			policies:     policyInsecure,
-			wantErr:      true,
-			errMsg:       "pinging docker registry ",
+			name:        "bad registry",
+			image:       "nonsuch.io/library/busybox",
+			credentials: [][]string{{"user", "password"}},
+			policies:    policyInsecure,
+			wantErr:     true,
+			errMsg:      "pinging docker registry ",
 		},
 	}
 	for _, tt := range tests {

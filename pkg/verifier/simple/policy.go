@@ -25,48 +25,57 @@ import (
 )
 
 // transformPolicy ...
-func transformPolicy(inPolicy *v1beta1.Simple) (*signature.Policy, error) {
-	var policyRequirement signature.PolicyRequirement
+func transformPolicies(inPolicies []v1beta1.Simple) (*signature.Policy, error) {
+	var policyRequirements []signature.PolicyRequirement
 
-	switch inPolicy.Type {
-	case "insecureAcceptAnything":
-		policyRequirement = signature.NewPRInsecureAcceptAnything()
+	for _, inPolicy := range inPolicies {
+		var policyRequirement signature.PolicyRequirement
 
-	case "reject":
-		policyRequirement = signature.NewPRReject()
+		switch inPolicy.Type {
+		case "insecureAcceptAnything":
+			policyRequirement = signature.NewPRInsecureAcceptAnything()
 
-	case "signedBy":
-		keyData, err := policyKeyData(inPolicy.KeyData)
-		if err != nil {
-			return nil, err
-		}
-		if len(keyData) == 0 {
-			return nil, fmt.Errorf("keyData zero length")
-		}
-		signedIdentity, err := policySignedIdentity(inPolicy)
-		if err != nil {
-			return nil, err
-		}
-		policyRequirement, err = signature.NewPRSignedByKeyData(signature.SBKeyTypeGPGKeys, keyData, signedIdentity)
-		if err != nil {
-			return nil, err
-		}
+		case "reject":
+			policyRequirement = signature.NewPRReject()
 
-	default:
-		return nil, fmt.Errorf("simple policy unexpected type %s", inPolicy.Type)
+		case "signedBy":
+			keyData, err := policyKeyData(inPolicy.KeyData)
+			if err != nil {
+				return nil, fmt.Errorf("KeyData: %s", err.Error())
+			}
+			if len(keyData) == 0 {
+				return nil, fmt.Errorf("KeyData empty")
+			}
+
+			signedIdentity, err := policySignedIdentity(&inPolicy)
+			if err != nil {
+				return nil, err
+			}
+			switch inPolicy.KeyType {
+			case "GPGKeys":
+				policyRequirement, err = signature.NewPRSignedByKeyData(signature.SBKeyTypeGPGKeys, keyData, signedIdentity)
+				if err != nil {
+					return nil, err
+				}
+				break
+			default:
+				return nil, fmt.Errorf("invalid KeyType: %s", inPolicy.KeyType)
+			}
+
+		default:
+			return nil, fmt.Errorf("simple policy invalid Type: %s", inPolicy.Type)
+		}
+		policyRequirements = append(policyRequirements, policyRequirement)
 	}
 
-	policy := &signature.Policy{
+	return &signature.Policy{
 		Default: signature.PolicyRequirements{signature.NewPRReject()},
 		Transports: map[string]signature.PolicyTransportScopes{
 			"docker": {
-				"": {
-					policyRequirement,
-				},
+				"": policyRequirements,
 			},
 		},
-	}
-	return policy, nil
+	}, nil
 }
 
 func policySignedIdentity(inPolicy *v1beta1.Simple) (signature.PolicyReferenceMatch, error) {
@@ -90,7 +99,7 @@ func policySignedIdentity(inPolicy *v1beta1.Simple) (signature.PolicyReferenceMa
 		}
 		return prm, nil
 	default:
-		return nil, fmt.Errorf("unexpected SignedIdentityType: %s", inPolicy.SignedIdentity.Type)
+		return nil, fmt.Errorf("invalid SignedIdentity Type: %s", inPolicy.SignedIdentity.Type)
 	}
 }
 

@@ -21,137 +21,195 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestTransformPolicyInvalidType(t *testing.T) {
-	simplePolicy := &v1beta1.Simple{
-		Type: "invalid",
-	}
-	policy, err := transformPolicy(simplePolicy)
-	assert.Nil(t, policy, "unexpected")
-	assert.Error(t, err, "expected")
-}
+var keyValidGPG = "mQENBF15FJUBCAC+RDRL14lFAeVUAQrsg7XU3tLEb6Goy+XADZL1VLOgjDNqbkM8\n" +
+	"UnHRlGAVcMkui/vaiF/PHQchIc64vbQFjHsswxuNiRpL1n72k3dq9fQkdE5uMFtg\n" +
+	"m/LYlqFJDOhdFWarUUvBW1rTAwZAxWQSsZGGzTasSzA2JtiAR51qAMF3JZxV6RAR\n" +
+	"vIAf4XqdVTG/LhbA15GTDx4zGI30hb29pVV6d6nV+qEvXP4QTOQ27dBv8ZN1d8rD\n" +
+	"SQI7fhb7xoXt6xqsSjFl+rgCCyoRbCCWpdQIhcBLqK4O8MEYp2M+D5YpO8WV4OM9\n" +
+	"EDx9YhFpsNaOirzfd1ZQZ+vUpT7qFq2kqen1ABEBAAG0KFN0dWFydCBIYXl0b24g\n" +
+	"PHN0dWFydC5oYXl0b25AdWsuaWJtLmNvbT6JAVQEEwEIAD4WIQR3TcmcAGUBN1Ic\n" +
+	"i7Pxx2Awu2yqjQUCXXkUlQIbAwUJA8JnAAULCQgHAgYVCgkICwIEFgIDAQIeAQIX\n" +
+	"gAAKCRDxx2Awu2yqjbtkCACaUuWxKuuw1+kDKy06Ir1/+mrPrNHiPndmmOxvVrhT\n" +
+	"JqmukXHSq3HgXxJWCnU+ubhmnKV7StK8pG8bNSFVtTxVKfcedQGZlvQY6/avGfd7\n" +
+	"BysKpFQl9QjAwojcirVFmOzA/bfVY1lGUivnxOUwzPsznngl+fsG3s9VEYYnry8D\n" +
+	"oeewR6Xy4d+EB/phTK61Oh+gB7Gic3wnf5HJMKWUl4GchyzPpxRi2az8tfBS9tkH\n" +
+	"NaqtzIb5QV9mZ2/LQ/opXvE56yyM9jRaQqKdeO6MtQus2AI8w2NYl3PNFK/Ncblc\n" +
+	"JKEMlNJ6d+j/stk/mCNmRvebutiDYuTKCjqmW1lYleP9uQENBF15FJUBCACckqwm\n" +
+	"DBKPp93nXSyJzH8Di9cC7cL58Q6pGjcwG4GhanfbDxR0eDem/l2Ccn3lVoBdSM8P\n" +
+	"5SGRCbQdgUNfreHofjp6idcFg/rkjc2Q5BS+fQ0HDfFuLMnS3eKuwFbRSHtNKDP/\n" +
+	"fKiIgKzx4ra55S7lgVX8Skh11acFHkuH+9xpeV+bv84F28TCZ+pL+G2XYRqYKNvA\n" +
+	"nGB5PmCfUwZJlgJEu29F7sYiplYD5nIWBSz0ZwzWM+wSGCdntgxYuw+7c+3vfOws\n" +
+	"gAOpgqXXNHwpRSd1xazbTpu8Kz1nWeZ8w8aPmYKuo9+ucMbpzYpqmyiXb1DiHbxO\n" +
+	"VsE3ZM6kBIyl7H5HABEBAAGJATwEGAEIACYWIQR3TcmcAGUBN1Ici7Pxx2Awu2yq\n" +
+	"jQUCXXkUlQIbDAUJA8JnAAAKCRDxx2Awu2yqjQ4xCACRYNG/6JpKuOjsU/LSpw8G\n" +
+	"rBNjFMlzNdiPOdHiW/gglBbMJB3LJJrM4TvMcFsqmuKUh1j7/gO9GUhm3VIRxZXx\n" +
+	"mble0sEh5n6Tpz0HoZb2ndvi+tqbMm1ufDP9pbIXOZzdksywrAX3283vjDUTlDog\n" +
+	"7qYBzQEG6TK68RGDKGobDtBIoR9S/enHoAkrWONKJ9uyJw2cIpx72MPXiMqP6vnL\n" +
+	"Exdgp01NoEQx1UPfy/Y9gJ5aGaUUBDG7i6twpeTo9XFyJihrU5tFfrzT6iuGggxF\n" +
+	"fJoCgxVAKzXJnGTulcClquAOmMCFKqxbkOTIUy0uATSGF4pIvGu0Edi0GzvfCKST"
 
-func TestTransformPolicyRejectType(t *testing.T) {
-	simplePolicy := &v1beta1.Simple{
-		Type: "reject",
-	}
-	policy, err := transformPolicy(simplePolicy)
-	assert.NotNil(t, policy, "unexpected")
-	assert.Nil(t, err, "expected")
-}
+//	"=Q8Ys" (armour checksum)
+var keyValidB64 = "ZG8geW91IGtub3cgbWUK"
+var keyInvalid = "******"
 
-func TestTransformPolicyAcceptType(t *testing.T) {
-	simplePolicy := &v1beta1.Simple{
-		Type: "insecureAcceptAnything",
-	}
-	policy, err := transformPolicy(simplePolicy)
-	assert.NotNil(t, policy, "unexpected")
-	assert.Nil(t, err, "expected")
-}
-
-func TestTransformPolicySignedByType(t *testing.T) {
-	simplePolicy := &v1beta1.Simple{
-		Type:           "signedBy",
-		KeyType:        "GPGKey",
-		KeyData:        "somedata",
-		SignedIdentity: v1beta1.IdentityRequirement{},
-	}
-	policy, err := transformPolicy(simplePolicy)
-	assert.NotNil(t, policy, "unexpected")
-	assert.Nil(t, err, "expected")
-}
-
-func TestTransformPolicySignedByTypeInvalidKey(t *testing.T) {
-	simplePolicy := &v1beta1.Simple{
-		Type:           "signedBy",
-		KeyType:        "GPGKey",
-		KeyData:        "******",
-		SignedIdentity: v1beta1.IdentityRequirement{},
-	}
-	policy, err := transformPolicy(simplePolicy)
-	assert.Nil(t, policy, "unexpected")
-	assert.Error(t, err, "expected")
-}
-
-func TestTransformPolicySignedByTypeEmptyKey(t *testing.T) {
-	simplePolicy := &v1beta1.Simple{
-		Type:           "signedBy",
-		KeyType:        "GPGKey",
-		KeyData:        "",
-		SignedIdentity: v1beta1.IdentityRequirement{},
-	}
-	policy, err := transformPolicy(simplePolicy)
-	assert.Nil(t, policy, "unexpected")
-	assert.Error(t, err, "expected")
-}
-
-func TestTransformPolicySignedByTypeInvalidSignedId(t *testing.T) {
-	simplePolicy := &v1beta1.Simple{
-		Type:    "signedBy",
-		KeyType: "GPGKey",
-		KeyData: "somedata",
-		SignedIdentity: v1beta1.IdentityRequirement{
-			Type: "invalid",
+func TestTransformPolicy(t *testing.T) {
+	tests := []struct {
+		name           string
+		image          string
+		simplePolicies []v1beta1.Simple
+		wantErr        bool
+		errMsg         string
+	}{
+		{
+			name: "invalid simple type",
+			simplePolicies: []v1beta1.Simple{{
+				Type: "invalid",
+			}},
+			wantErr: true,
+			errMsg:  "invalid Type:",
+		},
+		{
+			name: "reject type",
+			simplePolicies: []v1beta1.Simple{{
+				Type: "reject",
+			}},
+			wantErr: false,
+		},
+		{
+			name: "accept type",
+			simplePolicies: []v1beta1.Simple{{
+				Type: "insecureAcceptAnything",
+			}},
+			wantErr: false,
+		},
+		{
+			name: "signedByInvalidKeyType",
+			simplePolicies: []v1beta1.Simple{{
+				Type:    "signedBy",
+				KeyType: "badKeyType",
+				KeyData: keyValidGPG,
+			}},
+			wantErr: true,
+			errMsg:  "invalid KeyType:",
+		},
+		{
+			name: "signedByValidKey",
+			simplePolicies: []v1beta1.Simple{{
+				Type:    "signedBy",
+				KeyType: "GPGKeys",
+				KeyData: keyValidGPG,
+			}},
+			wantErr: false,
+		},
+		{
+			name: "signedByInvalidKey",
+			simplePolicies: []v1beta1.Simple{{
+				Type:    "signedBy",
+				KeyType: "GPGKeys",
+				KeyData: keyInvalid,
+			}},
+			wantErr: true,
+			errMsg:  "KeyData: illegal base64",
+		},
+		{
+			name: "signedByEmptyKey",
+			simplePolicies: []v1beta1.Simple{{
+				Type:    "signedBy",
+				KeyType: "GPGKeys",
+				KeyData: "",
+			}},
+			wantErr: true,
+			errMsg:  "KeyData empty",
+		},
+		{
+			name: "signedByValidB64InvalidKey",
+			simplePolicies: []v1beta1.Simple{{
+				Type:    "signedBy",
+				KeyType: "GPGKeys",
+				KeyData: keyValidB64,
+			}},
+			//  wantErr: true,
+			// an error here would be helpful since we could give a more explicit diagnostic
+			// however invalid keys are picked up during signature validation so it is not critical
+			wantErr: false,
+		},
+		{
+			name: "invalid SignedIdentity Type",
+			simplePolicies: []v1beta1.Simple{{
+				Type:    "signedBy",
+				KeyType: "GPGKeys",
+				KeyData: keyValidGPG,
+				SignedIdentity: v1beta1.IdentityRequirement{
+					Type: "invalid",
+				},
+			}},
+			wantErr: true,
+			errMsg:  "invalid SignedIdentity Type:",
+		},
+		{
+			name: "SignedIdentity matchExact",
+			simplePolicies: []v1beta1.Simple{{
+				Type:    "signedBy",
+				KeyType: "GPGKeys",
+				KeyData: keyValidGPG,
+				SignedIdentity: v1beta1.IdentityRequirement{
+					Type: "matchExact",
+				},
+			}},
+			wantErr: false,
+		},
+		{
+			name: "SignedIdentity matchRepository",
+			simplePolicies: []v1beta1.Simple{{
+				Type:    "signedBy",
+				KeyType: "GPGKeys",
+				KeyData: keyValidGPG,
+				SignedIdentity: v1beta1.IdentityRequirement{
+					Type: "matchRepository",
+				},
+			}},
+			wantErr: false,
+		},
+		{
+			name: "SignedIdentity matchExactRepository",
+			simplePolicies: []v1beta1.Simple{{
+				Type:    "signedBy",
+				KeyType: "GPGKeys",
+				KeyData: keyValidGPG,
+				SignedIdentity: v1beta1.IdentityRequirement{
+					Type:             "matchExactRepository",
+					DockerRepository: "repository",
+				},
+			}},
+			wantErr: false,
+		},
+		{
+			name: "SignedIdentity matchExactReference",
+			simplePolicies: []v1beta1.Simple{{
+				Type:    "signedBy",
+				KeyType: "GPGKeys",
+				KeyData: keyValidGPG,
+				SignedIdentity: v1beta1.IdentityRequirement{
+					Type:            "matchExactReference",
+					DockerReference: "reg.io/image:tag",
+				},
+			}},
+			wantErr: false,
 		},
 	}
-	policy, err := transformPolicy(simplePolicy)
-	assert.Nil(t, policy, "unexpected")
-	assert.Error(t, err, "expected")
-}
-
-func TestTransformPolicySignedByTypeMatchExact(t *testing.T) {
-	simplePolicy := &v1beta1.Simple{
-		Type:    "signedBy",
-		KeyType: "GPGKey",
-		KeyData: "somedata",
-		SignedIdentity: v1beta1.IdentityRequirement{
-			Type: "matchExact",
-		},
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			policy, err := transformPolicies(tt.simplePolicies)
+			if tt.wantErr {
+				assert.Error(t, err, "error expected")
+				if err != nil {
+					assert.Contains(t, err.Error(), tt.errMsg, "unexpected error message")
+				}
+				assert.Nil(t, policy, "policy result unexpected")
+			} else {
+				assert.NoError(t, err, "error unexpected")
+				assert.NotNil(t, policy, "policy result expected")
+			}
+		})
 	}
-	policy, err := transformPolicy(simplePolicy)
-	assert.NotNil(t, policy, "expected")
-	assert.Nil(t, err, "no error")
-}
-
-func TestTransformPolicySignedByTypeMatchRepository(t *testing.T) {
-	simplePolicy := &v1beta1.Simple{
-		Type:    "signedBy",
-		KeyType: "GPGKey",
-		KeyData: "somedata",
-		SignedIdentity: v1beta1.IdentityRequirement{
-			Type: "matchRepository",
-		},
-	}
-	policy, err := transformPolicy(simplePolicy)
-	assert.NotNil(t, policy, "expected")
-	assert.Nil(t, err, "no error")
-}
-
-func TestTransformPolicySignedByTypeMatchExactRepository(t *testing.T) {
-	simplePolicy := &v1beta1.Simple{
-		Type:    "signedBy",
-		KeyType: "GPGKey",
-		KeyData: "somedata",
-		SignedIdentity: v1beta1.IdentityRequirement{
-			Type:             "matchExactRepository",
-			DockerRepository: "repository",
-		},
-	}
-	policy, err := transformPolicy(simplePolicy)
-	assert.NotNil(t, policy, "expected")
-	assert.Nil(t, err, "no error")
-}
-
-func TestTransformPolicySignedByTypeMatchExactReference(t *testing.T) {
-	simplePolicy := &v1beta1.Simple{
-		Type:    "signedBy",
-		KeyType: "GPGKey",
-		KeyData: "somedata",
-		SignedIdentity: v1beta1.IdentityRequirement{
-			Type:            "matchExactReference",
-			DockerReference: "reg.io/image:tag",
-		},
-	}
-	policy, err := transformPolicy(simplePolicy)
-	assert.NotNil(t, policy, "expected")
-	assert.Nil(t, err, "no error")
 }

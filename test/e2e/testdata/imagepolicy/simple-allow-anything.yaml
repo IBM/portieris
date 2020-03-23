@@ -7,8 +7,4 @@ spec:
     - name: "icr.io/cise/*"
       policy:
          simple:
-            type: "insecureAcceptAnything"
-    - name: "icr.io/obs/admittest/*"
-      policy:
-         simple:
-            type: "insecureAcceptAnything"
+          - type: "insecureAcceptAnything"

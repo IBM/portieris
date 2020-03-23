@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: global-nginx-another
+  labels:
+    app: global-nginx-another
+    test: true
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: global-nginx-another
+  template:
+    metadata:
+      labels:
+        app: global-nginx-another
+    spec:
+      containers:
+      - name: nginx
+        image: icr.io/cise/nginx:another
+        ports:
+        - containerPort: 80
