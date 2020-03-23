@@ -189,13 +189,15 @@ func (c *Controller) verifiedDigestByPolicy(namespace string, img *image.Referen
 	var deny, err error
 	glog.Infof("policy.Simple %v", policy.Simple)
 	if policy.Simple != nil {
-		digest, deny, err = simpleverifier.VerifyByPolicy(img.String(), credentials, policy)
+		simplePolicy, err := simpleverifier.TransformPolicies(c.kubeClientsetWrapper, namespace, policy.Simple)
+		if err != nil {
+			return nil, nil, err
+		}
+		digest, deny, err = simpleverifier.VerifyByPolicy(img.String(), credentials, simplePolicy)
 		if err != nil || deny != nil {
 			return nil, deny, err
 		}
 	}
-
-	glog.Infof("simple digest: %v", digest)
 
 	if policy.Trust.Enabled != nil && *policy.Trust.Enabled == true {
 		var notaryDigest *bytes.Buffer

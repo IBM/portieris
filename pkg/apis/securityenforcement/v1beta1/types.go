@@ -111,8 +111,7 @@ type Signer struct {
 // Simple .
 type Simple struct {
 	Type           string              `json:"type"`
-	KeyType        string              `json:"keyType,omitEmpty"`
-	KeyData        string              `json:"keyData,omitEmpty"`
+	KeySecret      string              `json:"keySecret,omitEmpty"`
 	SignedIdentity IdentityRequirement `json:"signedIdentity,omitEmpty"`
 }
 

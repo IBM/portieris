@@ -19,21 +19,11 @@ package simple
 import (
 	"testing"
 
-	"github.com/IBM/portieris/pkg/apis/securityenforcement/v1beta1"
+	"github.com/containers/image/v5/signature"
 	"github.com/stretchr/testify/assert"
 )
 
-var policyBad = &v1beta1.Policy{
-	Simple: []v1beta1.Simple{{
-		Type: "invalid",
-	}},
-}
-
-var policyInsecure = &v1beta1.Policy{
-	Simple: []v1beta1.Simple{{
-		Type: "insecureAcceptAnything",
-	}},
-}
+var policyRequirementInsecure = signature.NewPRInsecureAcceptAnything()
 
 // Cover error paths - good path is covered in e2e tests
 func TestVerifyByPolicy(t *testing.T) {
@@ -41,25 +31,17 @@ func TestVerifyByPolicy(t *testing.T) {
 		name        string
 		image       string
 		credentials [][]string
-		policies    *v1beta1.Policy
+		policies    *signature.PolicyRequirement
 		wantErr     bool
 		errMsg      string
 		wantDeny    bool
 		denyMsg     string
 	}{
 		{
-			name:        "bad policy",
-			image:       "docker.io/library/busybox",
-			credentials: [][]string{},
-			policies:    policyBad,
-			wantErr:     true,
-			errMsg:      "policy invalid",
-		},
-		{
 			name:        "bad image",
 			image:       "blahBLAHblah",
 			credentials: [][]string{},
-			policies:    policyInsecure,
+			policies:    &policyRequirementInsecure,
 			wantErr:     true,
 			errMsg:      "name must be lowercase",
 		},
@@ -67,7 +49,7 @@ func TestVerifyByPolicy(t *testing.T) {
 			name:        "no creds", // fails, future enhancement to cover no-auth registries
 			image:       "docker.io/library/busybox",
 			credentials: [][]string{},
-			policies:    policyInsecure,
+			policies:    &policyRequirementInsecure,
 			wantErr:     true,
 			errMsg:      "no valid ImagePullSecret",
 		},
@@ -75,15 +57,22 @@ func TestVerifyByPolicy(t *testing.T) {
 			name:        "bad registry",
 			image:       "nonsuch.io/library/busybox",
 			credentials: [][]string{{"user", "password"}},
-			policies:    policyInsecure,
+			policies:    &policyRequirementInsecure,
 			wantErr:     true,
 			errMsg:      "pinging docker registry ",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-
-			digest, deny, err := VerifyByPolicy(tt.image, tt.credentials, tt.policies)
+			policy := &signature.Policy{
+				Default: signature.PolicyRequirements{signature.NewPRReject()},
+				Transports: map[string]signature.PolicyTransportScopes{
+					"docker": {
+						"": {*tt.policies},
+					},
+				},
+			}
+			digest, deny, err := VerifyByPolicy(tt.image, tt.credentials, policy)
 			if tt.wantErr {
 				assert.Error(t, err)
 				assert.Contains(t, err.Error(), tt.errMsg, "unexpected error")

@@ -17,15 +17,15 @@
 package simple
 
 import (
-	"encoding/base64"
 	"fmt"
 
 	"github.com/IBM/portieris/pkg/apis/securityenforcement/v1beta1"
+	"github.com/IBM/portieris/pkg/kubernetes"
 	"github.com/containers/image/v5/signature"
 )
 
-// transformPolicy ...
-func transformPolicies(inPolicies []v1beta1.Simple) (*signature.Policy, error) {
+// TransformPolicies from Portieris to container/image lib policies
+func TransformPolicies(kWrapper kubernetes.WrapperInterface, namespace string, inPolicies []v1beta1.Simple) (*signature.Policy, error) {
 	var policyRequirements []signature.PolicyRequirement
 
 	for _, inPolicy := range inPolicies {
@@ -39,28 +39,30 @@ func transformPolicies(inPolicies []v1beta1.Simple) (*signature.Policy, error) {
 			policyRequirement = signature.NewPRReject()
 
 		case "signedBy":
-			keyData, err := policyKeyData(inPolicy.KeyData)
-			if err != nil {
-				return nil, fmt.Errorf("KeyData: %s", err.Error())
+			if inPolicy.KeySecret == "" {
+				return nil, fmt.Errorf("KeySecret missing in signedBy requirement")
 			}
-			if len(keyData) == 0 {
-				return nil, fmt.Errorf("KeyData empty")
+
+			secretBytes, err := kWrapper.GetSecretKey(namespace, inPolicy.KeySecret)
+			if err != nil {
+				return nil, err
+			}
+
+			keyData, err := decodeArmoredKey(secretBytes)
+			if err != nil {
+				return nil, err
 			}
 
 			signedIdentity, err := policySignedIdentity(&inPolicy)
 			if err != nil {
 				return nil, err
 			}
-			switch inPolicy.KeyType {
-			case "GPGKeys":
-				policyRequirement, err = signature.NewPRSignedByKeyData(signature.SBKeyTypeGPGKeys, keyData, signedIdentity)
-				if err != nil {
-					return nil, err
-				}
-				break
-			default:
-				return nil, fmt.Errorf("invalid KeyType: %s", inPolicy.KeyType)
+
+			policyRequirement, err = signature.NewPRSignedByKeyData(signature.SBKeyTypeGPGKeys, keyData, signedIdentity)
+			if err != nil {
+				return nil, err
 			}
+			break
 
 		default:
 			return nil, fmt.Errorf("simple policy invalid Type: %s", inPolicy.Type)
@@ -101,8 +103,4 @@ func policySignedIdentity(inPolicy *v1beta1.Simple) (signature.PolicyReferenceMa
 	default:
 		return nil, fmt.Errorf("invalid SignedIdentity Type: %s", inPolicy.SignedIdentity.Type)
 	}
-}
-
-func policyKeyData(base64data string) ([]byte, error) {
-	return base64.StdEncoding.DecodeString(base64data)
 }

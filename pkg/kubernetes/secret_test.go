@@ -40,6 +40,52 @@ func createSecret(name, namespace, dataKey string, dataValue []byte) *corev1.Sec
 	}
 }
 
+func TestWrapper_GetSecretKey(t *testing.T) {
+	tests := []struct {
+		name       string
+		secret     *corev1.Secret
+		namespace  string
+		secretName string
+		wantKey    []byte
+		wantErr    bool
+	}{
+		{
+			name:       "should return key",
+			secret:     createSecret("name", "namespace", "key", []byte(`testkey`)),
+			secretName: "name",
+			namespace:  "namespace",
+			wantKey:    []byte(`testkey`),
+		},
+		{
+			name:       "error if secret not found",
+			wantErr:    true,
+			secret:     createSecret("wrong-name", "namespace", ".dockerconfig", []byte("{}")),
+			secretName: "name",
+			namespace:  "namespace",
+		},
+		{
+			name:       "error if no key or .dockerconfigjson key",
+			wantErr:    true,
+			secret:     createSecret("name", "namespace", "motKey", []byte("{}")),
+			secretName: "name",
+			namespace:  "namespace",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			kubeClientset := k8sfake.NewSimpleClientset(tt.secret)
+			w := NewKubeClientsetWrapper(kubeClientset)
+			key, err := w.GetSecretKey(tt.namespace, tt.secretName)
+			if tt.wantErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tt.wantKey, key)
+			}
+		})
+	}
+}
+
 func TestWrapper_GetSecretToken(t *testing.T) {
 	tests := []struct {
 		name       string
