@@ -78,7 +78,6 @@ func TestVerifyByPolicy(t *testing.T) {
 				assert.Contains(t, err.Error(), tt.errMsg, "unexpected error")
 			} else {
 				assert.NoError(t, err)
-				//assert.Equal(t, tt.wantList, got)
 			}
 			if tt.wantDeny {
 				assert.Error(t, deny)

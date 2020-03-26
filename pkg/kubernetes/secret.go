@@ -48,7 +48,7 @@ func (w *Wrapper) GetSecretKey(namespace, secretName string) ([]byte, error) {
 	if key, ok := secret.Data["key"]; ok {
 		return key, nil
 	}
-	return nil, fmt.Errorf("Secret %q in %q does not contain a \"key\" attribte", secretName, namespace)
+	return nil, fmt.Errorf("Secret %q in %q does not contain a \"key\" attribute", secretName, namespace)
 }
 
 // GetSecretToken retrieve the token (password field) for the given namespace/secret/registry

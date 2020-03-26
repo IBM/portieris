@@ -131,7 +131,7 @@ func (c *Controller) mutatePodSpec(namespace, specPath string, pod corev1.PodSpe
 				// convert digest to patch
 				glog.Infof("Mutation #: %s %d  Image name: %s", containerType, containerIndex, img.String())
 				if strings.Contains(container.Image, img.String()) {
-					// TODO: seems odd to have both tag and digest
+					// ISSUE: https://github.com/IBM/portieris/issues/90
 					glog.Infof("Mutated to: %s@sha256:%s", img.NameWithTag(), digest.String())
 					patch := types.JSONPatch{
 						Op:    "replace",
