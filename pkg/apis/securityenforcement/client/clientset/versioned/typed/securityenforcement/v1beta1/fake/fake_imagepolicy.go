@@ -62,7 +62,7 @@ func (c *FakeImagePolicies) List(opts v1.ListOptions) (result *v1beta1.ImagePoli
 	if label == nil {
 		label = labels.Everything()
 	}
-	list := &v1beta1.ImagePolicyList{}
+	list := &v1beta1.ImagePolicyList{ListMeta: obj.(*v1beta1.ImagePolicyList).ListMeta}
 	for _, item := range obj.(*v1beta1.ImagePolicyList).Items {
 		if label.Matches(labels.Set(item.Labels)) {
 			list.Items = append(list.Items, item)
@@ -119,7 +119,7 @@ func (c *FakeImagePolicies) DeleteCollection(options *v1.DeleteOptions, listOpti
 // Patch applies the patch and returns the patched imagePolicy.
 func (c *FakeImagePolicies) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1beta1.ImagePolicy, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(imagepoliciesResource, c.ns, name, data, subresources...), &v1beta1.ImagePolicy{})
+		Invokes(testing.NewPatchSubresourceAction(imagepoliciesResource, c.ns, name, pt, data, subresources...), &v1beta1.ImagePolicy{})
 
 	if obj == nil {
 		return nil, err

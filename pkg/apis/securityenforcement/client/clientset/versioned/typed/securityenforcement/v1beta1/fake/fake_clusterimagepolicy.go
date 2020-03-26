@@ -59,7 +59,7 @@ func (c *FakeClusterImagePolicies) List(opts v1.ListOptions) (result *v1beta1.Cl
 	if label == nil {
 		label = labels.Everything()
 	}
-	list := &v1beta1.ClusterImagePolicyList{}
+	list := &v1beta1.ClusterImagePolicyList{ListMeta: obj.(*v1beta1.ClusterImagePolicyList).ListMeta}
 	for _, item := range obj.(*v1beta1.ClusterImagePolicyList).Items {
 		if label.Matches(labels.Set(item.Labels)) {
 			list.Items = append(list.Items, item)
@@ -112,7 +112,7 @@ func (c *FakeClusterImagePolicies) DeleteCollection(options *v1.DeleteOptions, l
 // Patch applies the patch and returns the patched clusterImagePolicy.
 func (c *FakeClusterImagePolicies) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1beta1.ClusterImagePolicy, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewRootPatchSubresourceAction(clusterimagepoliciesResource, name, data, subresources...), &v1beta1.ClusterImagePolicy{})
+		Invokes(testing.NewRootPatchSubresourceAction(clusterimagepoliciesResource, name, pt, data, subresources...), &v1beta1.ClusterImagePolicy{})
 	if obj == nil {
 		return nil, err
 	}

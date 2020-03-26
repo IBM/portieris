@@ -1,0 +1,13 @@
+apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
+kind: ImagePolicy
+metadata:
+  name: simple-signedby2
+spec:
+   repositories:
+    - name: "icr.io/cise/*"
+      policy:
+         simple:
+          - type: "signedBy"
+            keySecret: simple1pubkey
+          - type: "signedBy"
+            keySecret: simple2pubkey

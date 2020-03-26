@@ -35,6 +35,22 @@ type RegistriesStruct map[string]struct {
 	Auth     string `json:"auth"`
 }
 
+// GetSecretKey obtains the "key" data from the named secret
+func (w *Wrapper) GetSecretKey(namespace, secretName string) ([]byte, error) {
+	// Retrieve secret
+	secret, err := w.CoreV1().Secrets(namespace).Get(secretName, metav1.GetOptions{})
+	if err != nil {
+		glog.Error("Error: ", err)
+		return nil, err
+	}
+	glog.Infof("Found secret %s", secretName)
+	// Obtain the key data
+	if key, ok := secret.Data["key"]; ok {
+		return key, nil
+	}
+	return nil, fmt.Errorf("Secret %q in %q does not contain a \"key\" attribute", secretName, namespace)
+}
+
 // GetSecretToken retrieve the token (password field) for the given namespace/secret/registry
 func (w *Wrapper) GetSecretToken(namespace, secretName, registry string) (string, string, error) {
 	// glog.Infof("getSecretToken << : namespace(%s) secret(%s) registry(%s)", namespace, secretName, registry)
@@ -71,7 +87,7 @@ func (w *Wrapper) GetSecretToken(namespace, secretName, registry string) (string
 		username = login.Username
 		password = login.Password
 	} else {
-		err = fmt.Errorf("Secret not defined for registry: %s", registry)
+		err = fmt.Errorf("Secret %s not defined for registry: %s", secretName, registry)
 	}
 	// glog.Infof("getSecretToken >> : token(%s)", token)
 	return username, password, err

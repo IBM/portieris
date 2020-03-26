@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package notary
+package trust
 
 import (
 	"bytes"
@@ -40,8 +40,8 @@ type foundSigner struct {
 }
 
 // getDigest .
-func (c *Controller) getDigest(server, image, notaryToken, targetName string, signers []Signer) (*bytes.Buffer, error) {
-	repo, err := c.trust.GetNotaryRepo(server, image, notaryToken)
+func (v *Verifier) getDigest(server, image, notaryToken, targetName string, signers []Signer) (*bytes.Buffer, error) {
+	repo, err := v.trust.GetNotaryRepo(server, image, notaryToken)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func (c *Controller) getDigest(server, image, notaryToken, targetName string, si
 	}
 
 	if len(rolelist) == 0 {
-		glog.Infof("roleList length == 0, returning digest %s", digest)
+		glog.Infof("roleList length == 0, returning digest %s", hex.EncodeToString(digest))
 	} else {
 		for _, target := range targets { // iterate over each target
 			// See if a signer was specified for this target
@@ -121,10 +121,10 @@ func (c *Controller) getDigest(server, image, notaryToken, targetName string, si
 }
 
 // Retrieve the username and public key for the given namespace/secret
-func (c *Controller) getSignerSecret(namespace, signerSecretName string) (Signer, error) {
+func (v *Verifier) getSignerSecret(namespace, signerSecretName string) (Signer, error) {
 
 	// Retrieve secret
-	secret, err := c.kubeClientsetWrapper.CoreV1().Secrets(namespace).Get(signerSecretName, metav1.GetOptions{})
+	secret, err := v.kubeClientsetWrapper.CoreV1().Secrets(namespace).Get(signerSecretName, metav1.GetOptions{})
 	if err != nil {
 		glog.Error("Error: ", err)
 		return Signer{}, err

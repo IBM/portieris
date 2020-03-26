@@ -20,7 +20,6 @@ package versioned
 
 import (
 	securityenforcementv1beta1 "github.com/IBM/portieris/pkg/apis/securityenforcement/client/clientset/versioned/typed/securityenforcement/v1beta1"
-	glog "github.com/golang/glog"
 	discovery "k8s.io/client-go/discovery"
 	rest "k8s.io/client-go/rest"
 	flowcontrol "k8s.io/client-go/util/flowcontrol"
@@ -29,8 +28,6 @@ import (
 type Interface interface {
 	Discovery() discovery.DiscoveryInterface
 	SecurityenforcementV1beta1() securityenforcementv1beta1.SecurityenforcementV1beta1Interface
-	// Deprecated: please explicitly pick a version if possible.
-	Securityenforcement() securityenforcementv1beta1.SecurityenforcementV1beta1Interface
 }
 
 // Clientset contains the clients for groups. Each group has exactly one
@@ -42,12 +39,6 @@ type Clientset struct {
 
 // SecurityenforcementV1beta1 retrieves the SecurityenforcementV1beta1Client
 func (c *Clientset) SecurityenforcementV1beta1() securityenforcementv1beta1.SecurityenforcementV1beta1Interface {
-	return c.securityenforcementV1beta1
-}
-
-// Deprecated: Securityenforcement retrieves the default version of SecurityenforcementClient.
-// Please explicitly pick a version.
-func (c *Clientset) Securityenforcement() securityenforcementv1beta1.SecurityenforcementV1beta1Interface {
 	return c.securityenforcementV1beta1
 }
 
@@ -74,7 +65,6 @@ func NewForConfig(c *rest.Config) (*Clientset, error) {
 
 	cs.DiscoveryClient, err = discovery.NewDiscoveryClientForConfig(&configShallowCopy)
 	if err != nil {
-		glog.Errorf("failed to create the DiscoveryClient: %v", err)
 		return nil, err
 	}
 	return &cs, nil

@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: global-nginx-simple
+  labels:
+    app: global-nginx-simple
+    test: true
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: global-nginx-simple
+  template:
+    metadata:
+      labels:
+        app: global-nginx-simple
+    spec:
+      containers:
+      - name: nginx
+        image: icr.io/cise/nginx:simple
+        ports:
+        - containerPort: 80

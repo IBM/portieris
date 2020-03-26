@@ -6,9 +6,10 @@ replicaCount: 3
 namespace: ibm-system
 
 image:
-  host: docker.io/ibmcom
+  host:
+  pullSecret:
   image: portieris
-  tag: 0.5.3
+  tag: 0.6.0
   pullPolicy: Always
 
 service:

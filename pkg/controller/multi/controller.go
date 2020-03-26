@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018,2020 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package notary
+package multi
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/IBM/portieris/helpers/image"
@@ -26,10 +26,11 @@ import (
 	"github.com/IBM/portieris/pkg/notary"
 	"github.com/IBM/portieris/pkg/policy"
 	registryclient "github.com/IBM/portieris/pkg/registry"
+	simpleverifier "github.com/IBM/portieris/pkg/verifier/simple"
+	notaryverifier "github.com/IBM/portieris/pkg/verifier/trust"
 	"github.com/IBM/portieris/pkg/webhook"
 	"github.com/IBM/portieris/types"
 	"github.com/golang/glog"
-	store "github.com/theupdateframework/notary/storage"
 	admissionv1beta1 "k8s.io/api/admission/v1beta1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -44,25 +45,23 @@ type Controller struct {
 	kubeClientsetWrapper kubernetes.WrapperInterface
 	// policyClient is a securityenforcementclientset with a wrapper for retrieving the relevent policy spec
 	policyClient policy.Interface
-	// Trust Client
-	trust notary.Interface
-	// Container Registry client
-	cr registryclient.Interface
+	// nv notary verifier
+	nv *notaryverifier.Verifier
 }
 
 // NewController creates a new controller object from the various clients passed in
 func NewController(kubeWrapper kubernetes.WrapperInterface, policyClient policy.Interface, trust notary.Interface, cr registryclient.Interface) *Controller {
+	nv := notaryverifier.NewVerifier(kubeWrapper, trust, cr)
 	return &Controller{
 		kubeClientsetWrapper: kubeWrapper,
 		policyClient:         policyClient,
-		trust:                trust,
-		cr:                   cr,
+		nv:                   nv,
 	}
 }
 
 // Admit is the admissionRequest handler
 func (c *Controller) Admit(admissionRequest *admissionv1beta1.AdmissionRequest) *admissionv1beta1.AdmissionResponse {
-	glog.Infof("Processing Trust Admission Request for %s on %s", admissionRequest.Operation, admissionRequest.Name)
+	glog.Infof("Processing admission request for %s on %s", admissionRequest.Operation, admissionRequest.Name)
 
 	podSpecLocation, ps, err := c.kubeClientsetWrapper.GetPodSpec(admissionRequest)
 	switch err {
@@ -79,11 +78,12 @@ func (c *Controller) Admit(admissionRequest *admissionv1beta1.AdmissionRequest) 
 	}
 	return c.mutatePodSpec(admissionRequest.Namespace, podSpecLocation, *ps)
 }
+
 func (c *Controller) mutatePodSpec(namespace, specPath string, pod corev1.PodSpec) *admissionv1beta1.AdmissionResponse {
 	a := &webhook.AdmissionResponder{}
 	patches := []types.JSONPatch{}
 
-	// Iterate over each container image specified
+	// for each container image subtype
 	for _, containerType := range []string{"initContainers", "containers"} {
 		var containers []corev1.Container
 		switch containerType {
@@ -96,110 +96,61 @@ func (c *Controller) mutatePodSpec(namespace, specPath string, pod corev1.PodSpe
 			return a.Flush()
 		}
 
-	containerLoop:
+		// for each container of this type
 		for containerIndex, container := range containers {
-			var policy *securityenforcementv1beta1.Policy
+
+			// move this?
 			img, err := image.NewReference(container.Image)
 			if err != nil {
 				glog.Error(err)
 				a.StringToAdmissionResponse(fmt.Sprintf("Deny %q, invalid image name", container.Image))
-				continue containerLoop
+				continue
 			}
 
-			glog.Infof("Container Image: %s   Namespace: %s", img.String(), namespace)
-			if policy, err = c.policyClient.GetPolicyToEnforce(namespace, img.String()); err != nil {
-				a.StringToAdmissionResponse(err.Error())
-				continue containerLoop
-			} else if policy == nil || !(policy.Trust.Enabled != nil && *policy.Trust.Enabled == true) {
-				a.SetAllowed()
-				continue containerLoop
+			glog.Infof("Getting policy for container image: %s   namespace: %s", img.String(), namespace)
+			containerPolicy, err := c.policyClient.GetPolicyToEnforce(namespace, img.String())
+			if err != nil {
+				a.ToAdmissionResponse(err)
+				continue
 			}
 
-			// Trust is enforced
-			glog.Info("Trust is enforced")
+			credentialCandidates := c.getPodCredentials(namespace, img, pod)
 
-			// Make sure image sure there is a ImagePullSecret defined
-			// TODO: This prevents use of signed publically available images with publically available signing data
-			if len(pod.ImagePullSecrets) == 0 {
-				a.StringToAdmissionResponse(fmt.Sprintf("Deny %q, no ImagePullSecret defined for %s", img.String(), img.GetHostname()))
-				continue containerLoop
+			digest, deny, err := c.verifiedDigestByPolicy(namespace, img, credentialCandidates, containerPolicy)
+			if err != nil {
+				// error and return
+				a.ToAdmissionResponse(err)
+				return a.Flush()
 			}
-
-		secretLoop:
-			for _, secret := range pod.ImagePullSecrets {
-				notaryURL := policy.Trust.TrustServer
-				if notaryURL == "" {
-					notaryURL, err = img.GetContentTrustURL()
-					if err != nil {
-						a.StringToAdmissionResponse(fmt.Sprintf("Trust Server/Image Configuration Error: %v", err.Error()))
-						continue containerLoop
-					}
-				}
-
-				username, password, err := c.kubeClientsetWrapper.GetSecretToken(namespace, secret.Name, img.GetHostname())
-				if err != nil {
-					glog.Error(err)
-					continue secretLoop
-				}
-
-				notaryToken, err := c.cr.GetContentTrustToken(username, password, img.NameWithoutTag(), img.GetRegistryURL())
-				if err != nil {
-					glog.Error(err)
-					continue secretLoop
-				}
-
-				var signers []Signer
-				if policy.Trust.SignerSecrets != nil {
-					// Generate a []Singer with the values for each signerSecret
-					signers = make([]Signer, len(policy.Trust.SignerSecrets))
-					for i, secretName := range policy.Trust.SignerSecrets {
-						signers[i], err = c.getSignerSecret(namespace, secretName.Name)
-						if err != nil {
-							a.StringToAdmissionResponse(fmt.Sprintf("Deny %q, could not get signerSecret from your cluster, %s", img.String(), err.Error()))
-							continue containerLoop
-						}
-					}
-				}
-
-				// Get image digest
-				glog.Info("getting signed image...")
-
-				digest, err := c.getDigest(notaryURL, img.NameWithoutTag(), notaryToken, img.GetTag(), signers)
-				if err != nil {
-					if strings.Contains(err.Error(), "401") {
-						continue secretLoop
-					}
-					a.StringToAdmissionResponse(fmt.Sprintf("Deny %q, failed to get content trust information: %s", img.String(), err.Error()))
-					if _, ok := err.(store.ErrServerUnavailable); ok {
-						glog.Errorf("Trust server unavailable: %v", err)
-						return a.Flush()
-					}
-					glog.Warningf("Failed to get trust information for %q: %v", img.String(), err)
-					continue containerLoop
-				}
-				glog.Infof("Mutation #: %s %d  Image name: %s", containerType, containerIndex+1, img.String())
+			if deny != nil {
+				// deny and continue
+				a.ToAdmissionResponse(deny)
+				continue
+			}
+			if digest != nil {
+				// convert digest to patch
+				glog.Infof("Mutation #: %s %d  Image name: %s", containerType, containerIndex, img.String())
 				if strings.Contains(container.Image, img.String()) {
-					glog.Infof("Mutated to: %s@sha256:%s", img.String(), digest.String())
-					patches = append(patches, types.JSONPatch{
+					// ISSUE: https://github.com/IBM/portieris/issues/90
+					glog.Infof("Mutated to: %s@sha256:%s", img.NameWithTag(), digest.String())
+					patch := types.JSONPatch{
 						Op:    "replace",
-						Path:  fmt.Sprintf("%s/%s/%s/image", specPath, containerType, strconv.Itoa(containerIndex)),
+						Path:  fmt.Sprintf("%s/%s/%d/image", specPath, containerType, containerIndex),
 						Value: fmt.Sprintf("%s@sha256:%s", img.NameWithTag(), digest.String()),
-					})
+					}
+					glog.Infof("Patch: %v", patch)
+					patches = append(patches, patch)
 				}
-				a.SetAllowed()
-				break secretLoop
-			}
-			if !a.IsAllowed() {
-				a.StringToAdmissionResponse(fmt.Sprintf("Deny %q, no valid ImagePullSecret defined for %s", img.String(), img.GetHostname()))
 			}
 		}
 	}
 
 	if a.HasErrors() {
+		glog.Info("Deny")
 		return a.Flush()
 	}
 
-	// Apply patches if any
+	// apply patches
 	if len(patches) > 0 {
 		jsonPatch, err := json.Marshal(patches)
 		if err != nil {
@@ -207,9 +158,61 @@ func (c *Controller) mutatePodSpec(namespace, specPath string, pod corev1.PodSpe
 			return a.Flush()
 		}
 		glog.Infof("Mutation patch: %s", string(jsonPatch))
-		a.SetAllowed()
 		a.SetPatch(jsonPatch)
 	}
-
+	a.SetAllowed()
+	glog.Info("Allow")
 	return a.Flush()
+}
+
+func (c *Controller) getPodCredentials(namespace string, img *image.Reference, pod corev1.PodSpec) [][]string {
+	var creds [][]string
+	for _, secret := range pod.ImagePullSecrets {
+		username, password, err := c.kubeClientsetWrapper.GetSecretToken(namespace, secret.Name, img.GetHostname())
+		if err != nil {
+			glog.Error(err)
+			continue
+		}
+		creds = append(creds, []string{username, password})
+	}
+	return creds
+}
+
+func (c *Controller) verifiedDigestByPolicy(namespace string, img *image.Reference, credentials [][]string, policy *securityenforcementv1beta1.Policy) (*bytes.Buffer, error, error) {
+
+	// no policy indicates admission should be allowed, without mutation
+	if policy == nil {
+		return nil, nil, nil
+	}
+
+	var digest *bytes.Buffer
+	var deny, err error
+	glog.Infof("policy.Simple %v", policy.Simple)
+	if policy.Simple != nil {
+		simplePolicy, err := simpleverifier.TransformPolicies(c.kubeClientsetWrapper, namespace, policy.Simple)
+		if err != nil {
+			return nil, nil, err
+		}
+		digest, deny, err = simpleverifier.VerifyByPolicy(img.String(), credentials, simplePolicy)
+		if err != nil || deny != nil {
+			return nil, deny, err
+		}
+	}
+
+	if policy.Trust.Enabled != nil && *policy.Trust.Enabled == true {
+		var notaryDigest *bytes.Buffer
+		notaryDigest, deny, err = c.nv.VerifyByPolicy(namespace, img, credentials, policy)
+		if err != nil || deny != nil {
+			return nil, deny, err
+		}
+		glog.Infof("DCT digest: %v", notaryDigest)
+		if notaryDigest != nil {
+			if digest != nil && notaryDigest != digest {
+				return nil, fmt.Errorf("Notary signs conflicting digest: %v simple: %v", notaryDigest, digest), nil
+			}
+			digest = notaryDigest
+		}
+	}
+
+	return digest, nil, nil
 }

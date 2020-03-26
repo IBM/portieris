@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018,2020 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,19 +15,22 @@
 package main
 
 import (
+	"flag"
 	"io/ioutil"
 	"os"
 
+	notaryclient "github.com/IBM/portieris/pkg/notary"
+
 	kube "github.com/IBM/portieris/helpers/kube"
-	notaryController "github.com/IBM/portieris/pkg/controller/notary"
+	"github.com/IBM/portieris/pkg/controller/multi"
 	"github.com/IBM/portieris/pkg/kubernetes"
-	notaryClient "github.com/IBM/portieris/pkg/notary"
 	registryclient "github.com/IBM/portieris/pkg/registry"
 	"github.com/IBM/portieris/pkg/webhook"
 	"github.com/golang/glog"
 )
 
 func main() {
+	flag.Parse() // glog flags
 	kubeClientset := kube.GetKubeClient()
 	kubeWrapper := kubernetes.NewKubeClientsetWrapper(kubeClientset)
 	policyClient, err := kube.GetPolicyClient()
@@ -43,7 +46,7 @@ func main() {
 			glog.Fatal("Could not read /etc/certs/ca.pem", err)
 		}
 	}
-	trust, err := notaryClient.NewClient(".trust", ca)
+	trust, err := notaryclient.NewClient(".trust", ca)
 	if err != nil {
 		glog.Fatal("Could not get trust client", err)
 	}
@@ -58,7 +61,7 @@ func main() {
 	}
 
 	cr := registryclient.NewClient()
-	controller := notaryController.NewController(kubeWrapper, policyClient, trust, cr)
-	webhook := webhook.NewServer("notary", controller, serverCert, serverKey)
+	controller := multi.NewController(kubeWrapper, policyClient, trust, cr)
+	webhook := webhook.NewServer("policy", controller, serverCert, serverKey)
 	webhook.Run()
 }

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package notary
+package trust
 
 import (
 	"fmt"
@@ -66,7 +66,7 @@ Aaq77T1fhZkFO5uTAgMBAAE=
 
 		It("should return an error if it fails to get the repo", func() {
 			trust.GetNotaryRepoReturns(nil, fakeErr)
-			ctrl = NewController(kubeWrapper, policyClient, trust, cr)
+			ctrl = NewVerifier(kubeWrapper, trust, cr)
 			_, err := ctrl.getDigest(server, image, notaryToken, targetName, nil)
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring(fakeErrorMessage))
@@ -75,7 +75,7 @@ Aaq77T1fhZkFO5uTAgMBAAE=
 		It("should return an error if it fails to get the target by name", func() {
 			fakeRepo.GetAllTargetMetadataByNameReturns(nil, fakeErr)
 			trust.GetNotaryRepoReturns(fakeRepo, nil)
-			ctrl = NewController(kubeWrapper, policyClient, trust, cr)
+			ctrl = NewVerifier(kubeWrapper, trust, cr)
 			_, err := ctrl.getDigest(server, image, notaryToken, targetName, nil)
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring(fakeErrorMessage))
@@ -84,7 +84,7 @@ Aaq77T1fhZkFO5uTAgMBAAE=
 		It("should return an error if there are not targets", func() {
 			fakeRepo.GetAllTargetMetadataByNameReturns([]notaryclient.TargetSignedStruct{}, nil)
 			trust.GetNotaryRepoReturns(fakeRepo, nil)
-			ctrl = NewController(kubeWrapper, policyClient, trust, cr)
+			ctrl = NewVerifier(kubeWrapper, trust, cr)
 			_, err := ctrl.getDigest(server, image, notaryToken, targetName, nil)
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("No signed targets found"))
@@ -107,7 +107,7 @@ Aaq77T1fhZkFO5uTAgMBAAE=
 					},
 				}, nil)
 				trust.GetNotaryRepoReturns(fakeRepo, nil)
-				ctrl = NewController(kubeWrapper, policyClient, trust, cr)
+				ctrl = NewVerifier(kubeWrapper, trust, cr)
 				digest, err := ctrl.getDigest(server, image, notaryToken, targetName, nil)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(digest.String()).To(Equal("31323334353637383930"))
@@ -142,7 +142,7 @@ Aaq77T1fhZkFO5uTAgMBAAE=
 					},
 				}, nil)
 				trust.GetNotaryRepoReturns(fakeRepo, nil)
-				ctrl = NewController(kubeWrapper, policyClient, trust, cr)
+				ctrl = NewVerifier(kubeWrapper, trust, cr)
 				_, err := ctrl.getDigest(server, image, notaryToken, targetName, []Signer{
 					{
 						signer:    "wibble",
@@ -180,7 +180,7 @@ Aaq77T1fhZkFO5uTAgMBAAE=
 					},
 				}, nil)
 				trust.GetNotaryRepoReturns(fakeRepo, nil)
-				ctrl = NewController(kubeWrapper, policyClient, trust, cr)
+				ctrl = NewVerifier(kubeWrapper, trust, cr)
 				_, err := ctrl.getDigest(server, image, notaryToken, targetName, []Signer{
 					{
 						signer:    "wibble",
@@ -218,7 +218,7 @@ Aaq77T1fhZkFO5uTAgMBAAE=
 					},
 				}, nil)
 				trust.GetNotaryRepoReturns(fakeRepo, nil)
-				ctrl = NewController(kubeWrapper, policyClient, trust, cr)
+				ctrl = NewVerifier(kubeWrapper, trust, cr)
 				_, err := ctrl.getDigest(server, image, notaryToken, targetName, []Signer{
 					{
 						signer: "wibble",
@@ -255,7 +255,7 @@ Aaq77T1fhZkFO5uTAgMBAAE=
 					},
 				}, nil)
 				trust.GetNotaryRepoReturns(fakeRepo, nil)
-				ctrl = NewController(kubeWrapper, policyClient, trust, cr)
+				ctrl = NewVerifier(kubeWrapper, trust, cr)
 				_, err := ctrl.getDigest(server, image, notaryToken, targetName, []Signer{
 					{
 						// signer: "wibble",
@@ -293,7 +293,7 @@ Aaq77T1fhZkFO5uTAgMBAAE=
 					},
 				}, nil)
 				trust.GetNotaryRepoReturns(fakeRepo, nil)
-				ctrl = NewController(kubeWrapper, policyClient, trust, cr)
+				ctrl = NewVerifier(kubeWrapper, trust, cr)
 				digest, err := ctrl.getDigest(server, image, notaryToken, targetName, []Signer{
 					{
 						signer:    "wibble",
@@ -335,7 +335,7 @@ Aaq77T1fhZkFO5uTAgMBAAE=
 		})
 
 		It("should return an error if there is not secret", func() {
-			ctrl = NewController(kubeWrapper, policyClient, trust, cr)
+			ctrl = NewVerifier(kubeWrapper, trust, cr)
 			signer, err := ctrl.getSignerSecret(namespace, "no-secret")
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(Equal(`secrets "no-secret" not found`))
@@ -349,7 +349,7 @@ Aaq77T1fhZkFO5uTAgMBAAE=
 			}
 			kubeClientset = k8sfake.NewSimpleClientset(fakeSecret)
 			kubeWrapper = kubernetes.NewKubeClientsetWrapper(kubeClientset)
-			ctrl = NewController(kubeWrapper, policyClient, trust, cr)
+			ctrl = NewVerifier(kubeWrapper, trust, cr)
 			signer, err := ctrl.getSignerSecret(namespace, "my-secret")
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(Equal("name or publicKey field in secret my-secret is empty"))
@@ -363,7 +363,7 @@ Aaq77T1fhZkFO5uTAgMBAAE=
 			}
 			kubeClientset = k8sfake.NewSimpleClientset(fakeSecret)
 			kubeWrapper = kubernetes.NewKubeClientsetWrapper(kubeClientset)
-			ctrl = NewController(kubeWrapper, policyClient, trust, cr)
+			ctrl = NewVerifier(kubeWrapper, trust, cr)
 			signer, err := ctrl.getSignerSecret(namespace, "my-secret")
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(Equal("name or publicKey field in secret my-secret is empty"))
@@ -377,7 +377,7 @@ Aaq77T1fhZkFO5uTAgMBAAE=
 			}
 			kubeClientset = k8sfake.NewSimpleClientset(fakeSecret)
 			kubeWrapper = kubernetes.NewKubeClientsetWrapper(kubeClientset)
-			ctrl = NewController(kubeWrapper, policyClient, trust, cr)
+			ctrl = NewVerifier(kubeWrapper, trust, cr)
 			signer, err := ctrl.getSignerSecret(namespace, "my-secret")
 			Expect(err).ToNot(HaveOccurred())
 			Expect(signer).To(Equal(Signer{signer: "signer", publicKey: "key"}))

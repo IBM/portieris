@@ -35,8 +35,8 @@ import (
 const (
 	ns = "ibm-system"
 
-	helmReleaseName = "cise"
-	helmChartName   = "ibmcloud-image-enforcement"
+	helmReleaseName = "portieris"
+	helmChartName   = "portieris"
 
 	imagePolicyCRDName        = "imagepolicies.securityenforcement.admission.cloud.ibm.com"
 	clusterImagePolicyCRDName = "clusterimagepolicies.securityenforcement.admission.cloud.ibm.com"
@@ -66,8 +66,8 @@ func New(kubeconfig, helmChart string, noInstall bool) (*Framework, error) {
 		return nil, fmt.Errorf("unable to create Kube client: %v", err)
 	}
 	httpClient := kubeClient.CoreV1().RESTClient().(*rest.RESTClient).Client
-	if err != nil {
-		return nil, fmt.Errorf("unable to create Kube client: %v", err)
+	if httpClient == nil {
+		return nil, fmt.Errorf("unable to create Kube client")
 	}
 	imagePolicyClient, err := securityenforcementclientset.NewForConfig(config)
 	if err != nil {

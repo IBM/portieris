@@ -24,6 +24,7 @@ type Client struct{}
 // Interface .
 type Interface interface {
 	GetContentTrustToken(username, password, imageRepo, hostname string) (string, error)
+	GetRegistryToken(username, password, imageRepo, hostname string) (string, error)
 }
 
 // NewClient .
@@ -34,6 +35,15 @@ func NewClient() Interface {
 // GetContentTrustToken .
 func (c Client) GetContentTrustToken(username, password, imageRepo, hostname string) (string, error) {
 	token, err := oauth.Request(password, imageRepo, username, false, "notary", hostname)
+	if err != nil {
+		return "", err
+	}
+	return token.Token, nil
+}
+
+// GetRegistryToken .
+func (c Client) GetRegistryToken(username, password, imageRepo, hostname string) (string, error) {
+	token, err := oauth.Request(password, imageRepo, username, false, "registry", hostname)
 	if err != nil {
 		return "", err
 	}

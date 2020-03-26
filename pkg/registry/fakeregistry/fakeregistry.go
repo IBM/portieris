@@ -15,6 +15,7 @@
 package fakeregistry
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/IBM/portieris/pkg/registry"
@@ -62,4 +63,9 @@ func (fake *FakeRegistry) GetContentTrustTokenReturns(token string, err error) {
 		token string
 		err   error
 	}{token, err}
+}
+
+// GetRegistryToken ...
+func (fake *FakeRegistry) GetRegistryToken(username, password, imageRepo, hostname string) (string, error) {
+	return "", fmt.Errorf("not implemented")
 }
