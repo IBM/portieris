@@ -46,6 +46,10 @@ You can uninstall Portieris at any time by running `helm delete --purge portieri
 
 Image security policies define Portieris' behavior in your cluster. You must configure your own policies in order for Portieris to enforce your desired security posture. [Policies](POLICIES.md) are described separately.
 
+## Configuring access controls for your security policies
+
+You can configure Kubernetes RBAC rules to define which users and applications have the ability to modify your security policies. For more information, see the [IBM Cloud docs](https://cloud.ibm.com/docs/services/Registry?topic=registry-security_enforce#assign_user_policy).
+
 ## Reporting security issues
 
 To report a security issue, DO NOT open an issue. Instead, send your report via email to alchreg@uk.ibm.com privately.
