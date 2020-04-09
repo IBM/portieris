@@ -1,12 +1,25 @@
 # Portieris Policies
 
-## Custom Resource Definitions
+## Image Policy Resources
 
-Portieris defines two custom resource types:
+Portieris defines two custom resource types for policy:
 
-* ClusterImagePolicy at cluster scope
-  - example:
+* ImagePolicies can be configured in each Kubernetes namespace, and define Portieris' behavior in that namespace. If an ImagePolicy exists in a namespace, the policies from that namespace are used, even if the ImagePolicy does not have a matching policy for a given image. If a namespace does not have an ImagePolicy, the ClusterImagePolicy is used.
+  - this example allows any image from the "icr.io" registry with no further checks (the policy is empty):
+```yaml
+apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
+kind: ImagePolicy
+metadata:
+  name: allow-all
+spec:
+   repositories:
+    - name: "icr.io/*"
+      policy:
 ```
+
+* ClusterImagePolicies are configured at the cluster level, and take effect whenever there is no ImagePolicy in the namespace where the workload is being deployed.
+  - this example allows all images from all registries:
+```yaml
 apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
 kind: ClusterImagePolicy
 metadata:
@@ -16,40 +29,46 @@ spec:
   - name: '*'
     policy:
 ```
-This resource provides a default when no ImagePolicy is defined. This example is an empty policy which allows all images.
 
-* ImagePolicy at namespace scope
-  - example:
-```
+For both types or resource if there are multiple resources, they are merged together, and can be protected by RBAC policy.
+
+## Installation Default Policies
+Default policies are installed when Portieris is installed. You must review and change these acording to your requirements.
+
+## Repository Matching
+When an image is evaluated for admission, the set of policies set is wildcard matched on the repository name. If there are multiple matches the most specific match is used. 
+
+## Policy 
+A policy consists of an array of objects defining requirements on the image either in `trust:` (Docker Content Trust / Notary V1)  or `simple:` (RedHat's Simple Signing) objects . 
+
+### trust (Docker Content Trust/Notary)
+Portieris supports sourcing trust data from the following registries without additional configuration in the image policy:
+* IBM Cloud Container Registry
+* Quay.io
+* Docker Hub
+
+To use a different trust server for a repository, you can specify the `trustServer` parameter in your policy:
+*Example*
+```yaml
 apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
 kind: ImagePolicy
 metadata:
-  name: allow-all
+  name: allow-custom
 spec:
    repositories:
     - name: "icr.io/*"
       policy:
-         simple:
-          - type: "insecureAcceptAnything"
-```
-This resource enables different namespaces to be treated appropriately, the example shows all images from the "icr.io" registry being allowed, simple signature verification will be invoked but the policy is totally permissive. The overall effect is similar to an empty policy.
+        trust:
+          enabled: true
+          trustServer: "https://icr.io:4443" # Optional, custom trust server for repository
+```  
+For more information, see the [IBM Cloud docs](https://cloud.ibm.com/docs/services/Registry?topic=registry-security_enforce#customize_policies).
 
-In both cases multiple policy resources are merged, and can be protected by RBAC policy.
-
-## Repository Matching
-
-When an image is evaluated for admission, the set of policies set is wildcard matched on the repository name. Only if no match is found from ImagePolicies are the ClusterImagePolicies consulted. If there are multiple matches the most specific match is used. 
-
-## Policy 
-
-A policy consists of an array of objects defining requirements on the image either in `trust:` (Docker Content Trust / Notary V1)  or `simple:` (RedHat's Simple Signing) objects . 
-
-### Simple
-
+### simple (RedHat simple signing)
 The policy requirements are similar to those defined for configuration files consulted when using the RedHat tools [policy requirements](https://github.com/containers/image/blob/master/docs/containers-policy.json.5.md#policy-requirements) however there are some differences. The main difference is that the public key in a "signedBy" requirement is defined in a "KeySecret:" attribute, the value is the name of an in-scope Kubernetes secret containing the public key data. The value of "KeyType" is implied and cannot be provided.
 
-examples:
-```
+this example requires that images from `icr.io` are signed by the identity with public key in `my-pubkey`:
+```yaml
 apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
 kind: ImagePolicy
 metadata:
@@ -63,8 +82,8 @@ spec:
             keySecret: my-pubkey
 ```
 
-
-```
+this example requires that a given image is singed but allows the location to have changed:
+```yaml
 apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
 kind: ImagePolicy
 metadata:
