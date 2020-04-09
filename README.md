@@ -44,38 +44,7 @@ You can uninstall Portieris at any time by running `helm delete --purge portieri
 
 ## Image security policies
 
-Image security policies define Portieris' behavior in your cluster. There are two types of policy:
-
-* ImagePolicies can be configured in each Kubernetes namespace, and define Portieris' behavior in that namespace. If an ImagePolicy exists in a namespace, the policies from that namespace are used, even if the ImagePolicy does not have a matching policy for a given image. If a namespace does not have an ImagePolicy, the ClusterImagePolicy is used.
-* ClusterImagePolicies are configured at the cluster level, and take effect whenever there is no ImagePolicy in the namespace where the workload is being deployed.
-
-## Configuring image security policies
-
-You can configure custom security policies to control what images can be deployed in your Kubernetes namespaces, and to enforce trust pinning of particular signers.  
-Portieris supports sourcing trust data from the following registries without additional configuration in the image policy:
-* IBM Cloud Container Registry
-* Quay.io
-* Docker Hub
-
-To use a different trust server for a repository, you can specify the `trustServer` parameter in your policy:
-*Example*
-```yaml
-apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
-kind: ImagePolicy
-metadata:
-  name: allow-custom
-spec:
-   repositories:
-    - name: "icr.io/*"
-      policy:
-        trust:
-          enabled: true
-          trustServer: "https://icr.io:4443" # Optional, custom trust server for repository
-```  
-For more information, see the [IBM Cloud docs](https://cloud.ibm.com/docs/services/Registry?topic=registry-security_enforce#customize_policies).
-## Configuring access controls for your security policies
-
-You can configure Kubernetes RBAC rules to define which users and applications have the ability to modify your security policies. For more information, see the [IBM Cloud docs](https://cloud.ibm.com/docs/services/Registry?topic=registry-security_enforce#assign_user_policy).
+Image security policies define Portieris' behavior in your cluster. You must configure your own policies in order for Portieris to enforce your desired security posture. [Policies](POLICIES.md) are described separately.
 
 ## Reporting security issues
 
