@@ -10,15 +10,15 @@ Portieris defines two custom resource types for policy:
 apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
 kind: ImagePolicy
 metadata:
-  name: allow-all
+  name: allow-all-icrio
 spec:
    repositories:
     - name: "icr.io/*"
       policy:
 ```
 
-* ClusterImagePolicies are configured at the cluster level, and take effect whenever there is no ImagePolicy resource defined in the namespace where the workload is being deployed. These resources have the same structure as namespace ImagePolicies and if no matching policy is found for an image deplyment is denied. 
-  - this example allows all images from all registries:
+* ClusterImagePolicies are configured at the cluster level, and take effect whenever there is no ImagePolicy resource defined in the namespace where the workload is being deployed. These resources have the same structure as namespace ImagePolicies and if no matching policy is found for an image deployment is denied. 
+  - this example allows all images from all registries with no checks:
 ```yaml
 apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
 kind: ClusterImagePolicy
