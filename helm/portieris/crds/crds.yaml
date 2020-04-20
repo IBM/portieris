@@ -1,0 +1,101 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: imagepolicies.securityenforcement.admission.cloud.ibm.com
+  labels:
+    app: portieris
+spec:
+  group: securityenforcement.admission.cloud.ibm.com
+  names:
+    kind: ImagePolicy
+    listKind: ImagePolicyList
+    plural: imagepolicies
+    singular: imagepolicy
+  scope: Namespaced
+  versions:
+  - name: v1beta1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              repositories:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    policy:
+                      type: object
+                      nullable: true
+                      properties:
+                        trust:
+                          type: object
+                          properties:
+                            enabled:
+                              type: boolean
+                            trustServer:
+                              type: string
+                            signerSecrets:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  name:
+                                    type: string
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: clusterimagepolicies.securityenforcement.admission.cloud.ibm.com
+  labels:
+    app: portieris
+spec:
+  group: securityenforcement.admission.cloud.ibm.com
+  names:
+    kind: ClusterImagePolicy
+    listKind: ClusterImagePolicyList
+    plural: clusterimagepolicies
+    singular: clusterimagepolicy
+  scope: Cluster
+  versions:
+  - name: v1beta1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              repositories:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    policy:
+                      type: object
+                      nullable: true
+                      properties:
+                        trust:
+                          type: object
+                          properties:
+                            enabled:
+                              type: boolean
+                            trustServer:
+                              type: string
+                            signerSecrets:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  name:
+                                    type: string

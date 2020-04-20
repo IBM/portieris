@@ -1,5 +1,8 @@
-{{ define "webhooks.yaml.tpl" }}
+{{- if .Capabilities.APIVersions.Has "admissionregistration.k8s.io/v1" }}
+apiVersion: admissionregistration.k8s.io/v1
+{{- else }}
 apiVersion: admissionregistration.k8s.io/v1beta1
+{{- end }}
 kind: MutatingWebhookConfiguration
 metadata:
   name: image-admission-config
@@ -23,4 +26,5 @@ webhooks:
         apiVersions: ["*"]
         resources: ["pods", "deployments", "replicationcontrollers", "replicasets", "daemonsets", "statefulsets", "jobs", "cronjobs"]
     failurePolicy: Fail
-{{ end }}
+    sideEffects: None
+    admissionReviewVersions: ["v1beta1"]
