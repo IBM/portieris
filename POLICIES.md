@@ -4,7 +4,7 @@
 
 Portieris defines two custom resource types for policy:
 
-* ImagePolicies can be configured in each Kubernetes namespace, and define Portieris' behavior in that namespace. If an ImagePolicy exists in a namespace, the policies from that namespace are used, even if the ImagePolicy does not have a matching policy for a given image. If a namespace does not have an ImagePolicy, the ClusterImagePolicy is used.
+* ImagePolicies can be configured in a Kubernetes namespace, and define Portieris' behavior in that namespace. If ImagePolicies exists in a namespace, the policies from those ImagePolicy resources are used exclusively, if there is no match for the workload image in ImagePolicies ClusterImagePolicies are not examined. Images in deployed workloads are wildcard matched against the set of policies defined, if there is no policy matching the workload image then deployment is denied. 
   - this example allows any image from the "icr.io" registry with no further checks (the policy is empty):
 ```yaml
 apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
@@ -17,7 +17,7 @@ spec:
       policy:
 ```
 
-* ClusterImagePolicies are configured at the cluster level, and take effect whenever there is no ImagePolicy in the namespace where the workload is being deployed.
+* ClusterImagePolicies are configured at the cluster level, and take effect whenever there is no ImagePolicy resource defined in the namespace where the workload is being deployed. These resources have the same structure as namespace ImagePolicies and if no matching policy is found for an image deplyment is denied. 
   - this example allows all images from all registries:
 ```yaml
 apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
