@@ -48,6 +48,8 @@ spec:
       tolerations:
 {{ toYaml . | indent 8 }}
     {{- end }}
+      securityContext:
+        runAsUser: 1000060001
       volumes:
       - name: portieris-certs
         secret:

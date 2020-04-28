@@ -16,8 +16,10 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
 
 	notaryclient "github.com/IBM/portieris/pkg/notary"
 
@@ -30,7 +32,31 @@ import (
 )
 
 func main() {
+	mkdir := flag.String("mkdir", "", "create directories needed for Portieris to run")
+
 	flag.Parse() // glog flags
+
+	if mkdir != nil && *mkdir != "" {
+		dirs := strings.Split(*mkdir, ",")
+		for i := range dirs {
+			dir := dirs[i]
+			fmt.Printf("making dir %s\n", dir)
+			// make a directory and required parents, permission will be determined by UMASK
+			err := os.MkdirAll(dir, os.ModePerm)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Unable to create: %s, %v\n", dir, err)
+				os.Exit(1)
+			}
+			// explicitly set the required permission
+			err = os.Chmod(dir, 0775)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Unable to change mode: %s, %v\n", dir, err)
+				os.Exit(1)
+			}
+		}
+		os.Exit(0)
+	}
+
 	kubeClientset := kube.GetKubeClient()
 	kubeWrapper := kubernetes.NewKubeClientsetWrapper(kubeClientset)
 	policyClient, err := kube.GetPolicyClient()
