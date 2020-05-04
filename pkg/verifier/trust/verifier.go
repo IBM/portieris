@@ -17,9 +17,11 @@ package trust
 import (
 	"bytes"
 	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/IBM/portieris/helpers/image"
+	"github.com/IBM/portieris/helpers/oauth"
 	securityenforcementv1beta1 "github.com/IBM/portieris/pkg/apis/securityenforcement/v1beta1"
 	"github.com/IBM/portieris/pkg/kubernetes"
 	"github.com/IBM/portieris/pkg/notary"
@@ -74,14 +76,54 @@ func (v *Verifier) VerifyByPolicy(namespace string, img *image.Reference, creden
 		}
 	}
 
+	official := !strings.ContainsRune(img.NameWithoutTag(), '/')
+
+	resp, err := oauth.CheckAuthRequired(notaryURL, img.GetHostname(), img.RepoName(), official)
+	if err != nil {
+		glog.Error(err)
+		return nil, nil, fmt.Errorf("Some error occurred while checking if authentication is required to fetch target metadata")
+	}
+
+	if resp.StatusCode == http.StatusUnauthorized {
+		glog.Infof("Need to get token for %s to fetch target metadata", notaryURL)
+	} else if resp.StatusCode == http.StatusOK {
+		glog.Infof("No need to fetch token for %s to get the target metadata", notaryURL)
+	} else {
+		glog.Infof("Status code: %v was returned", resp.StatusCode)
+		return nil, nil, fmt.Errorf("Status code: %v was returned while checking if authentication is required to fetch target metadata", resp.StatusCode)
+	}
+
+	glog.Infof("Status code: %v returned for repo: %v", resp.StatusCode, img.NameWithoutTag())
+
+	var challengeSlice []oauth.Challenge
+
+	if resp.StatusCode == http.StatusUnauthorized {
+		challengeSlice = oauth.ResponseChallenges(resp)
+		if err != nil {
+			glog.Error(err)
+			return nil, nil, fmt.Errorf("Some error occurred when fetching challenge slice %s", err.Error())
+		}
+	}
+
 	for _, cred := range credentials {
-		notaryToken, err := v.cr.GetContentTrustToken(cred[0], cred[1], img.NameWithoutTag(), img.GetRegistryURL())
+		notaryToken, err := v.cr.GetContentTrustToken(cred[0], cred[1], img.NameWithoutTag(), challengeSlice)
 		if err != nil {
 			glog.Error(err)
 			continue
 		}
 
-		digest, err := v.getDigest(notaryURL, img.NameWithoutTag(), notaryToken, img.GetTag(), signers)
+		// Get image digest
+		glog.Infof("getting signed image... %v", img.RepoName())
+		// notaryToken will be blank for unauthorized calls
+		var image string
+		if official {
+			image = "docker.io/library/" + img.RepoName()
+		} else {
+			image = img.NameWithoutTag()
+		}
+		glog.Infof("Image: %v", image)
+
+		digest, err := v.getDigest(notaryURL, image, notaryToken, img.GetTag(), signers)
 		if err != nil {
 			if strings.Contains(err.Error(), "401") {
 				continue
@@ -95,5 +137,38 @@ func (v *Verifier) VerifyByPolicy(namespace string, img *image.Reference, creden
 		}
 		return digest, nil, nil
 	}
-	return nil, fmt.Errorf("Deny %q, no valid ImagePullSecret defined for %s", img.String(), img.String()), nil
+
+	// if no credentials defined and pulling signed images from public docker
+	notaryToken, err := v.cr.GetContentTrustToken("", "", img.NameWithoutTag(), challengeSlice)
+	glog.Infof("Token: %s", notaryToken)
+	if err != nil {
+		glog.Error(err)
+		return nil, nil, fmt.Errorf("Some error occurred while trying to fetch token for unauthenticated pubilc pull %s", err.Error())
+	}
+
+	// Get image digest
+	glog.Infof("getting signed image for %v", img.RepoName())
+	// notaryToken will be blank for unauthorized calls
+	var image string
+	if official {
+		image = "docker.io/library/" + img.RepoName()
+	} else {
+		image = img.NameWithoutTag()
+	}
+	glog.Infof("Image: %v and tag: %v", image, img.GetTag())
+	glog.Infof("Notary URL: %v", notaryURL)
+	digest, err := v.getDigest(notaryURL, image, notaryToken, img.GetTag(), signers)
+	if err != nil {
+		glog.Infof(err.Error())
+		if strings.Contains(err.Error(), "401") {
+			return nil, fmt.Errorf("Deny %q, no valid ImagePullSecret defined for %s", img.String(), img.String()), nil
+		}
+
+		if _, ok := err.(store.ErrServerUnavailable); ok {
+			glog.Errorf("Trust server unavailable: %v", err)
+			return nil, nil, fmt.Errorf("Deny %q, failed to get content trust information: %s", img.String(), err.Error())
+		}
+		return nil, fmt.Errorf("Deny %q, failed to get content trust information: %s", img.String(), err.Error()), nil
+	}
+	return digest, nil, nil
 }

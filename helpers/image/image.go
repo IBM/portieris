@@ -31,6 +31,7 @@ type Reference struct {
 	digest   string
 	hostname string
 	port     string
+	repo     string
 }
 
 // NewReference parses the image name and returns an error if the name is invalid.
@@ -141,4 +142,9 @@ func (r Reference) NameWithoutTag() string {
 // String returns the original image name.
 func (r Reference) String() string {
 	return r.original
+}
+
+// RepoName returns the image name without the tag and doesn't contain the server/host detals.
+func (r Reference) RepoName() string {
+	return r.repo
 }
