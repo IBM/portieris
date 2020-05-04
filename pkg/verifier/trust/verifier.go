@@ -76,7 +76,7 @@ func (v *Verifier) VerifyByPolicy(namespace string, img *image.Reference, creden
 		}
 	}
 
-	official := !strings.ContainsRune(img.NameWithoutTag(), '/')
+	official := !strings.ContainsRune(img.RepoName(), '/')
 
 	resp, err := oauth.CheckAuthRequired(notaryURL, img.GetHostname(), img.RepoName(), official)
 	if err != nil {
@@ -140,7 +140,6 @@ func (v *Verifier) VerifyByPolicy(namespace string, img *image.Reference, creden
 
 	// if no credentials defined and pulling signed images from public docker
 	notaryToken, err := v.cr.GetContentTrustToken("", "", img.NameWithoutTag(), challengeSlice)
-	glog.Infof("Token: %s", notaryToken)
 	if err != nil {
 		glog.Error(err)
 		return nil, nil, fmt.Errorf("Some error occurred while trying to fetch token for unauthenticated pubilc pull %s", err.Error())

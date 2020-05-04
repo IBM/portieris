@@ -51,6 +51,7 @@ func NewReference(name string) (*Reference, error) {
 		return nil, err
 	}
 	result.name = ref.Name()
+	result.repo = reference.Path(ref)
 
 	// Get the hostname
 	hostname := reference.Domain(ref)
