@@ -589,7 +589,7 @@ var _ = Describe("Main", func() {
 					Expect(len(trust.GetNotaryRepoArgsForCall)).To(Equal(1))
 					Expect(trust.GetNotaryRepoArgsForCall[0].Server).To(Equal("https://us.icr.io:4443"))
 					Expect(resp.Response.Allowed).To(BeFalse())
-					Expect(resp.Response.Result.Message).To(BeIdenticalTo("\n" + `Deny "us.icr.io/hello", failed to get content trust information: unable to reach trust server at this time: 0.`))
+					Expect(resp.Response.Result.Message).To(ContainSubstring(`Deny "us.icr.io/hello", failed to get content trust information: unable to reach trust server at this time: 0.`))
 				})
 			})
 
@@ -620,7 +620,7 @@ var _ = Describe("Main", func() {
 					Expect(len(trust.GetNotaryRepoArgsForCall)).To(Equal(1))
 					Expect(trust.GetNotaryRepoArgsForCall[0].Server).To(Equal("https://some-trust-server.com:4443"))
 					Expect(resp.Response.Allowed).To(BeFalse())
-					Expect(resp.Response.Result.Message).To(BeIdenticalTo("\n" + `Deny "us.icr.io/hello", failed to get content trust information: unable to reach trust server at this time: 0.`))
+					Expect(resp.Response.Result.Message).To(ContainSubstring(`Deny "us.icr.io/hello", failed to get content trust information: unable to reach trust server at this time: 0.`))
 				})
 			})
 

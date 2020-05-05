@@ -194,16 +194,22 @@ func (c *Controller) verifiedDigestByPolicy(namespace string, img *image.Referen
 			return nil, nil, err
 		}
 		digest, deny, err = simpleverifier.VerifyByPolicy(img.String(), credentials, simplePolicy)
-		if err != nil || deny != nil {
-			return nil, deny, err
+		if err != nil {
+			return nil, nil, fmt.Errorf("simple: %v", err)
+		}
+		if deny != nil {
+			return nil, fmt.Errorf("simple: policy denied the request: %v", deny), nil
 		}
 	}
 
-	if policy.Trust.Enabled != nil && *policy.Trust.Enabled == true {
+	if policy.Trust.Enabled != nil && *policy.Trust.Enabled {
 		var notaryDigest *bytes.Buffer
 		notaryDigest, deny, err = c.nv.VerifyByPolicy(namespace, img, credentials, policy)
-		if err != nil || deny != nil {
-			return nil, deny, err
+		if err != nil {
+			return nil, nil, fmt.Errorf("trust: %v", err)
+		}
+		if deny != nil {
+			return nil, fmt.Errorf("trust: policy denied the request: %v", deny), nil
 		}
 		glog.Infof("DCT digest: %v", notaryDigest)
 		if notaryDigest != nil {
