@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/IBM/portieris/helpers/oauth"
 	"github.com/IBM/portieris/pkg/registry"
 )
 
@@ -25,13 +26,13 @@ var _ registry.Interface = &FakeRegistry{}
 
 // FakeRegistry .
 type FakeRegistry struct {
-	GetContentTrustTokenStub        func(username, password, imageRepo, hostname string) (string, error)
+	GetContentTrustTokenStub        func(username, password, imageRepo string, challengeSlice []oauth.Challenge) (string, error)
 	getContentTrustTokenMutex       sync.RWMutex
 	getContentTrustTokenArgsForCall []struct {
-		username  string
-		password  string
-		imageRepo string
-		hostname  string
+		username       string
+		password       string
+		imageRepo      string
+		challengeSlice []oauth.Challenge
 	}
 	getContentTrustTokenReturns struct {
 		token string
@@ -40,17 +41,17 @@ type FakeRegistry struct {
 }
 
 // GetContentTrustToken ...
-func (fake *FakeRegistry) GetContentTrustToken(username, password, imageRepo, hostname string) (string, error) {
+func (fake *FakeRegistry) GetContentTrustToken(username, password, imageRepo string, challengeSlice []oauth.Challenge) (string, error) {
 	fake.getContentTrustTokenMutex.Lock()
 	fake.getContentTrustTokenArgsForCall = append(fake.getContentTrustTokenArgsForCall, struct {
-		username  string
-		password  string
-		imageRepo string
-		hostname  string
-	}{username, password, imageRepo, hostname})
+		username       string
+		password       string
+		imageRepo      string
+		challengeSlice []oauth.Challenge
+	}{username, password, imageRepo, challengeSlice})
 	fake.getContentTrustTokenMutex.Unlock()
 	if fake.GetContentTrustTokenStub != nil {
-		return fake.GetContentTrustTokenStub(username, password, imageRepo, hostname)
+		return fake.GetContentTrustTokenStub(username, password, imageRepo, challengeSlice)
 	}
 	return fake.getContentTrustTokenReturns.token, fake.getContentTrustTokenReturns.err
 }
@@ -66,6 +67,6 @@ func (fake *FakeRegistry) GetContentTrustTokenReturns(token string, err error) {
 }
 
 // GetRegistryToken ...
-func (fake *FakeRegistry) GetRegistryToken(username, password, imageRepo, hostname string) (string, error) {
+func (fake *FakeRegistry) GetRegistryToken(username, password, imageRepo string, challengeSlice []oauth.Challenge) (string, error) {
 	return "", fmt.Errorf("not implemented")
 }
