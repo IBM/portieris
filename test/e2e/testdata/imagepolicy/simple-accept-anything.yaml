@@ -1,7 +1,7 @@
 apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
 kind: ImagePolicy
 metadata:
-  name: allow-all
+  name: simple-accept-anything
 spec:
    repositories:
     - name: "icr.io/cise/*"
