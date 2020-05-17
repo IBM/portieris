@@ -33,6 +33,16 @@ spec:
           - name: portieris-certs
             readOnly: true
             mountPath: "/etc/certs"
+          livenessProbe:
+            httpGet:
+              port: 8000
+              path: "/health/liveness"
+              scheme: HTTPS
+          readinessProbe:
+            httpGet:
+              port: 8000
+              path: "/health/readiness"
+              scheme: HTTPS
           env:
           resources:
 {{ toYaml .Values.resources | indent 12 }}
