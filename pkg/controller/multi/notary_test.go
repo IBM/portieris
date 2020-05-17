@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018,2020 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -403,7 +403,7 @@ var _ = Describe("Main", func() {
 					wh.HandleAdmissionRequest(w, req)
 					parseResponse()
 					Expect(resp.Response.Allowed).To(BeTrue())
-					Expect(string(resp.Response.Patch)).To(ContainSubstring("us.icr.io/hello:latest@sha256:31323334353637383930"))
+					Expect(string(resp.Response.Patch)).To(ContainSubstring("us.icr.io/hello@sha256:31323334353637383930"))
 				})
 			})
 
@@ -428,7 +428,7 @@ var _ = Describe("Main", func() {
 					req := newFakeRequest("us.icr.io/hello")
 					wh.HandleAdmissionRequest(w, req)
 					parseResponse()
-					Expect(string(resp.Response.Patch)).To(ContainSubstring("us.icr.io/hello:latest@sha256:31323334353637383930"))
+					Expect(string(resp.Response.Patch)).To(ContainSubstring("us.icr.io/hello@sha256:31323334353637383930"))
 					Expect(resp.Response.Allowed).To(BeTrue())
 				})
 			})
@@ -454,7 +454,7 @@ var _ = Describe("Main", func() {
 					req := newFakeRequestMulitpleSecretsBadSecond("us.icr.io/hello")
 					wh.HandleAdmissionRequest(w, req)
 					parseResponse()
-					Expect(string(resp.Response.Patch)).To(ContainSubstring("us.icr.io/hello:latest@sha256:31323334353637383930"))
+					Expect(string(resp.Response.Patch)).To(ContainSubstring("us.icr.io/hello@sha256:31323334353637383930"))
 					Expect(resp.Response.Allowed).To(BeTrue())
 				})
 			})
@@ -480,7 +480,7 @@ var _ = Describe("Main", func() {
 					req := newFakeRequestMulitpleSecrets("us.icr.io/hello")
 					wh.HandleAdmissionRequest(w, req)
 					parseResponse()
-					Expect(string(resp.Response.Patch)).To(ContainSubstring("us.icr.io/hello:latest@sha256:31323334353637383930"))
+					Expect(string(resp.Response.Patch)).To(ContainSubstring("us.icr.io/hello@sha256:31323334353637383930"))
 					Expect(resp.Response.Allowed).To(BeTrue())
 				})
 			})
@@ -506,7 +506,7 @@ var _ = Describe("Main", func() {
 					req := newFakeRequestDeployment("us.icr.io/hello")
 					wh.HandleAdmissionRequest(w, req)
 					parseResponse()
-					Expect(string(resp.Response.Patch)).To(ContainSubstring("us.icr.io/hello:latest@sha256:31323334353637383930"))
+					Expect(string(resp.Response.Patch)).To(ContainSubstring("us.icr.io/hello@sha256:31323334353637383930"))
 					Expect(resp.Response.Allowed).To(BeTrue())
 				})
 			})
@@ -532,7 +532,7 @@ var _ = Describe("Main", func() {
 					req := newFakeRequestWithParents("us.icr.io/hello")
 					wh.HandleAdmissionRequest(w, req)
 					parseResponse()
-					Expect(string(resp.Response.Patch)).NotTo(ContainSubstring("us.icr.io/hello:latest@sha256:31323334353637383930"))
+					Expect(string(resp.Response.Patch)).NotTo(ContainSubstring("us.icr.io/hello@sha256:31323334353637383930"))
 					Expect(resp.Response.Allowed).To(BeTrue())
 				})
 			})
@@ -558,7 +558,7 @@ var _ = Describe("Main", func() {
 					req := newFakeRequestDeploymentWithZeroReplicas("us.icr.io/hello")
 					wh.HandleAdmissionRequest(w, req)
 					parseResponse()
-					Expect(string(resp.Response.Patch)).NotTo(ContainSubstring("us.icr.io/hello:latest@sha256:31323334353637383930"))
+					Expect(string(resp.Response.Patch)).NotTo(ContainSubstring("us.icr.io/hello@sha256:31323334353637383930"))
 					Expect(resp.Response.Allowed).To(BeTrue())
 				})
 			})
@@ -834,7 +834,7 @@ var _ = Describe("Main", func() {
 					req := newFakeRequestInitContainer("us.icr.io/hello", "icr.io/nosign")
 					wh.HandleAdmissionRequest(w, req)
 					parseResponse()
-					Expect(string(resp.Response.Patch)).To(ContainSubstring("us.icr.io/hello:latest@sha256:31323334353637383930"))
+					Expect(string(resp.Response.Patch)).To(ContainSubstring("us.icr.io/hello@sha256:31323334353637383930"))
 					// Check if added patch contains patch to initContainers
 					Expect(string(resp.Response.Patch)).To(ContainSubstring("initContainers"))
 					Expect(resp.Response.Allowed).To(BeTrue())
