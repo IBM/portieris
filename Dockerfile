@@ -7,8 +7,8 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -tags containers_image_openpgp -o ./bin
 
 FROM scratch
 COPY --from=golang /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-# Create /tmp for log files
-WORKDIR /tmp 
-WORKDIR /
-COPY --from=golang /go/src/github.com/IBM/portieris/bin/trust .
-CMD ["./trust","--alsologtostderr","-v=4","2>&1"]
+COPY --from=golang /go/src/github.com/IBM/portieris/bin/trust /trust
+# Create /tmp for logs and /run for working directory
+RUN [ "/trust", "--mkdir",  "/tmp,/run" ]
+WORKDIR /run
+CMD ["/trust","--alsologtostderr","-v=4","2>&1"]

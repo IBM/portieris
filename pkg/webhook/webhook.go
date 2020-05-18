@@ -79,6 +79,22 @@ func (s *Server) HandleAdmissionRequest(w http.ResponseWriter, r *http.Request) 
 	w.Write(reviewResponseToByte(admissionResponse, admissionReview))
 }
 
+// HandleLiveness responds to a Kubernetes Liveness probe
+// Fail this request if Kubernetes should restart this instance
+func (s *Server) HandleLiveness(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+
+	w.WriteHeader(http.StatusOK)
+}
+
+// HandleReadiness responds to a Kubernetes Readiness probe
+// Fail this request if this instance can't accept traffic, but Kubernetes shouldn't restart it
+func (s *Server) HandleReadiness(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+
+	w.WriteHeader(http.StatusOK)
+}
+
 // Run starts the server
 func (s *Server) Run() {
 	flag.Parse()
@@ -100,6 +116,8 @@ func (s *Server) Run() {
 		ClientAuth: tls.NoClientCert,
 	}
 	s.mux.HandleFunc("/admit", s.HandleAdmissionRequest)
+	s.mux.HandleFunc("/health/liveness", s.HandleLiveness)
+	s.mux.HandleFunc("/health/readiness", s.HandleReadiness)
 	port := "8000"
 	server := &http.Server{
 		Addr:      fmt.Sprintf(":%s", port),
