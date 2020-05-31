@@ -91,9 +91,10 @@ type Repository struct {
 
 // Policy .
 type Policy struct {
-	Trust  Trust    `json:"trust,omitempty"`
-	Simple []Simple `json:"simple,omitempty"`
-	Va     VA       `json:"va,omitempty"`
+	Trust       Trust       `json:"trust,omitempty"`
+	SimpleStore SimpleStore `json:"simpleStore,omitempty"`
+	Simple      []Simple    `json:"simple,omitempty"`
+	Va          VA          `json:"va,omitempty"`
 }
 
 // Trust .
@@ -106,6 +107,12 @@ type Trust struct {
 // Signer .
 type Signer struct {
 	Name string `json:"name"`
+}
+
+// SimpleStore .
+type SimpleStore struct {
+	URL    string `json:"url"`
+	Secret string `json:"secret,omitEmpty"`
 }
 
 // Simple .

@@ -193,7 +193,7 @@ func (c *Controller) verifiedDigestByPolicy(namespace string, img *image.Referen
 		if err != nil {
 			return nil, nil, err
 		}
-		digest, deny, err = simpleverifier.VerifyByPolicy(img.String(), credentials, simplePolicy)
+		digest, deny, err = simpleverifier.VerifyByPolicy(img.String(), credentials, "", simplePolicy)
 		if err != nil {
 			return nil, nil, fmt.Errorf("simple: %v", err)
 		}
