@@ -26,6 +26,7 @@ import (
 	"github.com/IBM/portieris/pkg/notary"
 	"github.com/IBM/portieris/pkg/policy"
 	registryclient "github.com/IBM/portieris/pkg/registry"
+	"github.com/IBM/portieris/pkg/verifier/simple"
 	simpleverifier "github.com/IBM/portieris/pkg/verifier/simple"
 	notaryverifier "github.com/IBM/portieris/pkg/verifier/trust"
 	"github.com/IBM/portieris/pkg/webhook"
@@ -193,9 +194,17 @@ func (c *Controller) verifiedDigestByPolicy(namespace string, img *image.Referen
 		if err != nil {
 			return nil, nil, err
 		}
-		digest, deny, err = simpleverifier.VerifyByPolicy(img.String(), credentials, "", simplePolicy)
+		storeConfigDir, err := simple.CreateRegistryDir(policy.SimpleStore.URL, "", "")
+		if err != nil {
+			return nil, nil, err
+		}
+		digest, deny, err = simpleverifier.VerifyByPolicy(img.String(), credentials, storeConfigDir, simplePolicy)
 		if err != nil {
 			return nil, nil, fmt.Errorf("simple: %v", err)
+		}
+		err = simple.RemoveRegistryDir(storeConfigDir)
+		if err != nil {
+			glog.Warningf("failed to remove %s, %v", storeConfigDir, err)
 		}
 		if deny != nil {
 			return nil, fmt.Errorf("simple: policy denied the request: %v", deny), nil

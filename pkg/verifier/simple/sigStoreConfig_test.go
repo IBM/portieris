@@ -30,24 +30,44 @@ func TestCreateRegistryFile(t *testing.T) {
 		sigStore       string
 		sigUser        string
 		sigPassword    string
+		expectedErr    bool
+		expectedDir    bool
 		expectedConfig string
 	}{
 		{
+			name:           "no url",
+			sigStore:       "",
+			sigUser:        "",
+			sigPassword:    "",
+			expectedErr:    false,
+			expectedDir:    false,
+			expectedConfig: "",
+		}, {
 			name:           "url without credentials",
 			sigStore:       "http://foo.com/x",
 			sigUser:        "",
 			sigPassword:    "",
+			expectedErr:    false,
+			expectedDir:    true,
 			expectedConfig: "http://foo.com/x",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			dirName, fileName, err := createRegistryFile(tt.sigStore, tt.sigUser, tt.sigPassword)
+			dirName, err := CreateRegistryDir(tt.sigStore, tt.sigUser, tt.sigPassword)
+			if tt.expectedErr {
+				assert.Error(t, err)
+				return
+			}
 			assert.NoError(t, err)
+			if !tt.expectedDir {
+				assert.Zero(t, dirName)
+				return
+			}
 			assert.Contains(t, dirName, os.TempDir())
 			assert.DirExists(t, dirName)
 
-			assert.Contains(t, fileName, dirName)
+			fileName := dirName + "/default.yaml"
 			assert.FileExists(t, fileName)
 
 			bytes, err := ioutil.ReadFile(fileName)
@@ -61,7 +81,7 @@ func TestCreateRegistryFile(t *testing.T) {
 			assert.NotZero(t, out)
 			assert.Equal(t, out.DefaultDocker.SigStore, tt.expectedConfig)
 
-			err = removeRegistryFile(dirName)
+			err = RemoveRegistryDir(dirName)
 			assert.NoError(t, err)
 		})
 	}

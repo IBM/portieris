@@ -18,26 +18,32 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/golang/glog"
 	"gopkg.in/yaml.v3"
 )
 
 type sigConfig struct {
-	SigStore string `json:"sigstore"`
+	SigStore string `yaml:"sigstore"`
 }
 type config struct {
-	DefaultDocker sigConfig `json:"default-docker"`
+	DefaultDocker sigConfig `yaml:"default-docker"`
 }
 
-// CreateRegistryFile write a file in a new directory containing the desired default docker configuration
-func createRegistryFile(sigStore, sigUser, sigPassword string) (string, string, error) {
+// CreateRegistryDir write a file in a new directory containing the desired default docker configuration
+func CreateRegistryDir(sigStore, sigUser, sigPassword string) (string, error) {
+	if sigStore == "" {
+		glog.Infof("No lookaside signature store.")
+		return "", nil
+	}
+	glog.Infof("Lookaside signature store at: %s", sigStore)
 	dir, err := ioutil.TempDir("", "registry.d")
 	if err != nil {
-		return "", "", err
+		return "", err
 	}
 	file, err := os.OpenFile(dir+"/default.yaml", os.O_RDWR|os.O_CREATE|os.O_EXCL, 0600)
 	if err != nil {
 		os.RemoveAll(dir)
-		return "", "", err
+		return "", err
 	}
 
 	rConf := config{
@@ -48,17 +54,22 @@ func createRegistryFile(sigStore, sigUser, sigPassword string) (string, string, 
 	bytes, err := yaml.Marshal(rConf)
 	if err != nil {
 		os.RemoveAll(dir)
-		return "", "", err
+		return "", err
 	}
 
 	_, err = file.Write(bytes)
 	if err != nil {
 		os.RemoveAll(dir)
-		return "", "", err
+		return "", err
 	}
-	return dir, file.Name(), nil
+	glog.Infof("Using store config dir: %s", dir)
+	return dir, nil
 }
 
-func removeRegistryFile(dirName string) error {
+// RemoveRegistryDir .
+func RemoveRegistryDir(dirName string) error {
+	if dirName == "" {
+		return nil
+	}
 	return os.RemoveAll(dirName)
 }
