@@ -40,6 +40,21 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+# Affinity settings
+# the `podAntiAffinity` defined here results in the distribution of pods over nodes where possible
+# this gives improves availability in the face of node instability, reducing the potential of admission deadlock
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: affinityLabel
+            operator: In
+            values:
+            - portieris
+        topologyKey: "kubernetes.io/hostname"
+      weight: 50
 
 # Not recommended for user to configure this. Hyperkube image to use when creating custom resources
 hyperkube:
