@@ -43,13 +43,37 @@ func TestCreateRegistryFile(t *testing.T) {
 			expectedDir:    false,
 			expectedConfig: "",
 		}, {
-			name:           "url without credentials",
+			name:           "http: url without credentials",
 			sigStore:       "http://foo.com/x",
 			sigUser:        "",
 			sigPassword:    "",
 			expectedErr:    false,
 			expectedDir:    true,
 			expectedConfig: "http://foo.com/x",
+		}, {
+			name:           "https: url without credentials",
+			sigStore:       "https://foo.com/x",
+			sigUser:        "",
+			sigPassword:    "",
+			expectedErr:    false,
+			expectedDir:    true,
+			expectedConfig: "https://foo.com/x",
+		}, {
+			name:           "invalid: url without credentials",
+			sigStore:       "invalid://foo.com/x",
+			sigUser:        "",
+			sigPassword:    "",
+			expectedErr:    true,
+			expectedDir:    false,
+			expectedConfig: "",
+		}, {
+			name:           "valiid url with credentials",
+			sigStore:       "https://foo.com/x",
+			sigUser:        "user",
+			sigPassword:    "pass",
+			expectedErr:    false,
+			expectedDir:    true,
+			expectedConfig: "https://user:pass@foo.com/x",
 		},
 	}
 	for _, tt := range tests {

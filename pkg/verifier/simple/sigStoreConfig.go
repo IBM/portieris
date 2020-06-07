@@ -15,27 +15,52 @@
 package simple
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
 
 	"github.com/golang/glog"
 	"gopkg.in/yaml.v3"
 )
 
-type sigConfig struct {
+type regConfig struct {
 	SigStore string `yaml:"sigstore"`
 }
 type config struct {
-	DefaultDocker sigConfig `yaml:"default-docker"`
+	DefaultDocker regConfig `yaml:"default-docker"`
 }
 
 // CreateRegistryDir write a file in a new directory containing the desired default docker configuration
-func CreateRegistryDir(sigStore, sigUser, sigPassword string) (string, error) {
-	if sigStore == "" {
+func CreateRegistryDir(storeURL, storeUser, storePassword string) (string, error) {
+	if storeURL == "" {
 		glog.Infof("No lookaside signature store.")
 		return "", nil
 	}
-	glog.Infof("Lookaside signature store at: %s", sigStore)
+	method := ""
+	rest := ""
+	if strings.HasPrefix(storeURL, "http://") {
+		method = "http://"
+		rest = strings.TrimPrefix(storeURL, "http://")
+	}
+	if strings.HasPrefix(storeURL, "https://") {
+		method = "https://"
+		rest = strings.TrimPrefix(storeURL, "https://")
+	}
+
+	// allow only http:// and https://
+	if method == "" {
+		return "", fmt.Errorf("expecting https:// or http:// URL, got: %s", storeURL)
+	}
+	// insert credentials as <method>user:password@<rest>
+	if storeUser == "" {
+		glog.Infof("Lookaside signature store at: %s", storeURL)
+	} else {
+		glog.Infof("Lookaside signature store at: %s%s:***@%s", method, storeUser, rest)
+		storeURL = fmt.Sprintf("%s%s:%s@%s", method, storeUser, storePassword, rest)
+	}
+
+	glog.Infof("Lookaside signature store at: %s", storeURL)
 	dir, err := ioutil.TempDir("", "registry.d")
 	if err != nil {
 		return "", err
@@ -47,8 +72,8 @@ func CreateRegistryDir(sigStore, sigUser, sigPassword string) (string, error) {
 	}
 
 	rConf := config{
-		DefaultDocker: sigConfig{
-			SigStore: sigStore,
+		DefaultDocker: regConfig{
+			SigStore: storeURL,
 		},
 	}
 	bytes, err := yaml.Marshal(rConf)

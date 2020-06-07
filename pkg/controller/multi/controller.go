@@ -1,4 +1,4 @@
-// Copyright 2018,2020 Portieris Authors.
+// Copyright 2018, 2020 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -189,12 +189,16 @@ func (c *Controller) verifiedDigestByPolicy(namespace string, img *image.Referen
 	var digest *bytes.Buffer
 	var deny, err error
 	glog.Infof("policy.Simple %v", policy.Simple)
-	if policy.Simple != nil {
-		simplePolicy, err := simpleverifier.TransformPolicies(c.kubeClientsetWrapper, namespace, policy.Simple)
+	if len(policy.Simple.Requirements) > 0 {
+		simplePolicy, err := simpleverifier.TransformPolicies(c.kubeClientsetWrapper, namespace, policy.Simple.Requirements)
 		if err != nil {
 			return nil, nil, err
 		}
-		storeConfigDir, err := simple.CreateRegistryDir(policy.SimpleStore.URL, "", "")
+		storeUser, storePassword, err := c.kubeClientsetWrapper.GetBasicCredentials(namespace, policy.Simple.StoreAuth)
+		if err != nil {
+			return nil, nil, err
+		}
+		storeConfigDir, err := simple.CreateRegistryDir(policy.Simple.StoreURL, storeUser, storePassword)
 		if err != nil {
 			return nil, nil, err
 		}
