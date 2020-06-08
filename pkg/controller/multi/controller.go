@@ -194,7 +194,7 @@ func (c *Controller) verifiedDigestByPolicy(namespace string, img *image.Referen
 		if err != nil {
 			return nil, nil, err
 		}
-		storeUser, storePassword, err := c.kubeClientsetWrapper.GetBasicCredentials(namespace, policy.Simple.StoreAuth)
+		storeUser, storePassword, err := c.kubeClientsetWrapper.GetBasicCredentials(namespace, policy.Simple.StoreSecret)
 		if err != nil {
 			return nil, nil, err
 		}

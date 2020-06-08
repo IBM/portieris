@@ -110,9 +110,9 @@ type Signer struct {
 
 // Simple .
 type Simple struct {
-	Requirements []SimpleRequirement `json:"requirerements"`
+	Requirements []SimpleRequirement `json:"requirements"`
 	StoreURL     string              `json:"storeURL,omitEmpty"`
-	StoreAuth    string              `json:"storeAuth,omitEmpty"`
+	StoreSecret  string              `json:"storeSecret,omitEmpty"`
 }
 
 // SimpleRequirement .
