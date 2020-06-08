@@ -49,7 +49,7 @@ affinity:
     - podAffinityTerm:
         labelSelector:
           matchExpressions:
-          - key: affinityLabel
+          - key: affinity
             operator: In
             values:
             - portieris
