@@ -17,7 +17,7 @@ spec:
   template:
     metadata:
       labels:
-        affinityLabel: portieris
+        affinity: portieris
         app: {{ template "portieris.name" . }}
         release: {{ .Release.Name }}
     spec:
