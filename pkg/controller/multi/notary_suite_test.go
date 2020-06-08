@@ -112,9 +112,6 @@ func createNewImagePolicy(repo, namespace string) *securityenforcementv1beta1.Im
 							Enabled:       securityenforcementv1beta1.FalsePointer,
 							SignerSecrets: []securityenforcementv1beta1.Signer{},
 						},
-						VCheck: securityenforcementv1beta1.VCheck{
-							Type: "",
-						},
 					},
 				},
 			},
@@ -154,9 +151,6 @@ func createClusterImagePolicy(repo, namespace string) *securityenforcementv1beta
 						Trust: securityenforcementv1beta1.Trust{
 							Enabled:       securityenforcementv1beta1.FalsePointer,
 							SignerSecrets: []securityenforcementv1beta1.Signer{},
-						},
-						VCheck: securityenforcementv1beta1.VCheck{
-							Type: "",
 						},
 					},
 				},

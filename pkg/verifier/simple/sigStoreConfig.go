@@ -60,7 +60,6 @@ func CreateRegistryDir(storeURL, storeUser, storePassword string) (string, error
 		storeURL = fmt.Sprintf("%s%s:%s@%s", method, storeUser, storePassword, rest)
 	}
 
-	glog.Infof("Lookaside signature store at: %s", storeURL)
 	dir, err := ioutil.TempDir("", "registry.d")
 	if err != nil {
 		return "", err
