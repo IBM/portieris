@@ -64,7 +64,7 @@ func (f *Framework) WaitForNamespace(name string, timeout time.Duration) error {
 }
 
 // CreateNamespaceWithIPS creates a namespace, service account and IPS to pull from the IBM Cloud Container Registry Global region
-// It coopies the `IBMCloudSecretName` imagePullSecret from the default namespace
+// It copies the `IBMCloudSecretName` imagePullSecret from the default namespace
 func (f *Framework) CreateNamespaceWithIPS(name string) (*corev1.Namespace, error) {
 	namespace, err := f.CreateNamespace(name)
 	if err != nil {
