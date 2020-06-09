@@ -1,4 +1,4 @@
-// Copyright 2018,2020 Portieris Authors.
+// Copyright 2018, 2020 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import (
 	"github.com/IBM/portieris/pkg/notary"
 	"github.com/IBM/portieris/pkg/policy"
 	registryclient "github.com/IBM/portieris/pkg/registry"
+	"github.com/IBM/portieris/pkg/verifier/simple"
 	simpleverifier "github.com/IBM/portieris/pkg/verifier/simple"
 	notaryverifier "github.com/IBM/portieris/pkg/verifier/trust"
 	"github.com/IBM/portieris/pkg/webhook"
@@ -188,14 +189,26 @@ func (c *Controller) verifiedDigestByPolicy(namespace string, img *image.Referen
 	var digest *bytes.Buffer
 	var deny, err error
 	glog.Infof("policy.Simple %v", policy.Simple)
-	if policy.Simple != nil {
-		simplePolicy, err := simpleverifier.TransformPolicies(c.kubeClientsetWrapper, namespace, policy.Simple)
+	if len(policy.Simple.Requirements) > 0 {
+		simplePolicy, err := simpleverifier.TransformPolicies(c.kubeClientsetWrapper, namespace, policy.Simple.Requirements)
 		if err != nil {
 			return nil, nil, err
 		}
-		digest, deny, err = simpleverifier.VerifyByPolicy(img.String(), credentials, simplePolicy)
+		storeUser, storePassword, err := c.kubeClientsetWrapper.GetBasicCredentials(namespace, policy.Simple.StoreSecret)
+		if err != nil {
+			return nil, nil, err
+		}
+		storeConfigDir, err := simple.CreateRegistryDir(policy.Simple.StoreURL, storeUser, storePassword)
+		if err != nil {
+			return nil, nil, err
+		}
+		digest, deny, err = simpleverifier.VerifyByPolicy(img.String(), credentials, storeConfigDir, simplePolicy)
 		if err != nil {
 			return nil, nil, fmt.Errorf("simple: %v", err)
+		}
+		err = simple.RemoveRegistryDir(storeConfigDir)
+		if err != nil {
+			glog.Warningf("failed to remove %s, %v", storeConfigDir, err)
 		}
 		if deny != nil {
 			return nil, fmt.Errorf("simple: policy denied the request: %v", deny), nil

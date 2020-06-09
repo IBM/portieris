@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2020 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -112,9 +112,6 @@ func createNewImagePolicy(repo, namespace string) *securityenforcementv1beta1.Im
 							Enabled:       securityenforcementv1beta1.FalsePointer,
 							SignerSecrets: []securityenforcementv1beta1.Signer{},
 						},
-						Va: securityenforcementv1beta1.VA{
-							Enabled: securityenforcementv1beta1.FalsePointer,
-						},
 					},
 				},
 			},
@@ -154,9 +151,6 @@ func createClusterImagePolicy(repo, namespace string) *securityenforcementv1beta
 						Trust: securityenforcementv1beta1.Trust{
 							Enabled:       securityenforcementv1beta1.FalsePointer,
 							SignerSecrets: []securityenforcementv1beta1.Signer{},
-						},
-						Va: securityenforcementv1beta1.VA{
-							Enabled: securityenforcementv1beta1.FalsePointer,
 						},
 					},
 				},

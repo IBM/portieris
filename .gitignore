@@ -1,4 +1,4 @@
-vendor
+code-generator
 cover.*
 
 *.tgz

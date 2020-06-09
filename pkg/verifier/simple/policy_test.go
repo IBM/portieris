@@ -111,13 +111,13 @@ func TestTransformPolicy(t *testing.T) {
 	tests := []struct {
 		name           string
 		image          string
-		simplePolicies []v1beta1.Simple
+		simplePolicies []v1beta1.SimpleRequirement
 		wantErr        bool
 		errMsg         string
 	}{
 		{
 			name: "invalid simple type",
-			simplePolicies: []v1beta1.Simple{{
+			simplePolicies: []v1beta1.SimpleRequirement{{
 				Type: "invalid",
 			}},
 			wantErr: true,
@@ -125,21 +125,21 @@ func TestTransformPolicy(t *testing.T) {
 		},
 		{
 			name: "reject type",
-			simplePolicies: []v1beta1.Simple{{
+			simplePolicies: []v1beta1.SimpleRequirement{{
 				Type: "reject",
 			}},
 			wantErr: false,
 		},
 		{
 			name: "accept type",
-			simplePolicies: []v1beta1.Simple{{
+			simplePolicies: []v1beta1.SimpleRequirement{{
 				Type: "insecureAcceptAnything",
 			}},
 			wantErr: false,
 		},
 		{
 			name: "signedByInvalidKey",
-			simplePolicies: []v1beta1.Simple{{
+			simplePolicies: []v1beta1.SimpleRequirement{{
 				Type:      "signedBy",
 				KeySecret: "badKeySecret",
 			}},
@@ -148,7 +148,7 @@ func TestTransformPolicy(t *testing.T) {
 		},
 		{
 			name: "signedByValidKey",
-			simplePolicies: []v1beta1.Simple{{
+			simplePolicies: []v1beta1.SimpleRequirement{{
 				Type:      "signedBy",
 				KeySecret: "validKeySecret",
 			}},
@@ -156,7 +156,7 @@ func TestTransformPolicy(t *testing.T) {
 		},
 		{
 			name: "signedByMissingKey",
-			simplePolicies: []v1beta1.Simple{{
+			simplePolicies: []v1beta1.SimpleRequirement{{
 				Type:      "signedBy",
 				KeySecret: "missingSecret",
 			}},
@@ -165,7 +165,7 @@ func TestTransformPolicy(t *testing.T) {
 		},
 		{
 			name: "signedByNoKey",
-			simplePolicies: []v1beta1.Simple{{
+			simplePolicies: []v1beta1.SimpleRequirement{{
 				Type: "signedBy",
 			}},
 			wantErr: true,
@@ -173,7 +173,7 @@ func TestTransformPolicy(t *testing.T) {
 		},
 		{
 			name: "signedByEmptyKey",
-			simplePolicies: []v1beta1.Simple{{
+			simplePolicies: []v1beta1.SimpleRequirement{{
 				Type:      "signedBy",
 				KeySecret: "emptyKeySecret",
 			}},
@@ -182,7 +182,7 @@ func TestTransformPolicy(t *testing.T) {
 		},
 		{
 			name: "invalid SignedIdentity Type",
-			simplePolicies: []v1beta1.Simple{{
+			simplePolicies: []v1beta1.SimpleRequirement{{
 				Type:      "signedBy",
 				KeySecret: "validKeySecret",
 				SignedIdentity: v1beta1.IdentityRequirement{
@@ -194,7 +194,7 @@ func TestTransformPolicy(t *testing.T) {
 		},
 		{
 			name: "SignedIdentity matchExact",
-			simplePolicies: []v1beta1.Simple{{
+			simplePolicies: []v1beta1.SimpleRequirement{{
 				Type:      "signedBy",
 				KeySecret: "validKeySecret",
 				SignedIdentity: v1beta1.IdentityRequirement{
@@ -205,7 +205,7 @@ func TestTransformPolicy(t *testing.T) {
 		},
 		{
 			name: "SignedIdentity matchRepository",
-			simplePolicies: []v1beta1.Simple{{
+			simplePolicies: []v1beta1.SimpleRequirement{{
 				Type:      "signedBy",
 				KeySecret: "validKeySecret",
 				SignedIdentity: v1beta1.IdentityRequirement{
@@ -216,7 +216,7 @@ func TestTransformPolicy(t *testing.T) {
 		},
 		{
 			name: "SignedIdentity matchExactRepository",
-			simplePolicies: []v1beta1.Simple{{
+			simplePolicies: []v1beta1.SimpleRequirement{{
 				Type:      "signedBy",
 				KeySecret: "validKeySecret",
 				SignedIdentity: v1beta1.IdentityRequirement{
@@ -228,7 +228,7 @@ func TestTransformPolicy(t *testing.T) {
 		},
 		{
 			name: "SignedIdentity matchExactReference",
-			simplePolicies: []v1beta1.Simple{{
+			simplePolicies: []v1beta1.SimpleRequirement{{
 				Type:      "signedBy",
 				KeySecret: "validKeySecret",
 				SignedIdentity: v1beta1.IdentityRequirement{

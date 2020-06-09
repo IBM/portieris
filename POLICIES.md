@@ -30,7 +30,7 @@ spec:
     policy:
 ```
 
-For both types or resource if there are multiple resources, they are merged together, and can be protected by RBAC policy.
+For both types of resource if there are multiple resources, they are merged together, and can be protected by RBAC policy.
 
 ## Installation Default Policies
 Default policies are installed when Portieris is installed. You must review and change these according to your requirements.
@@ -78,12 +78,13 @@ spec:
    repositories:
     - name: "icr.io/*"
       policy:
-         simple:
+        simple:
+          requirements:
           - type: "signedBy"
             keySecret: my-pubkey
 ```
 
-this example requires that a given image is singed but allows the location to have changed:
+This example requires that a given image is signed but allows the location to have changed:
 ```yaml
 apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
 kind: ImagePolicy
@@ -93,14 +94,32 @@ spec:
    repositories:
     - name: "uk.icr.io/mymirror/db2/db2manager:6.1.0.0"
       policy:
-         simple:
+        simple:
+          requirements:
           - type: "signedBy"
-            keySecret: my-pubkey
+            keySecret: db2-pubkey
             signedIdentity: 
                 type: "matchExactRepository"
                 dockerRepository: "icr.io/ibm/db2/db2manager"
 ```
 
-
+It is also possible to specify the location of signature storage for registries which do not support the registry extension:
+```yaml
+apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
+kind: ImagePolicy
+metadata:
+  name: db2mirror
+spec:
+   repositories:
+    - name: "uk.icr.io/mymirror/db2/db2manager:6.1.0.0"
+      policy:
+        simple:
+          storeURL: https://server.another.com/signatures
+          storeSecret: another-secret
+          requirements:
+          - type: "signedBy"
+            keySecret: db2-pubkey
+```
+where `storeSecret` identifies an in scope Kubernetes secret which contains `username` and `password` data items which are used to authenticate with the server referenced in `storeURL`.
 
 
