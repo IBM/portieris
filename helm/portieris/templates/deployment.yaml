@@ -17,8 +17,7 @@ spec:
   template:
     metadata:
       labels:
-        affinity: portieris
-        app: {{ template "portieris.name" . }}
+        app: portieris
         release: {{ .Release.Name }}
     spec:
       serviceAccountName: portieris
@@ -39,11 +38,15 @@ spec:
               port: 8000
               path: "/health/liveness"
               scheme: HTTPS
+            initialDelaySeconds: 10
+            timeoutSeconds: 10
           readinessProbe:
             httpGet:
               port: 8000
               path: "/health/readiness"
               scheme: HTTPS
+            initialDelaySeconds: 10
+            timeoutSeconds: 10
           env:
           resources:
 {{ toYaml .Values.resources | indent 12 }}
