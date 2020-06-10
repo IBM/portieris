@@ -25,7 +25,7 @@ import (
 )
 
 // TransformPolicies from Portieris to container/image lib policies
-func TransformPolicies(kWrapper kubernetes.WrapperInterface, namespace string, inPolicies []v1beta1.Simple) (*signature.Policy, error) {
+func TransformPolicies(kWrapper kubernetes.WrapperInterface, namespace string, inPolicies []v1beta1.SimpleRequirement) (*signature.Policy, error) {
 	var policyRequirements []signature.PolicyRequirement
 
 	for _, inPolicy := range inPolicies {
@@ -80,7 +80,7 @@ func TransformPolicies(kWrapper kubernetes.WrapperInterface, namespace string, i
 	}, nil
 }
 
-func policySignedIdentity(inPolicy *v1beta1.Simple) (signature.PolicyReferenceMatch, error) {
+func policySignedIdentity(inPolicy *v1beta1.SimpleRequirement) (signature.PolicyReferenceMatch, error) {
 	switch inPolicy.SignedIdentity.Type {
 	case "":
 		return signature.NewPRMMatchRepoDigestOrExact(), nil

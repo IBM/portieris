@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2020 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,6 +30,10 @@ func generateNamespace(name string) *corev1.Namespace {
 	return ns
 }
 
+// IBMCloudSecretName secret provided to enable access to test images
+// https://github.com/IBM/portieris/issues/34 to remove the need for this
+const IBMCloudSecretName = "default-icr-io"
+
 // CreateNamespace creates a namespace
 func (f *Framework) CreateNamespace(name string) (*corev1.Namespace, error) {
 
@@ -60,13 +64,13 @@ func (f *Framework) WaitForNamespace(name string, timeout time.Duration) error {
 }
 
 // CreateNamespaceWithIPS creates a namespace, service account and IPS to pull from the IBM Cloud Container Registry Global region
-// It uses the default-icr-io imagePullSecret from the default namespace
+// It copies the `IBMCloudSecretName` imagePullSecret from the default namespace
 func (f *Framework) CreateNamespaceWithIPS(name string) (*corev1.Namespace, error) {
 	namespace, err := f.CreateNamespace(name)
 	if err != nil {
 		return nil, fmt.Errorf("error creating namespace: %v", err)
 	}
-	ips, err := f.KubeClient.CoreV1().Secrets("default").Get("default-icr-io", metav1.GetOptions{})
+	ips, err := f.KubeClient.CoreV1().Secrets("default").Get(IBMCloudSecretName, metav1.GetOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("error getting imagePullSecret: %v", err)
 	}
@@ -77,7 +81,7 @@ func (f *Framework) CreateNamespaceWithIPS(name string) (*corev1.Namespace, erro
 	}
 	sa := generateServiceAccount("default")
 	sa.ImagePullSecrets = []corev1.LocalObjectReference{
-		{Name: "default-icr-io"},
+		{Name: IBMCloudSecretName},
 	}
 	if _, err := f.KubeClient.CoreV1().ServiceAccounts(namespace.Name).Update(sa); err != nil {
 		return nil, fmt.Errorf("error adding imagePullSecret to ServiceAccount: %v", err)

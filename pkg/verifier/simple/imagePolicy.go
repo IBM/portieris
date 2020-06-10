@@ -30,7 +30,7 @@ import (
 )
 
 // VerifyByPolicy verifies the image according to the supplied policy and returns the verified digest, verify error or processing error
-func VerifyByPolicy(imageToVerify string, credentials [][]string, simplePolicy *signature.Policy) (*bytes.Buffer, error, error) {
+func VerifyByPolicy(imageToVerify string, credentials [][]string, registriesConfigDir string, simplePolicy *signature.Policy) (*bytes.Buffer, error, error) {
 
 	policyContext, err := signature.NewPolicyContext(simplePolicy)
 	if err != nil {
@@ -44,6 +44,7 @@ func VerifyByPolicy(imageToVerify string, credentials [][]string, simplePolicy *
 	systemContext := &types.SystemContext{
 		RootForImplicitAbsolutePaths: "/nowhere",  // read nothing from files
 		DockerRegistryUserAgent:      "portieris", // add version?
+		RegistriesDirPath:            registriesConfigDir,
 	}
 
 	// support no-auth ?

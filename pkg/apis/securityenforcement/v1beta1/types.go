@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2020 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -91,9 +91,8 @@ type Repository struct {
 
 // Policy .
 type Policy struct {
-	Trust  Trust    `json:"trust,omitempty"`
-	Simple []Simple `json:"simple,omitempty"`
-	Va     VA       `json:"va,omitempty"`
+	Trust  Trust  `json:"trust,omitempty"`
+	Simple Simple `json:"simple,omitempty"`
 }
 
 // Trust .
@@ -110,6 +109,13 @@ type Signer struct {
 
 // Simple .
 type Simple struct {
+	Requirements []SimpleRequirement `json:"requirements"`
+	StoreURL     string              `json:"storeURL,omitEmpty"`
+	StoreSecret  string              `json:"storeSecret,omitEmpty"`
+}
+
+// SimpleRequirement .
+type SimpleRequirement struct {
 	Type           string              `json:"type"`
 	KeySecret      string              `json:"keySecret,omitEmpty"`
 	SignedIdentity IdentityRequirement `json:"signedIdentity,omitEmpty"`
@@ -120,11 +126,6 @@ type IdentityRequirement struct {
 	Type             string `json:"type"`
 	DockerReference  string `json:"dockerReference,omitEmpty"`
 	DockerRepository string `json:"dockerRepository,omitEmpty"`
-}
-
-// VA .
-type VA struct {
-	Enabled *bool `json:"enabled,omitempty"`
 }
 
 // FindImagePolicy - Given an ImagePolicyList, find the repository whose name

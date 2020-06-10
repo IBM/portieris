@@ -6,6 +6,10 @@ spec:
    repositories:
     - name: "icr.io/cise/*"
       policy:
+         simpleStore:
+            url: "https://foo.com/x"
+            auth: storesecret 
          simple:
-          - type: "signedBy"
-            keySecret: simple1pubkey
+           requirements:
+           - type: "signedBy"
+             keySecret: simple1pubkey
