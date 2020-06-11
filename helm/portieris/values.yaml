@@ -17,6 +17,9 @@ service:
   port: 443
   targetPort: 8000
 
+securityContext:
+  runAsUser: 1000060001
+
 # If not running on IBM Cloud Container Service set to false
 IBMContainerService: true
 
