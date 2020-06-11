@@ -26,23 +26,44 @@ IBMContainerService: true
 # If managing portieris-certs secret externally
 SkipSecretCreation: false
 
-resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #  cpu: 100m
-  #  memory: 128Mi
-  # requests:
-  #  cpu: 100m
-  #  memory: 128Mi
+# Resoures defined to assist scheduling
+# request is typical x10, limit is typical x100
+resources:
+  limits:
+    cpu: 400m
+    memory: 600Mi
+  requests:
+    cpu: 40m
+    memory: 60Mi
 
 nodeSelector: {}
 
 tolerations: []
 
-affinity: {}
+# Affinity settings
+# the `podAntiAffinity` defined here results in the distribution of pods over nodes where possible
+# intended to improve availability in the face of node and zone instability, reducing the potential of admission deadlock
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: app
+            operator: In
+            values:
+            - portieris
+        topologyKey: "kubernetes.io/hostname"
+      weight: 50
+    - podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: app
+            operator: In
+            values:
+            - portieris
+        topologyKey: "failure-domain.beta.kubernetes.io/zone"
+      weight: 50
 
 # Not recommended for user to configure this. Hyperkube image to use when creating custom resources
 hyperkube:
