@@ -8,6 +8,9 @@ metadata:
     chart: {{ template "portieris.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
+  annotations:
+    helm.sh/hook: pre-install
+    helm.sh/hook-weight: "-7"
 data:
   custom-resource-definitions.yaml: |-
     {{- include "crds.yaml.tpl" . | indent 4}}
