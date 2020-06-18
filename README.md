@@ -29,7 +29,7 @@ Portieris' Admission Webhook is configured to fail closed. Three instances of Po
 
 ## Installing Portieris
 
-Portieris is installed using a Helm chart. Before you begin, make sure that you have Kubernetes 1.9 or above, and Helm 2.8 or above (not Helm 3.x) installed in your cluster.
+Portieris is installed using a Helm chart. Before you begin, make sure that you have Kubernetes 1.16 or above and Helm 3.0 or above installed in your cluster.
 
 To install Portieris:
 

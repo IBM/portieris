@@ -63,7 +63,7 @@ spec:
 {{ toYaml . | indent 8 }}
     {{- end }}
       securityContext:
-        runAsUser: 1000060001
+        runAsUser: {{ .Values.securityContext.runAsUser }}
       volumes:
       - name: portieris-certs
         secret:
