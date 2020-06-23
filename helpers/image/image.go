@@ -153,7 +153,7 @@ func (r Reference) GetRepoWithoutTag() string {
 	return r.namespace + "/" + r.NameWithoutTag()
 }
 
-// GetRepoWithoutTag returns the image repository and the tag, without the server, in repo:tag format.
+// GetRepoWithTag returns the image repository and the tag, without the server, in repo:tag format.
 func (r Reference) GetRepoWithTag() string {
 	return r.namespace + "/" + r.NameWithTag()
 }
