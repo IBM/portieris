@@ -148,12 +148,12 @@ func (r Reference) GetNamespace() string {
 	return r.namespace
 }
 
-// GetNamespace returns the image namespace.
+// GetRepoWithoutTag returns the image repository, without the server, and without the tag on the end.
 func (r Reference) GetRepoWithoutTag() string {
 	return r.namespace + "/" + r.NameWithoutTag()
 }
 
-// GetNamespace returns the image namespace.
+// GetRepoWithoutTag returns the image repository and the tag, without the server, in repo:tag format.
 func (r Reference) GetRepoWithTag() string {
 	return r.namespace + "/" + r.NameWithTag()
 }
