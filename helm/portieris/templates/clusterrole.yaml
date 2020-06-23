@@ -9,7 +9,7 @@ metadata:
     heritage: {{ .Release.Service }}
   annotations:
     helm.sh/hook: pre-install
-    helm.sh/hook-weight: "1"
+    helm.sh/hook-weight: "-10"
 rules:
 - apiGroups: ["securityenforcement.admission.cloud.ibm.com"]
   resources: ["imagepolicies", "clusterimagepolicies"]
