@@ -7,7 +7,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## 2020-06-xx
 
 * Change the default namespace to portieris ([#117](https://github.com/IBM/portieris/issues/117))
-* Support Helm3 and Openshift 4 ([#130]([https://github.com/IBM/portieris/pull/130))
+* Support Helm3 and Openshift 4 ([#130](https://github.com/IBM/portieris/pull/130))
 * anti-affinity and liveness/readiness probes  ([#66](https://github.com/IBM/portieris/issues/66)) 
 
 # 0.7.0
