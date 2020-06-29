@@ -2,7 +2,7 @@
 apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
 kind: ImagePolicy
 metadata:
-  name: portieris-default-image-policy
+  name: portieris-default
   namespace: {{ .Values.namespace }}
   annotations:
     helm.sh/hook: post-install
@@ -10,7 +10,7 @@ metadata:
 spec:
    repositories:
     # This policy prevents Portieris from blocking itself. Do not remove this policy or portieris may not function correctly.
-    - name: "{{ .Values.image.host }}/{{ .Values.image.image }}:{{ .Values.image.tag }}"
+    - name: "{{ if .Values.image.host }}{{ .Values.image.host }}/{{ end }}{{ .Values.image.image }}:{{ .Values.image.tag }}"
       policy:
     # This policy allows Portieris to use Hyperkube to configure your cluster. This policy must exist if order to uninstall Portieris.
     - name: "{{ .Values.hyperkube.repository }}:{{ .Values.hyperkube.tag }}"
