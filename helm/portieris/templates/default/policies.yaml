@@ -2,7 +2,7 @@
 apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
 kind: ImagePolicy
 metadata:
-  name: portieris-default
+  name: default
   namespace: {{ .Values.namespace }}
   annotations:
     helm.sh/hook: post-install
@@ -10,16 +10,14 @@ metadata:
 spec:
    repositories:
     # This policy prevents Portieris from blocking itself. Do not remove this policy or portieris may not function correctly.
-    - name: "{{ if .Values.image.host }}{{ .Values.image.host }}/{{ end }}{{ .Values.image.image }}:{{ .Values.image.tag }}"
-      policy:
+    - name: "{{ .Values.image.host | default "docker.io/ibmcom"  }}/{{ .Values.image.image }}:{{ .Values.image.tag }}"
     # This policy allows Portieris to use Hyperkube to configure your cluster. This policy must exist if order to uninstall Portieris.
     - name: "{{ .Values.hyperkube.repository }}:{{ .Values.hyperkube.tag }}"
-      policy:
 ---
 apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
 kind: ImagePolicy
 metadata:
-  name: portieris-default-image-policy
+  name: default
   namespace: kube-system
   annotations:
     helm.sh/hook: post-install
@@ -34,30 +32,21 @@ spec:
     # These policies allow all IBM Cloud Container Service images to deploy in this namespace.
     # IMPORTANT: When you create your own policy in this namespace, be sure to retain these policies. If you do not, the cluster might not update or function properly.
     - name: "registry*.bluemix.net/armada/*"
-      policy:
     - name: "registry*.bluemix.net/armada-worker/*"
-      policy:
     - name: "registry*.bluemix.net/armada-master/*"
-      policy:
     - name: "*.icr.io/armada/*"
-      policy:
     - name: "*.icr.io/armada-worker/*"
-      policy:
     - name: "*.icr.io/armada-master/*"
-      policy:
     - name: "icr.io/armada/*"
-      policy:
     - name: "icr.io/armada-worker/*"
-      policy:
     - name: "icr.io/armada-master/*"
-      policy:
     {{ end }}
 ---
 {{ if .Values.IBMContainerService }}
 apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
 kind: ImagePolicy
 metadata:
-  name: portieris-default-image-policy
+  name: default
   namespace: ibm-system
   annotations:
     helm.sh/hook: post-install
@@ -67,29 +56,20 @@ spec:
     # These policies allow all IBM Cloud Container Service images to deploy in this namespace.
     # IMPORTANT: When you create your own policy in this namespace, make sure to retain these policies. If you do not, the cluster might not update or function properly.
     - name: "registry*.bluemix.net/armada/*"
-      policy:
     - name: "registry*.bluemix.net/armada-worker/*"
-      policy:
     - name: "registry*.bluemix.net/armada-master/*"
-      policy:
     - name: "*.icr.io/armada/*"
-      policy:
     - name: "*.icr.io/armada-worker/*"
-      policy:
     - name: "*.icr.io/armada-master/*"
-      policy:
     - name: "icr.io/armada/*"
-      policy:
     - name: "icr.io/armada-worker/*"
-      policy:
     - name: "icr.io/armada-master/*"
-      policy:
 ---
 {{ end}}
 apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
 kind: ClusterImagePolicy
 metadata:
-  name: portieris-default-cluster-image-policy
+  name: default
   annotations:
     helm.sh/hook: post-install
     helm.sh/hook-weight: "1"
@@ -98,5 +78,4 @@ spec:
     # This permissive policy allows all images in namespaces which do not have an ImagePolicy.
     # IMPORTANT: Review this policy and replace it with one that meets your requirements.
     - name: "*"
-      policy:
 {{ end }}
