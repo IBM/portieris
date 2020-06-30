@@ -20,8 +20,6 @@ This chart:
 ### !!! Regenerate Certs !!!
 The install will use the default certs if you do not run the gencerts script. **This means you will deploying with certs that are publically accessible on GitHub.**
 
-Note that this script requires https://github.com/mikefarah/yq to be installed. There are competing versions of yq with different syntax, so check that you have the right one. If `yq r` is a valid command, you have the right one. If `yq -r` is valid, you have a competing version that is incompatible with this script.
-
 ```
 ./gencerts
 ```
@@ -65,7 +63,7 @@ For information about configuring security policies, and an explanation of the s
     ```
     Alternatively, disable Portieris manually.
     ```
-    kubectl delete MutatingWebhookConfiguration image-admission-config 
+    kubectl delete MutatingWebhookConfiguration image-admission-config
     ```
 2. Remove the chart.
     ```

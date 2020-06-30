@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2020 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ type WrapperInterface interface {
 	GetPodSpec(*v1beta1.AdmissionRequest) (string, *corev1.PodSpec, error)
 	GetSecretToken(namespace, secretName, registry string) (string, string, error)
 	GetSecretKey(namespace, secretName string) ([]byte, error)
+	GetBasicCredentials(namespace, secretName string) (string, string, error)
 }
 
 // Wrapper is a wrapper around kubeclientset that includes some helper functions for applying behaviour to kube resources

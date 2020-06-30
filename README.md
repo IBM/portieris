@@ -29,18 +29,24 @@ Portieris' Admission Webhook is configured to fail closed. Three instances of Po
 
 ## Installing Portieris
 
-Portieris is installed using a Helm chart. Before you begin, make sure that you have Kubernetes 1.9 or above, and Helm 2.8 or above (not Helm 3.x) installed in your cluster.
+Portieris is installed using a Helm chart. Before you begin, make sure that you have Kubernetes 1.16 or above and Helm 3.0 or above installed on your workstation.
 
-To install Portieris:
+To install Portieris in the default namespace (portieris):
 
 * Clone the Portieris Git repository to your workstation.
 * Change directory into the Portieris Git repository.
-* Run `./helm/portieris/gencerts <namespace>`. The `gencerts` script generates new SSL certificates and keys for Portieris. Portieris presents this certificates to the Kubernetes API server when the API server makes admission requests. If you do not generate new certificates, it could be possible for an attacker to spoof Portieris in your cluster.
-* Run `helm upgrade --install portieris --set namespace=<namespace> helm/portieris`.
+* Run `./helm/portieris/gencerts`. The `gencerts` script generates new SSL certificates and keys for Portieris. Portieris presents this certificates to the Kubernetes API server when the API server makes admission requests. If you do not generate new certificates, it could be possible for an attacker to spoof Portieris in your cluster.
+* Run `kubectl create namespace portieris`
+* Run `helm install portieris helm/portieris`.
+
+To use an alternative namespace:
+* Run `./helm/portieris/gencerts <namespace>`.
+* Run `kubectl create namespace <namespace>`.
+* Run `helm install portieris --set namespace=<namespace> helm/portieris`.
 
 ## Uninstalling Portieris
 
-You can uninstall Portieris at any time by running `helm delete --purge portieris`. Note that all your image security policies are deleted when you uninstall Portieris.
+You can uninstall Portieris at any time by running `helm delete portieris`. Note that all your image security policies are deleted when you uninstall Portieris.
 
 ## Image security policies
 

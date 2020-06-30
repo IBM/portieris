@@ -17,7 +17,7 @@ spec:
   template:
     metadata:
       labels:
-        app: {{ template "portieris.name" . }}
+        app: portieris
         release: {{ .Release.Name }}
     spec:
       serviceAccountName: portieris
@@ -33,6 +33,20 @@ spec:
           - name: portieris-certs
             readOnly: true
             mountPath: "/etc/certs"
+          livenessProbe:
+            httpGet:
+              port: 8000
+              path: "/health/liveness"
+              scheme: HTTPS
+            initialDelaySeconds: 10
+            timeoutSeconds: 10
+          readinessProbe:
+            httpGet:
+              port: 8000
+              path: "/health/readiness"
+              scheme: HTTPS
+            initialDelaySeconds: 10
+            timeoutSeconds: 10
           env:
           resources:
 {{ toYaml .Values.resources | indent 12 }}
@@ -48,6 +62,8 @@ spec:
       tolerations:
 {{ toYaml . | indent 8 }}
     {{- end }}
+      securityContext:
+        runAsUser: {{ .Values.securityContext.runAsUser }}
       volumes:
       - name: portieris-certs
         secret:

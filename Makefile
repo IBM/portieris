@@ -1,7 +1,7 @@
 GOFILES=$(shell find . -type f -name '*.go' -not -path "./vendor/*")
 GOPACKAGES=$(shell go list ./... | grep -v test/ | grep -v pkg/apis/)
 
-VERSION=0.6.0
+VERSION=0.7.0
 TAG=$(VERSION)
 GOTAGS='containers_image_openpgp'
 

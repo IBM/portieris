@@ -1,4 +1,4 @@
-// Copyright 2018,2020 Portieris Authors.
+// Copyright 2018, 2020 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import (
 	"github.com/IBM/portieris/pkg/notary"
 	"github.com/IBM/portieris/pkg/policy"
 	registryclient "github.com/IBM/portieris/pkg/registry"
+	"github.com/IBM/portieris/pkg/verifier/simple"
 	simpleverifier "github.com/IBM/portieris/pkg/verifier/simple"
 	notaryverifier "github.com/IBM/portieris/pkg/verifier/trust"
 	"github.com/IBM/portieris/pkg/webhook"
@@ -132,11 +133,11 @@ func (c *Controller) mutatePodSpec(namespace, specPath string, pod corev1.PodSpe
 				glog.Infof("Mutation #: %s %d  Image name: %s", containerType, containerIndex, img.String())
 				if strings.Contains(container.Image, img.String()) {
 					// ISSUE: https://github.com/IBM/portieris/issues/90
-					glog.Infof("Mutated to: %s@sha256:%s", img.NameWithTag(), digest.String())
+					glog.Infof("Mutated to: %s@sha256:%s", img.NameWithoutTag(), digest.String())
 					patch := types.JSONPatch{
 						Op:    "replace",
 						Path:  fmt.Sprintf("%s/%s/%d/image", specPath, containerType, containerIndex),
-						Value: fmt.Sprintf("%s@sha256:%s", img.NameWithTag(), digest.String()),
+						Value: fmt.Sprintf("%s@sha256:%s", img.NameWithoutTag(), digest.String()),
 					}
 					glog.Infof("Patch: %v", patch)
 					patches = append(patches, patch)
@@ -188,22 +189,40 @@ func (c *Controller) verifiedDigestByPolicy(namespace string, img *image.Referen
 	var digest *bytes.Buffer
 	var deny, err error
 	glog.Infof("policy.Simple %v", policy.Simple)
-	if policy.Simple != nil {
-		simplePolicy, err := simpleverifier.TransformPolicies(c.kubeClientsetWrapper, namespace, policy.Simple)
+	if len(policy.Simple.Requirements) > 0 {
+		simplePolicy, err := simpleverifier.TransformPolicies(c.kubeClientsetWrapper, namespace, policy.Simple.Requirements)
 		if err != nil {
 			return nil, nil, err
 		}
-		digest, deny, err = simpleverifier.VerifyByPolicy(img.String(), credentials, simplePolicy)
-		if err != nil || deny != nil {
-			return nil, deny, err
+		storeUser, storePassword, err := c.kubeClientsetWrapper.GetBasicCredentials(namespace, policy.Simple.StoreSecret)
+		if err != nil {
+			return nil, nil, err
+		}
+		storeConfigDir, err := simple.CreateRegistryDir(policy.Simple.StoreURL, storeUser, storePassword)
+		if err != nil {
+			return nil, nil, err
+		}
+		digest, deny, err = simpleverifier.VerifyByPolicy(img.String(), credentials, storeConfigDir, simplePolicy)
+		if err != nil {
+			return nil, nil, fmt.Errorf("simple: %v", err)
+		}
+		err = simple.RemoveRegistryDir(storeConfigDir)
+		if err != nil {
+			glog.Warningf("failed to remove %s, %v", storeConfigDir, err)
+		}
+		if deny != nil {
+			return nil, fmt.Errorf("simple: policy denied the request: %v", deny), nil
 		}
 	}
 
-	if policy.Trust.Enabled != nil && *policy.Trust.Enabled == true {
+	if policy.Trust.Enabled != nil && *policy.Trust.Enabled {
 		var notaryDigest *bytes.Buffer
 		notaryDigest, deny, err = c.nv.VerifyByPolicy(namespace, img, credentials, policy)
-		if err != nil || deny != nil {
-			return nil, deny, err
+		if err != nil {
+			return nil, nil, fmt.Errorf("trust: %v", err)
+		}
+		if deny != nil {
+			return nil, fmt.Errorf("trust: policy denied the request: %v", deny), nil
 		}
 		glog.Infof("DCT digest: %v", notaryDigest)
 		if notaryDigest != nil {

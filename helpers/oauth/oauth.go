@@ -15,28 +15,57 @@
 package oauth
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net"
 	"net/http"
 	"net/url"
+	"os"
 	"time"
 
 	"github.com/golang/glog"
 )
 
-var client = &http.Client{
-	Timeout: 10 * time.Minute,
-	Transport: &http.Transport{
-		Dial: (&net.Dialer{
-			Timeout:   5 * time.Second,
-			KeepAlive: 30 * time.Second,
-		}).Dial,
-		DisableKeepAlives:   false,
-		MaxIdleConnsPerHost: 10,
-		TLSHandshakeTimeout: 5 * time.Second,
-	},
+// GetHTTPClient gets an http client to use for getting an oauth token
+// Takes the following as input:
+//   customFile - Path to custom ca certificate
+// Returns:
+//   *http.Client
+func GetHTTPClient(customFile string) *http.Client {
+	rootCA, err := x509.SystemCertPool()
+	customCA, err := ioutil.ReadFile(customFile)
+	if err != nil {
+		if os.IsNotExist(err) {
+			glog.Infof("CA not provided at %s, will use default system pool", customFile)
+		} else {
+			glog.Fatalf("Could not read %s: %s", customFile, err)
+		}
+	} else {
+		rootCA.AppendCertsFromPEM(customCA)
+	}
+
+	client := &http.Client{
+		Timeout: 10 * time.Minute,
+		Transport: &http.Transport{
+			Dial: (&net.Dialer{
+				Timeout:   5 * time.Second,
+				KeepAlive: 30 * time.Second,
+			}).Dial,
+			DisableKeepAlives:   false,
+			MaxIdleConnsPerHost: 10,
+			TLSHandshakeTimeout: 5 * time.Second,
+			TLSClientConfig: &tls.Config{
+				// Avoid fallback by default to SSL protocols < TLS1.2
+				MinVersion:               tls.VersionTLS12,
+				PreferServerCipherSuites: true,
+				RootCAs:                  rootCA,
+			},
+		},
+	}
+	return client
 }
 
 // Request is a helper for getting an OAuth token from the Registry OAuth Service.
@@ -72,6 +101,8 @@ func Request(token, repo, username string, challengeSlice []Challenge) (*TokenRe
 		return nil, fmt.Errorf(errMessage)
 	}
 
+  client := GetHTTPClient("/etc/certs/ca.pem")
+  
 	glog.Infof("Calling oauth endpoint: %s for registry service: %s and scope %s", oauthEndpoint, service, scope)
 	var resp *http.Response
 	var err error

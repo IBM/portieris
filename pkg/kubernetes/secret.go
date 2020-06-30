@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2020 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -91,4 +91,30 @@ func (w *Wrapper) GetSecretToken(namespace, secretName, registry string) (string
 	}
 	// glog.Infof("getSecretToken >> : token(%s)", token)
 	return username, password, err
+}
+
+// GetBasicCredentials retrieves username, password from a named secret
+func (w *Wrapper) GetBasicCredentials(namespace, name string) (string, string, error) {
+
+	if name == "" {
+		return "", "", nil
+	}
+
+	// Retrieve secret
+	secret, err := w.CoreV1().Secrets(namespace).Get(name, metav1.GetOptions{})
+	if err != nil {
+		return "", "", err
+	}
+
+	username, ok := secret.Data["username"]
+	if !ok {
+		return "", "", fmt.Errorf("secret: %s, does not contain username", name)
+	}
+
+	password, ok := secret.Data["password"]
+	if !ok {
+		return "", "", fmt.Errorf("secret: %s, does not contain password", name)
+	}
+
+	return string(username), string(password), nil
 }

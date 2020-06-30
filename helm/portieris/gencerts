@@ -2,8 +2,8 @@
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-SERVICE_NAME=$(yq r $SCRIPT_DIR/Chart.yaml name)
-NAMESPACE=${1:-ibm-system}
+SERVICE_NAME=portieris
+NAMESPACE=${1:-portieris}
 
 echo "Using $SERVICE_NAME as the service name"
 echo "Using $NAMESPACE as the namespace"

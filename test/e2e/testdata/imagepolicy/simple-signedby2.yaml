@@ -7,7 +7,8 @@ spec:
     - name: "icr.io/cise/*"
       policy:
          simple:
-          - type: "signedBy"
-            keySecret: simple1pubkey
-          - type: "signedBy"
-            keySecret: simple2pubkey
+           requirements:
+           - type: "signedBy"
+             keySecret: simple1pubkey
+           - type: "signedBy"
+             keySecret: simple2pubkey

@@ -169,3 +169,84 @@ func TestWrapper_GetSecretToken(t *testing.T) {
 		})
 	}
 }
+
+func createSecretBasic(name, namespace, data1 string, data2 string) *corev1.Secret {
+	return &corev1.Secret{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: "v1",
+			Kind:       "Secret",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      name,
+			Namespace: namespace,
+		},
+		Data: map[string][]byte{
+			data1: []byte(data1),
+			data2: []byte(data2),
+		},
+	}
+}
+
+func TestWrapper_GetBasicCredentials(t *testing.T) {
+	tests := []struct {
+		name       string
+		secret     *corev1.Secret
+		namespace  string
+		secretName string
+		wantUser   string
+		wantPass   string
+		wantErr    bool
+	}{
+		{
+			name:       "should return credentials",
+			secret:     createSecretBasic("name", "namespace", "username", "password"),
+			secretName: "name",
+			namespace:  "namespace",
+			wantUser:   "username",
+			wantPass:   "password",
+		},
+		{
+			name:       "should return empty no error if no name",
+			secret:     createSecretBasic("name", "namespace", "username", "password"),
+			secretName: "",
+			namespace:  "namespace",
+			wantUser:   "",
+			wantPass:   "",
+		},
+		{
+			name:       "error if secret not found",
+			wantErr:    true,
+			secret:     createSecretBasic("wrong-name", "namespace", "username", "password"),
+			secretName: "name",
+			namespace:  "namespace",
+		},
+		{
+			name:       "error if no username",
+			wantErr:    true,
+			secret:     createSecretBasic("name", "namespace", "userfoo", "password"),
+			secretName: "name",
+			namespace:  "namespace",
+		},
+		{
+			name:       "error if no password",
+			wantErr:    true,
+			secret:     createSecretBasic("name", "namespace", "username", "passwrong"),
+			secretName: "name",
+			namespace:  "namespace",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			kubeClientset := k8sfake.NewSimpleClientset(tt.secret)
+			w := NewKubeClientsetWrapper(kubeClientset)
+			username, password, err := w.GetBasicCredentials(tt.namespace, tt.secretName)
+			if tt.wantErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tt.wantUser, username)
+				assert.Equal(t, tt.wantPass, password)
+			}
+		})
+	}
+}
