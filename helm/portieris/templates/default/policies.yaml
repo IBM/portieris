@@ -27,7 +27,6 @@ spec:
     # This permissive policy allows all images to be deployed into this namespace. 
     # IMPORTANT: Review this policy and replace it with one that meets your requirements.
     - name: "*"
-      policy:
     {{ if .Values.IBMContainerService }}   
     # These policies allow all IBM Cloud Container Service images to deploy in this namespace.
     # IMPORTANT: When you create your own policy in this namespace, be sure to retain these policies. If you do not, the cluster might not update or function properly.
@@ -65,7 +64,7 @@ spec:
     - name: "icr.io/armada-worker/*"
     - name: "icr.io/armada-master/*"
 ---
-{{ end}}
+{{ end }}
 apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
 kind: ClusterImagePolicy
 metadata:
