@@ -9,7 +9,7 @@ metadata:
     helm.sh/hook-weight: "1"
 spec:
    repositories:
-    # This policy prevents Portieris from denying it own updates. Do not remove this policy or portieris may not function correctly.
+    # This policy prevents Portieris from denying its own updates. Do not remove this policy or portieris may not function correctly.
     - name: "{{ .Values.image.host | default "docker.io/ibmcom"  }}/{{ .Values.image.image }}:{{ .Values.image.tag }}"
     # This policy allows Portieris to use Hyperkube to configure your cluster. This policy must exist if order to uninstall Portieris.
     - name: "{{ .Values.hyperkube.repository }}:{{ .Values.hyperkube.tag }}"
