@@ -39,7 +39,8 @@ To install Portieris in the default namespace (portieris):
 * Run `./helm/portieris/gencerts`. The `gencerts` script generates new SSL certificates and keys for Portieris. Portieris presents this certificates to the Kubernetes API server when the API server makes admission requests. If you do not generate new certificates, it could be possible for an attacker to spoof Portieris in your cluster.
 * Run `helm install portieris --create-namespace --namespace portieris helm/portieris`. `portieris` is the default namespace defined in the charts' `values.yaml` file.
 
-To use an alternative namespace:
+You can also use a different namespace if you choose. The Portieris install creates the namespace automatically, and the namespace will be deleted if you uninstall the Portieris chart, so make sure that Portieris is the only thing running in that namespace! To use an alternative namespace:
+
 * Run `./helm/portieris/gencerts <namespace>`.
 * Run `helm install portieris --create <namespace> --namespace <namespace> --set namespace=<namespace> helm/portieris`.
 
@@ -59,6 +60,8 @@ Image security policies define Portieris' behavior in your cluster. You must con
 ## Configuring access controls for your security policies
 
 You can configure Kubernetes RBAC rules to define which users and applications have the ability to modify your security policies. For more information, see the [IBM Cloud docs](https://cloud.ibm.com/docs/services/Registry?topic=registry-security_enforce#assign_user_policy).
+
+You can prevent Portieris' admission webhook from being called in specific namespaces by labelling the namespace with `securityenforcement.admission.cloud.ibm.com/namespace: skip`. Doing so would allow pods in that namespace to recover when the admission webhook is down, but note that no policies are applied in that namespace. For example, the Portieris install namespace is configured with this label to allow Portieris itself to recover when it is down. Make sure to control who can add labels to namespaces and who can access namespaces with this label so that a malicious party cannot use this label to bypass Portieris.
 
 ## Reporting security issues
 
