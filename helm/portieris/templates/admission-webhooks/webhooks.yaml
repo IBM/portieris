@@ -23,4 +23,14 @@ webhooks:
         apiVersions: ["*"]
         resources: ["pods", "deployments", "replicationcontrollers", "replicasets", "daemonsets", "statefulsets", "jobs", "cronjobs"]
     failurePolicy: Fail
+    objectSelector:
+      matchExpressions:
+      - key: app
+        operator: NotIn
+        values:
+        - {{ template "portieris.name" . }}
+      - key: release
+        operator: NotIn
+        values:
+        - {{ .Release.Name }}
 {{ end }}
