@@ -16,7 +16,7 @@ webhooks:
         name: {{ template "portieris.name" . }}
         namespace: {{ .Values.namespace }}
         path: "/admit"
-      caBundle: {{ .Files.Get "certs/caCert.pem" | b64enc }}
+      caBundle: {{ .Files.Get "certs/ca.crt" | b64enc }}
     rules:
       - operations: [ "CREATE", "UPDATE" ]
         apiGroups: ["*"]
