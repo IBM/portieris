@@ -8,7 +8,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 * Change the default namespace to portieris ([#117](https://github.com/IBM/portieris/issues/117))
 * Support Helm3 and Openshift 4 ([#130](https://github.com/IBM/portieris/pull/130))
-* anti-affinity and liveness/readiness probes  ([#66](https://github.com/IBM/portieris/issues/66)) 
+* anti-affinity and liveness/readiness probes  ([#66](https://github.com/IBM/portieris/issues/66))
+* Support sourcing webhook certificates from cert-manager ([#59](https://github.com/IBM/portieris/issues/59))
 
 # 0.7.0
 ## 2020-06-09

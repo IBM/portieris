@@ -44,6 +44,9 @@ To use an alternative namespace:
 * Run `kubectl create namespace <namespace>`.
 * Run `helm install portieris --set namespace=<namespace> helm/portieris`.
 
+To manage certificates through installed cert-manager(https://cert-manager.io/):
+* Run `helm install portieris --set UseCertManager=true helm/portieris`.
+
 ## Uninstalling Portieris
 
 You can uninstall Portieris at any time by running `helm delete portieris`. Note that all your image security policies are deleted when you uninstall Portieris.
