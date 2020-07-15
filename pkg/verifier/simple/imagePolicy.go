@@ -47,34 +47,54 @@ func VerifyByPolicy(imageToVerify string, credentials [][]string, registriesConf
 		RegistriesDirPath:            registriesConfigDir,
 	}
 
-	// support no-auth ?
-	for _, cred := range credentials {
-		dockerAuthConfig := &types.DockerAuthConfig{
-			Username: cred[0],
-			Password: cred[1],
+	switch len(credentials) {
+	case 0:
+		return verifyAttempt(imageReference, systemContext, policyContext)
+
+	case 1:
+		systemContext.DockerAuthConfig = &types.DockerAuthConfig{
+			Username: credentials[0][0],
+			Password: credentials[0][1],
 		}
-		systemContext.DockerAuthConfig = dockerAuthConfig
-		imageSource, err := imageReference.NewImageSource(context.Background(), systemContext)
-		if err != nil {
-			return nil, nil, err
+		return verifyAttempt(imageReference, systemContext, policyContext)
+	}
+
+	for _, credential := range credentials {
+		systemContext.DockerAuthConfig = &types.DockerAuthConfig{
+			Username: credential[0],
+			Password: credential[1],
 		}
-		unparsedImage := image.UnparsedInstance(imageSource, nil)
-		_, deny := policyContext.IsRunningImageAllowed(context.Background(), unparsedImage)
+
+		digest, deny, err := verifyAttempt(imageReference, systemContext, policyContext)
 		if deny != nil {
 			switch deny.(type) {
 			case *docker.ErrUnauthorizedForCredentials:
 				continue
-			default:
-				return nil, deny, nil
 			}
 		}
-		// get the digest
-		m, _, err := unparsedImage.Manifest(context.Background())
-		digest, err := manifest.Digest(m)
-		if err != nil {
-			return nil, nil, err
-		}
-		return bytes.NewBufferString(strings.TrimPrefix(digest.String(), "sha256:")), nil, nil
+		return digest, deny, err
 	}
-	return nil, nil, fmt.Errorf("Deny %q, no valid ImagePullSecret defined for %s", imageToVerify, imageToVerify)
+
+	return nil, nil, fmt.Errorf("Deny %q, no valid ImagePullSecret, %d tried", imageToVerify, len(credentials))
+}
+
+func verifyAttempt(imageReference types.ImageReference, systemContext *types.SystemContext, policyContext *signature.PolicyContext) (*bytes.Buffer, error, error) {
+	imageSource, err := imageReference.NewImageSource(context.Background(), systemContext)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	unparsedImage := image.UnparsedInstance(imageSource, nil)
+	_, deny := policyContext.IsRunningImageAllowed(context.Background(), unparsedImage)
+	if deny != nil {
+		return nil, deny, nil
+	}
+
+	// get the digest
+	m, _, err := unparsedImage.Manifest(context.Background())
+	digest, err := manifest.Digest(m)
+	if err != nil {
+		return nil, nil, err
+	}
+	return bytes.NewBufferString(strings.TrimPrefix(digest.String(), "sha256:")), nil, nil
 }
