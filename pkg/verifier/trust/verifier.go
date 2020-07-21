@@ -78,7 +78,14 @@ func (v *Verifier) VerifyByPolicy(namespace string, img *image.Reference, creden
 
 	official := !strings.ContainsRune(img.RepoName(), '/')
 
-	resp, err := oauth.CheckAuthRequired(notaryURL, img.GetHostname(), img.RepoName(), official)
+	hostname := img.GetHostname()
+	port := img.GetPort()
+	if port != "" {
+		port = ":" + port
+	}
+	repo := hostname + port
+
+	resp, err := oauth.CheckAuthRequired(notaryURL, repo, img.RepoName(), official)
 	if err != nil {
 		glog.Error(err)
 		return nil, nil, fmt.Errorf("Some error occurred while checking if authentication is required to fetch target metadata")

@@ -276,6 +276,7 @@ var _ = Describe("Main", func() {
 							"policy": {
 								"trust": {
 									"enabled": true
+									"trustServer": "https://us.icr.io:4443"
 								},
 								"va": {
 									"enabled": false
@@ -290,7 +291,7 @@ var _ = Describe("Main", func() {
 					wh.HandleAdmissionRequest(w, req)
 					parseResponse()
 					Expect(resp.Response.Allowed).To(BeFalse())
-					Expect(resp.Response.Result.Message).To(ContainSubstring(`Deny "no-secret.icr.io/hello", no valid ImagePullSecret defined for no-secret.icr.io`))
+					Expect(resp.Response.Result.Message).To(ContainSubstring(`Deny "no-secret.icr.io/hello", no matching repositories in the ImagePolicies`))
 				})
 			})
 
@@ -343,7 +344,7 @@ var _ = Describe("Main", func() {
 					wh.HandleAdmissionRequest(w, req)
 					parseResponse()
 					Expect(resp.Response.Allowed).To(BeFalse())
-					Expect(resp.Response.Result.Message).To(ContainSubstring(`Deny "us.icr.io/hello", no valid ImagePullSecret defined for us.icr.io`))
+					Expect(resp.Response.Result.Message).To(ContainSubstring(`Some error occurred while trying to fetch token for unauthenticated pubilc pull FAKE_INVALID_TOKEN_ERROR`))
 				})
 			})
 
@@ -620,7 +621,7 @@ var _ = Describe("Main", func() {
 					Expect(len(trust.GetNotaryRepoArgsForCall)).To(Equal(1))
 					Expect(trust.GetNotaryRepoArgsForCall[0].Server).To(Equal("https://some-trust-server.com:4443"))
 					Expect(resp.Response.Allowed).To(BeFalse())
-					Expect(resp.Response.Result.Message).To(ContainSubstring(`Deny "us.icr.io/hello", failed to get content trust information: unable to reach trust server at this time: 0.`))
+					Expect(resp.Response.Result.Message).To(ContainSubstring(`Some error occurred while checking if authentication is required to fetch target metadata`))
 				})
 			})
 
@@ -665,7 +666,7 @@ var _ = Describe("Main", func() {
 								"policy": {
 									"trust": {
 										"enabled": true,
-										"trustServer": "https://some-trust-server.com:4443"
+										"trustServer": "https://notary.docker.io""
 									},
 									"va": {
 										"enabled": false
@@ -683,8 +684,8 @@ var _ = Describe("Main", func() {
 					wh.HandleAdmissionRequest(w, req)
 					parseResponse()
 					Expect(len(trust.GetNotaryRepoArgsForCall)).To(Equal(2))
-					Expect(trust.GetNotaryRepoArgsForCall[0].Server).To(Equal("https://some-trust-server.com:4443"))
-					Expect(trust.GetNotaryRepoArgsForCall[1].Server).To(Equal("https://some-trust-server.com:4443"))
+					Expect(trust.GetNotaryRepoArgsForCall[0].Server).To(Equal("https://notary.docker.io""))
+					Expect(trust.GetNotaryRepoArgsForCall[1].Server).To(Equal("https://notary.docker.io""))
 					Expect(resp.Response.Allowed).To(BeFalse())
 					Expect(resp.Response.Result.Message).To(ContainSubstring(`Deny "us.icr.io/hello", failed to get content trust information: FAKE_NO_SIGNED_IMAGE_ERROR`))
 					Expect(resp.Response.Result.Message).To(ContainSubstring(`Deny "us.icr.io/goodbye", failed to get content trust information: FAKE_NO_SIGNED_IMAGE_ERROR`))
@@ -739,6 +740,7 @@ var _ = Describe("Main", func() {
 							"policy": {
 								"trust": {
 									"enabled": true
+									"trustServer": "https://notary.docker.io"
 								},
 								"va": {
 									"enabled": false
@@ -770,7 +772,7 @@ var _ = Describe("Main", func() {
 					Expect(len(trust.GetNotaryRepoArgsForCall)).To(Equal(2))
 					Expect(trust.GetNotaryRepoArgsForCall[0].Server).To(Equal("https://us.icr.io:4443"))
 					Expect(trust.GetNotaryRepoArgsForCall[0].Image).To(Equal("us.icr.io/hello"))
-					Expect(trust.GetNotaryRepoArgsForCall[1].Server).To(Equal("https://some-trust-server.com:4443"))
+					Expect(trust.GetNotaryRepoArgsForCall[1].Server).To(Equal("https://notary.docker.io"))
 					Expect(trust.GetNotaryRepoArgsForCall[1].Image).To(Equal("icr.io/goodbye"))
 					Expect(resp.Response.Allowed).To(BeFalse())
 				})

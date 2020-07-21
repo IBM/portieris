@@ -101,8 +101,8 @@ func Request(token, repo, username string, challengeSlice []Challenge) (*TokenRe
 		return nil, fmt.Errorf(errMessage)
 	}
 
-  client := GetHTTPClient("/etc/certs/ca.pem")
-  
+	client := GetHTTPClient("/etc/certs/ca.pem")
+
 	glog.Infof("Calling oauth endpoint: %s for registry service: %s and scope %s", oauthEndpoint, service, scope)
 	var resp *http.Response
 	var err error
@@ -164,6 +164,7 @@ func CheckAuthRequired(notaryURL, hostName, repoName string, official bool) (*ht
 	// Github issue 51 Fix
 	var req *http.Request
 	var err error
+	client := GetHTTPClient("/etc/certs/ca.pem")
 	if hostName == "docker.io" && official {
 		req, err = http.NewRequest("GET", notaryURL+"/v2/"+hostName+"/library/"+repoName+"/_trust/tuf/root.json", nil)
 	} else {
