@@ -66,9 +66,13 @@ spec:
 For more information, see the [IBM Cloud docs](https://cloud.ibm.com/docs/services/Registry?topic=registry-security_enforce#customize_policies).
 
 ### simple (RedHat simple signing)
-The policy requirements are similar to those defined for configuration files consulted when using the RedHat tools [policy requirements](https://github.com/containers/image/blob/master/docs/containers-policy.json.5.md#policy-requirements). However there are some differences, the main difference is that the public key in a "signedBy" requirement is defined in a "KeySecret:" attribute, the value is the name of an in-scope Kubernetes secret containing the public key data. The value of "KeyType" is implied and cannot be provided.
+The policy requirements are similar to those defined for configuration files consulted when using the RedHat tools [policy requirements](https://github.com/containers/image/blob/master/docs/containers-policy.json.5.md#policy-requirements). However there are some differences, the main difference is that the public key in a "signedBy" requirement is defined in a `keySecret:` attribute, the value is the name of an in-scope Kubernetes secret containing the public key data. 
 
-this example requires that images from `icr.io` are signed by the identity with public key in `my-pubkey`:
+In creating the secret, ensure you are creating the key with a value of `key`, as shown below:
+
+`kubectl create secret generic my-pubkey --from-file=key=<your_pub_key>`
+
+This example requires that images from `icr.io` are signed by the identity with public key in `my-pubkey`:
 ```yaml
 apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
 kind: ImagePolicy
