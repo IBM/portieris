@@ -1,5 +1,4 @@
 Portieris is installed in your cluster.
 
-Default security policies are installed in your cluster. You can modify the default policies or replace them with your own. For more information, see http://ibm.biz/cise_default.
+You should update the policies acording your your local requirements, for more information see https://github.com/IBM/portieris/blob/master/POLICIES.md
 
-You can apply access control policies to limit who can modify Image Security Enforcement policies in your cluster. See http://ibm.biz/cise_assign.
