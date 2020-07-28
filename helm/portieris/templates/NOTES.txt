@@ -1,4 +1,4 @@
 Portieris is installed in your cluster.
 
-You should update the policies acording your your local requirements, for more information see https://github.com/IBM/portieris/blob/master/POLICIES.md
+You should update the policies according your your local requirements, for more information see https://github.com/IBM/portieris/blob/master/POLICIES.md
 
