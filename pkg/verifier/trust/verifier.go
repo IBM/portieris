@@ -74,6 +74,7 @@ func (v *Verifier) VerifyByPolicy(namespace string, img *image.Reference, creden
 		}
 	}
 
+	credentials = append(credentials, []string{"", ""})
 	for _, cred := range credentials {
 		notaryToken, err := v.cr.GetContentTrustToken(cred[0], cred[1], img.NameWithoutTag(), img.GetRegistryURL())
 		if err != nil {
