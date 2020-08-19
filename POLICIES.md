@@ -66,7 +66,13 @@ spec:
 For more information, see the [IBM Cloud docs](https://cloud.ibm.com/docs/services/Registry?topic=registry-security_enforce#customize_policies).
 
 ### simple (RedHat simple signing)
-The policy requirements are similar to those defined for configuration files consulted when using the RedHat tools [policy requirements](https://github.com/containers/image/blob/master/docs/containers-policy.json.5.md#policy-requirements). However there are some differences, the main difference is that the public key in a "signedBy" requirement is defined in a `keySecret:` attribute, the value is the name of an in-scope Kubernetes secret containing the public key data. 
+The policy requirements are similar to those defined for configuration files consulted when using the RedHat tools [policy requirements](https://github.com/containers/image/blob/master/docs/containers-policy.json.5.md#policy-requirements). However there are some differences, the main difference is that the public key in a`signedBy` requirement is defined in a `keySecret` attribute, the value is the name of an in-scope Kubernetes secret containing a public key block. The value of `keyType` is implied and cannot be provided. If multiple keys are present in the block then the requirement is satisfied if the signature is signed by any of them.
+
+To export a single public key identified by `<finger-print>` from gpg and create a KeySecret from it you could use: 
+```bash
+gpg --export --armour <finger-print> > my.pubkey
+kubectl create secret generic my-pubkey --from-file=key=my.pubkey
+```
 
 In creating the secret, ensure you are creating the key with a value of `key`, as shown below:
 
