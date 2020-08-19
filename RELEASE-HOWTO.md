@@ -14,4 +14,4 @@ Each release will see an increment in the version number acording to [SEMVER](ht
 1. Create a release with the chart as a release artifact. 
 
 ## Post Release 
-1. As the first commit after release update VERSION in Makefile, Chart.yaml and values.yaml with the suffix '+' such that so that further commits are clearly contributions to the next release.  
+1. As the first commit after release update VERSION in Makefile, version in Chart.yaml and tag in values.yaml with the suffix 'next' such that so that further commits are clearly contributions to the next release. Consequently installers from source helm should check out the release tag commit to find the appropriate image by default.

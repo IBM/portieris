@@ -35,6 +35,7 @@ To install Portieris in the default namespace (portieris):
 
 * Clone the Portieris Git repository to your workstation.
 * Change directory into the Portieris Git repository.
+* Checkout the tag commit that you want to install `git checkout 0.7.0`
 * Run `./helm/portieris/gencerts`. The `gencerts` script generates new SSL certificates and keys for Portieris. Portieris presents this certificates to the Kubernetes API server when the API server makes admission requests. If you do not generate new certificates, it could be possible for an attacker to spoof Portieris in your cluster.
 * Run `helm install portieris --create-namespace --namespace portieris helm/portieris`. `portieris` is the default namespace defined in the charts' `values.yaml` file.
 
