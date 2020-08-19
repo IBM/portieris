@@ -55,6 +55,14 @@ func (fake *FakeRegistry) GetContentTrustToken(username, password, imageRepo, ho
 	return fake.getContentTrustTokenReturns.token, fake.getContentTrustTokenReturns.err
 }
 
+// NoAnonymousContentTrustTokenStub ...
+func (fake *FakeRegistry) NoAnonymousContentTrustTokenStub(username, password, imageRepo, hostname string) (string, error) {
+	if username == "" {
+		return "", fmt.Errorf("not allowed")
+	}
+	return fake.getContentTrustTokenReturns.token, fake.getContentTrustTokenReturns.err
+}
+
 // GetContentTrustTokenReturns ...
 func (fake *FakeRegistry) GetContentTrustTokenReturns(token string, err error) {
 	fake.getContentTrustTokenMutex.Lock()
