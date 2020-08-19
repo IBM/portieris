@@ -16,7 +16,7 @@ function fail()
 
 
 # Enforce check for copyright statements in Go code
-GOSRCFILES=($(find . -name "*.go"))
+GOSRCFILES=($(find . -name "*.go" | grep -v code-generator))
 THISYEAR=$(date +"%Y")
 for GOFILE in "${GOSRCFILES[@]}"; do
   if ! grep -q "Licensed under the Apache License, Version 2.0" $GOFILE; then
