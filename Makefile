@@ -1,7 +1,7 @@
 GOFILES=$(shell find . -type f -name '*.go' -not -path "./vendor/*")
 GOPACKAGES=$(shell go list ./... | grep -v test/ | grep -v pkg/apis/)
 
-VERSION=0.7.0
+VERSION=0.7.0next
 TAG=$(VERSION)
 GOTAGS='containers_image_openpgp'
 
@@ -44,10 +44,12 @@ helm.package:
 	helm package helm/portieris
 
 helm.install.local: helm.package
-	helm install -n portieris $$(pwd)/portieris-$(VERSION).tgz --set image.host=$(HUB) --set image.tag=$(TAG) --set image.pullSecret=$(PULLSECRET) 
+	-kubectl create ns portieris
+	-kubectl get secret $(PULLSECRET) -o yaml | sed 's/namespace: default/namespace: portieris/' | kubectl create -f - 
+	helm install portieris $$(pwd)/portieris-$(VERSION).tgz --set image.host=$(HUB) --set image.tag=$(TAG) --set image.pullSecret=$(PULLSECRET) 
 
 helm.install: helm.package
-	helm install -n portieris $$(pwd)/portieris-$(VERSION).tgz
+	helm install portieris $$(pwd)/portieris-$(VERSION).tgz
 
 helm.clean:
 	-helm/cleanup.sh portieris
@@ -61,38 +63,34 @@ e2e.local: helm.install.local e2e.quick
 e2e.local.ics: helm.install.local e2e.quick.ics
 
 e2e.quick: e2e.quick.trust.imagepolicy e2e.quick.trust.clusterimagepolicy e2e.quick.wildcards e2e.quick.generic e2e.quick.simple.imagepolicy
-	- kubectl delete namespace $$(kubectl get namespaces | grep -v ibm | grep -v kube | grep -v default | awk '{ print $$1 }' | grep -v NAME)
+	-kubectl delete namespace $$(kubectl get namespaces | grep -v ibm | grep -v kube | grep -v default | grep -v portieris | awk '{ print $$1 }' | grep -v NAME)
 
 e2e.quick.ics: e2e.quick.trust.imagepolicy e2e.quick.trust.clusterimagepolicy e2e.quick.armada e2e.quick.wildcards e2e.quick.generic e2e.quick.simple.imagepolicy
-	- kubectl delete namespace $$(kubectl get namespaces | grep -v ibm | grep -v kube | grep -v default | awk '{ print $$1 }' | grep -v NAME)
+	-kubectl delete namespace $$(kubectl get namespaces | grep -v ibm | grep -v kube | grep -v default | grep -v portieris | awk '{ print $$1 }' | grep -v NAME)
 
 e2e.quick.trust.imagepolicy:
 	@go test -v ./test/e2e --no-install --trust-image-policy --helmChart $$(pwd)/portieris-$(VERSION).tgz
-	-kubectl delete namespace $$(kubectl get namespaces | grep -v ibm | grep -v kube | grep -v default | awk '{ print $$1 }' | grep -v NAME)
+	-kubectl delete namespace $$(kubectl get namespaces | grep -v ibm | grep -v kube | grep -v default | grep -v portieris | awk '{ print $$1 }' | grep -v NAME)
 
 e2e.quick.trust.clusterimagepolicy:
 	@go test -v ./test/e2e --no-install --trust-cluster-image-policy --helmChart $$(pwd)/portieris-$(VERSION).tgz
-	-kubectl delete namespace $$(kubectl get namespaces | grep -v ibm | grep -v kube | grep -v default | awk '{ print $$1 }' | grep -v NAME)
+	-kubectl delete namespace $$(kubectl get namespaces | grep -v ibm | grep -v kube | grep -v default | grep -v portieris | awk '{ print $$1 }' | grep -v NAME)
 
 e2e.quick.wildcards:
 	@go test -v ./test/e2e --no-install --wildcards-image-policy --helmChart $$(pwd)/portieris-$(VERSION).tgz
-	-kubectl delete namespace $$(kubectl get namespaces | grep -v ibm | grep -v kube | grep -v default | awk '{ print $$1 }' | grep -v NAME)
+	-kubectl delete namespace $$(kubectl get namespaces | grep -v ibm | grep -v kube | grep -v default | grep -v portieris | awk '{ print $$1 }' | grep -v NAME)
 
 e2e.quick.armada:
 	@go test -v ./test/e2e --no-install --armada --helmChart $$(pwd)/portieris-$(VERSION).tgz
-	-kubectl delete namespace $$(kubectl get namespaces | grep -v ibm | grep -v kube | grep -v default | awk '{ print $$1 }' | grep -v NAME)
+	-kubectl delete namespace $$(kubectl get namespaces | grep -v ibm | grep -v kube | grep -v default | grep -v portieris | awk '{ print $$1 }' | grep -v NAME)
 
 e2e.quick.generic:
 	go test -v ./test/e2e --no-install --generic --helmChart $$(pwd)/portieris-$(VERSION).tgz
-	-kubectl delete namespace $$(kubectl get namespaces | grep -v ibm | grep -v kube | grep -v default | awk '{ print $$1 }' | grep -v NAME)
+	-kubectl delete namespace $$(kubectl get namespaces | grep -v ibm | grep -v kube | grep -v default | grep -v portieris | awk '{ print $$1 }' | grep -v NAME)
 
 e2e.quick.simple.imagepolicy:
 	@go test -v ./test/e2e --no-install --simple-image-policy --helmChart $$(pwd)/portieris-$(VERSION).tgz
-	-kubectl delete namespace $$(kubectl get namespaces | grep -v ibm | grep -v kube | grep -v default | awk '{ print $$1 }' | grep -v NAME)
-
-e2e.helm:
-	kubectl apply -f test/helm/tiller-rbac.yaml
-	helm init --service-account tiller
+	-kubectl delete namespace $$(kubectl get namespaces | grep -v ibm | grep -v kube | grep -v default | grep -v portieris | awk '{ print $$1 }' | grep -v NAME)
 
 e2e.clean: helm.clean
 
