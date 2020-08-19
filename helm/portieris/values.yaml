@@ -26,6 +26,9 @@ IBMContainerService: true
 # If managing portieris-certs secret externally
 SkipSecretCreation: false
 
+# If using cert-manager to handle secrets
+UseCertManager: false
+
 # Resoures defined to assist scheduling
 # request is typical x10, limit is typical x100
 resources:
