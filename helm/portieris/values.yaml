@@ -68,3 +68,10 @@ affinity:
         topologyKey: "failure-domain.beta.kubernetes.io/zone"
       weight: 50
 
+# Allow an annotation to be used to skip the webhook. This is required for Portieris to be able to
+# self heal when it has no running pods, which could otherwise deadlock your cluster after an
+# outage.
+# However, if this is enabled, anyone with access to annotate namespaces could bypass Portieris by
+# setting the annotation on their namespaces. Therefore, be careful with your RBAC policies if you
+# enable this option!
+AllowAdmissionSkip: true

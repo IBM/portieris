@@ -12,12 +12,9 @@ If your cloud provider provides a [Notary](https://github.com/theupdateframework
 
 When you create or edit a workload, the Kubernetes API server sends a request to Portieris. The AdmissionRequest contains the content of your workload. For each image in your workload, Portieris finds a matching security policy.
 
-
 If trust enforcement is enabled in the policy, Portieris pulls signature information for your image from the corresponding Notary server and, if a signed version of the image exists, creates a JSON patch to edit the image name in the workload to the signed image by digest. If a signer is defined in the policy, Portieris additionally checks that the image is signed by the specified role, and verifies that the specified key was used to sign the image.
 
-
 If simple signing is specified by the policy, Portieris will verify the signature using using the public key and identity rules supplied in the policy and if verified similarly mutates the image name to a digest reference to ensure that concurrent tag changes cannot influence the image being pulled.
-
 
 While it is possible to require both Notary trust and simple signing, the two methods must agree on the signed digest for the image. If the two methods return different signed digests, the image is denied. It is not possible to allow alternative signing methods.
 
@@ -44,8 +41,11 @@ You can also use a different namespace if you choose. The Portieris install crea
 * Run `./helm/portieris/gencerts <namespace>`.
 * Run `helm install portieris --create <namespace> --namespace <namespace> --set namespace=<namespace> helm/portieris`.
 
-To manage certificates through installed cert-manager(https://cert-manager.io/):
+To manage certificates through installed [cert-manager](https://cert-manager.io/):
+
 * Run `helm install portieris --set UseCertManager=true helm/portieris`.
+
+By default, Portieris' admission webhook does not run in namespaces with a skip annotation set, which includes its own install namespace, so that Portieris is able to self heal in the event where all its pods go down. You can disable this by adding `--set AllowAdmissionSkip=false` to your install command, however if all Portieris pods are down you'll have to disable the webhook to recover it manually.
 
 ## Uninstalling Portieris
 
