@@ -22,7 +22,7 @@ alltests: test-deps fmt lint vet copyright-check test
 test: 
 	echo 'mode: atomic' > cover.out
 	for LINE in ${GOPACKAGES}; do sh -c "go test --tags $(GOTAGS)  -covermode=atomic -coverprofile=cover.tmp $${LINE} && tail -n +2 cover.tmp >> cover.out"; done
-	rm cover.tmp
+	-rm cover.tmp
 
 copyright:
 	@${GOPATH}/src/github.com/IBM/portieris/scripts/copyright.sh
