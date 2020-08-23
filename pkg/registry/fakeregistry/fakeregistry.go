@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2020 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -51,6 +51,14 @@ func (fake *FakeRegistry) GetContentTrustToken(username, password, imageRepo, ho
 	fake.getContentTrustTokenMutex.Unlock()
 	if fake.GetContentTrustTokenStub != nil {
 		return fake.GetContentTrustTokenStub(username, password, imageRepo, hostname)
+	}
+	return fake.getContentTrustTokenReturns.token, fake.getContentTrustTokenReturns.err
+}
+
+// NoAnonymousContentTrustTokenStub ...
+func (fake *FakeRegistry) NoAnonymousContentTrustTokenStub(username, password, imageRepo, hostname string) (string, error) {
+	if username == "" {
+		return "", fmt.Errorf("not allowed")
 	}
 	return fake.getContentTrustTokenReturns.token, fake.getContentTrustTokenReturns.err
 }

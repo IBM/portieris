@@ -11,6 +11,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Support Helm3 and Openshift 4 ([#130](https://github.com/IBM/portieris/pull/130))
 * anti-affinity and liveness/readiness probes  ([#66](https://github.com/IBM/portieris/issues/66))
 * Support sourcing webhook certificates from cert-manager ([#59](https://github.com/IBM/portieris/issues/59))
+* anti-affinity and liveness/readiness probes  ([#66](https://github.com/IBM/portieris/issues/66)) 
+* always attempt anonymous notary access 
 
 # 0.7.0
 ## 2020-06-09
