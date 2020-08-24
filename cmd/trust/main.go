@@ -77,13 +77,13 @@ func main() {
 		glog.Fatal("Could not get trust client", err)
 	}
 
-	serverCert, err := ioutil.ReadFile("/etc/certs/serverCert.pem")
+	serverCert, err := ioutil.ReadFile("/etc/certs/tls.crt")
 	if err != nil {
-		glog.Fatal("Could not read /etc/certs/serverCert.pem", err)
+		glog.Fatal("Could not read /etc/certs/tls.crt", err)
 	}
-	serverKey, err := ioutil.ReadFile("/etc/certs/serverKey.pem")
+	serverKey, err := ioutil.ReadFile("/etc/certs/tls.key")
 	if err != nil {
-		glog.Fatal("Could not read /etc/certs/serverKey.pem", err)
+		glog.Fatal("Could not read /etc/certs/tls.key", err)
 	}
 
 	cr := registryclient.NewClient()

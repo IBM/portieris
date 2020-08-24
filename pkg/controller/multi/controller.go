@@ -175,6 +175,7 @@ func (c *Controller) getPodCredentials(namespace string, img *image.Reference, p
 			continue
 		}
 		creds = append(creds, []string{username, password})
+		glog.Infof("ImagePullSecret %s/%s found", namespace, secret.Name)
 	}
 	return creds
 }
@@ -188,8 +189,8 @@ func (c *Controller) verifiedDigestByPolicy(namespace string, img *image.Referen
 
 	var digest *bytes.Buffer
 	var deny, err error
-	glog.Infof("policy.Simple %v", policy.Simple)
 	if len(policy.Simple.Requirements) > 0 {
+		glog.Infof("policy.Simple %v", policy.Simple)
 		simplePolicy, err := simpleverifier.TransformPolicies(c.kubeClientsetWrapper, namespace, policy.Simple.Requirements)
 		if err != nil {
 			return nil, nil, err
@@ -216,6 +217,7 @@ func (c *Controller) verifiedDigestByPolicy(namespace string, img *image.Referen
 	}
 
 	if policy.Trust.Enabled != nil && *policy.Trust.Enabled {
+		glog.Infof("policy.Trust %v", policy.Trust)
 		var notaryDigest *bytes.Buffer
 		notaryDigest, deny, err = c.nv.VerifyByPolicy(namespace, img, credentials, policy)
 		if err != nil {
