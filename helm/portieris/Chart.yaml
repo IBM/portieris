@@ -4,5 +4,5 @@ version: 0.8.0
 description: Admission Controller webhook for enforcing image trust in your cluster
 maintainer:
   - stuart.hayton@uk.ibm.com
-  - jhart@uk.ibm.com
+  - jack.baines@uk.ibm.com
   - michaelh@uk.ibm.com
