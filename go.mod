@@ -22,6 +22,7 @@ require (
 	github.com/golang/protobuf v1.3.3 // indirect
 	github.com/googleapis/gnostic v0.4.0 // indirect
 	github.com/hailocab/go-hostpool v0.0.0-20160125115350-e80d13ce29ed // indirect
+	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/jinzhu/gorm v1.9.12 // indirect
 	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0 // indirect
 	github.com/kr/pretty v0.2.0 // indirect
@@ -30,15 +31,18 @@ require (
 	github.com/onsi/ginkgo v1.10.1
 	github.com/onsi/gomega v1.7.0
 	github.com/satori/go.uuid v1.2.0
+	github.com/sirupsen/logrus v1.6.0 // indirect
 	github.com/spf13/viper v1.6.2 // indirect
 	github.com/stretchr/testify v1.4.0
 	github.com/theupdateframework/notary v0.6.1
 	golang.org/x/crypto v0.0.0-20200128174031-69ecbb4d6d5d
-	golang.org/x/sys v0.0.0-20200202164722-d101bd2416d5 // indirect
+	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
+	golang.org/x/sys v0.0.0-20200831180312-196b9ba8737a // indirect
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0 // indirect
 	gopkg.in/dancannon/gorethink.v3 v3.0.5 // indirect
 	gopkg.in/fatih/pool.v2 v2.0.0 // indirect
 	gopkg.in/gorethink/gorethink.v3 v3.0.5 // indirect
+	gopkg.in/yaml.v2 v2.3.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20200506231410-2ff61e1afc86
 	k8s.io/api v0.17.3
 	k8s.io/apiextensions-apiserver v0.17.2

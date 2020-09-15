@@ -6,6 +6,10 @@ apiVersion: admissionregistration.k8s.io/v1beta1
 kind: MutatingWebhookConfiguration
 metadata:
   name: image-admission-config
+  {{ if .Values.UseCertManager }}
+  annotations:
+    cert-manager.io/inject-ca-from: {{ .Values.namespace }}/portieris-certs
+  {{ end }}
   namespace: {{ .Values.namespace }}
   labels:
     app: {{ template "portieris.name" . }}
@@ -19,7 +23,9 @@ webhooks:
         name: {{ template "portieris.name" . }}
         namespace: {{ .Values.namespace }}
         path: "/admit"
-      caBundle: {{ .Files.Get "certs/caCert.pem" | b64enc }}
+      {{ if not .Values.UseCertManager }}
+      caBundle: {{ .Files.Get "certs/ca.crt" | b64enc }}
+      {{ end }}
     rules:
       - operations: [ "CREATE", "UPDATE" ]
         apiGroups: ["*"]

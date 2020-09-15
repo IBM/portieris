@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2020 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -108,9 +108,59 @@ func TestWrapper_GetSecretToken(t *testing.T) {
 			wantPass:   "registry-token",
 		},
 		{
+			name: "should return token, does not complain about missing auth field",
+			secret: createSecret("name", "namespace", ".dockerconfigjson",
+				[]byte(`{ "auths": { "us.icr.io": { "username": "token", "password": "registry-token", "email": "email@email.com" } } }`)),
+			secretName: "name",
+			namespace:  "namespace",
+			registry:   "us.icr.io",
+			wantUser:   "token",
+			wantPass:   "registry-token",
+		},
+		{
 			name: "should return token for old imagePullSecret format",
 			secret: createSecret("name", "namespace", ".dockercfg",
 				[]byte(`{ "us.icr.io": { "username": "token", "password": "registry-token", "email": "email@email.com", "auth": "auth-token" } }`)),
+			secretName: "name",
+			namespace:  "namespace",
+			registry:   "us.icr.io",
+			wantUser:   "token",
+			wantPass:   "registry-token",
+		},
+		{
+			name: "should override username and password with values from auth field if set",
+			secret: createSecret("name", "namespace", ".dockercfg",
+				[]byte(`{ "us.icr.io": { "username": "token", "password": "registry-token", "email": "email@email.com", "auth": "cGluZzpwb25n" } }`)),
+			secretName: "name",
+			namespace:  "namespace",
+			registry:   "us.icr.io",
+			wantUser:   "ping",
+			wantPass:   "pong",
+		},
+		{
+			name: "should override username and password with values from auth field if set and padded",
+			secret: createSecret("name", "namespace", ".dockercfg",
+				[]byte(`{ "us.icr.io": { "username": "token", "password": "registry-token", "email": "email@email.com", "auth": "d2liYmxlOndvYmJsZQ==" } }`)),
+			secretName: "name",
+			namespace:  "namespace",
+			registry:   "us.icr.io",
+			wantUser:   "wibble",
+			wantPass:   "wobble",
+		},
+		{
+			name: "should override username and password with values from auth field and accept colon in the password",
+			secret: createSecret("name", "namespace", ".dockerconfigjson",
+				[]byte(`{ "auths": { "us.icr.io": { "username": "token", "password": "registry-token", "email": "email@email.com", "auth": "d2liYmxlOndvYmJsZTp3aXRoY29sb24=" } } }`)),
+			secretName: "name",
+			namespace:  "namespace",
+			registry:   "us.icr.io",
+			wantUser:   "wibble",
+			wantPass:   "wobble:withcolon",
+		},
+		{
+			name: "should revert to username/password fields if auth field is set but badly formed",
+			secret: createSecret("name", "namespace", ".dockerconfigjson",
+				[]byte(`{ "auths": { "us.icr.io": { "username": "token", "password": "registry-token", "email": "email@email.com", "auth": "d2liYmxl" } } }`)),
 			secretName: "name",
 			namespace:  "namespace",
 			registry:   "us.icr.io",

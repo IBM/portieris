@@ -7,6 +7,9 @@ metadata:
     chart: {{ template "portieris.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
+  annotations:
+    helm.sh/hook: pre-install
+    helm.sh/hook-weight: "-9"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
