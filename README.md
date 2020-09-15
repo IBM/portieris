@@ -12,12 +12,9 @@ If your cloud provider provides a [Notary](https://github.com/theupdateframework
 
 When you create or edit a workload, the Kubernetes API server sends a request to Portieris. The AdmissionRequest contains the content of your workload. For each image in your workload, Portieris finds a matching security policy.
 
-
 If trust enforcement is enabled in the policy, Portieris pulls signature information for your image from the corresponding Notary server and, if a signed version of the image exists, creates a JSON patch to edit the image name in the workload to the signed image by digest. If a signer is defined in the policy, Portieris additionally checks that the image is signed by the specified role, and verifies that the specified key was used to sign the image.
 
-
 If simple signing is specified by the policy, Portieris will verify the signature using using the public key and identity rules supplied in the policy and if verified similarly mutates the image name to a digest reference to ensure that concurrent tag changes cannot influence the image being pulled.
-
 
 While it is possible to require both Notary trust and simple signing, the two methods must agree on the signed digest for the image. If the two methods return different signed digests, the image is denied. It is not possible to allow alternative signing methods.
 
@@ -39,12 +36,16 @@ To install Portieris in the default namespace (portieris):
 * Run `./helm/portieris/gencerts`. The `gencerts` script generates new SSL certificates and keys for Portieris. Portieris presents this certificates to the Kubernetes API server when the API server makes admission requests. If you do not generate new certificates, it could be possible for an attacker to spoof Portieris in your cluster.
 * Run `helm install portieris --create-namespace --namespace portieris helm/portieris`. `portieris` is the default namespace defined in the charts' `values.yaml` file.
 
-To use an alternative namespace:
+You can also use a different namespace if you choose. The Portieris install creates the namespace automatically, and the namespace will be deleted if you uninstall the Portieris chart, so make sure that Portieris is the only thing running in that namespace! To use an alternative namespace:
+
 * Run `./helm/portieris/gencerts <namespace>`.
 * Run `helm install portieris --create <namespace> --namespace <namespace> --set namespace=<namespace> helm/portieris`.
 
-To manage certificates through installed cert-manager(https://cert-manager.io/):
+To manage certificates through installed [cert-manager](https://cert-manager.io/):
+
 * Run `helm install portieris --set UseCertManager=true helm/portieris`.
+
+By default, Portieris' admission webhook runs in all namespaces including its own install namespace, so that Portieris is able to review all the pods in the cluster. However, this can prevent the cluster from self healing in the event where Portieris becomes unavailable. Portieris also supports skipping namespaces with a certain label set. You can enable this by adding `--set AllowAdmissionSkip=true` to your install command, but make sure to control who can add labels to namespaces and who can access namespaces with this label so that a malicious party cannot use this label to bypass Portieris.
 
 ## Uninstalling Portieris
 
@@ -59,6 +60,8 @@ Image security policies define Portieris' behavior in your cluster. You must con
 ## Configuring access controls for your security policies
 
 You can configure Kubernetes RBAC rules to define which users and applications have the ability to modify your security policies. For more information, see the [IBM Cloud docs](https://cloud.ibm.com/docs/services/Registry?topic=registry-security_enforce#assign_user_policy).
+
+If Portieris is installed with `AllowAdmissionSkip=true`, you can prevent Portieris' admission webhook from being called in specific namespaces by labelling the namespace with `securityenforcement.admission.cloud.ibm.com/namespace: skip`. Doing so would allow pods in that namespace to recover when the admission webhook is down, but note that no policies are applied in that namespace. For example, the Portieris install namespace is configured with this label to allow Portieris itself to recover when it is down. Make sure to control who can add labels to namespaces and who can access namespaces with this label so that a malicious party cannot use this label to bypass Portieris.
 
 ## Reporting security issues
 
