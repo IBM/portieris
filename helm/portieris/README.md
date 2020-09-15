@@ -29,7 +29,7 @@ The install will use the default certs if you do not run the gencerts script. **
 If you're deploying onto an IBM Cloud cluster Portieris automatically creates policies to allow the various Kubernetes components to be deployed as well as a policy rule to allow all images without verification. The allow everything should be changed because it is insecure but the IBM Cloud specific policies should be kept.
 
 ```
-helm install -n portieris .
+helm install --create-namespace -n portieris .
 ```
 
 ### Other Kubernetes Clusters
@@ -37,7 +37,7 @@ helm install -n portieris .
 If you're deploying onto a generic cluster Portieris automatically creates a policy to allow all images without verification. This is to prevent Portieris from preventing you deploying to your cluster. You should update this policy to something more restrictive.
 
 ```
-helm install -n portieris . --set IBMContainerService=false --debug
+helm install --create-namespace -n portieris . --set IBMContainerService=false --debug
 ```
 
 For full installation instructions, see [Installing security enforcement in your cluster](https://cloud.ibm.com/docs/services/Registry?topic=registry-security_enforce#sec_enforcer_install).
@@ -56,16 +56,7 @@ For information about configuring security policies, and an explanation of the s
 
 ## Removing the chart
 
-1. Portieris uses Hyperkube to remove some configuration from your cluster when you remove it. Before you can remove Portieris, you must make sure that Hyperkube is allowed to run. Make sure that the policy for the ibm-system namespace allows the `hyperkube` image.
-    ```yaml
-    - name: quay.io/coreos/hyperkube
-      policies:
+1. Remove the chart.
     ```
-    Alternatively, disable Portieris manually.
-    ```
-    kubectl delete MutatingWebhookConfiguration image-admission-config
-    ```
-2. Remove the chart.
-    ```
-    helm delete portieris
+    helm delete -n portieris portieris
     ```

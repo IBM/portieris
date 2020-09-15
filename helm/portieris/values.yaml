@@ -9,7 +9,7 @@ image:
   host:
   pullSecret:
   image: portieris
-  tag: 0.7.0
+  tag: 0.8.0next
   pullPolicy: Always
 
 service:
@@ -25,6 +25,9 @@ IBMContainerService: true
 
 # If managing portieris-certs secret externally
 SkipSecretCreation: false
+
+# If using cert-manager to handle secrets
+UseCertManager: false
 
 # Resoures defined to assist scheduling
 # request is typical x10, limit is typical x100
@@ -65,7 +68,3 @@ affinity:
         topologyKey: "failure-domain.beta.kubernetes.io/zone"
       weight: 50
 
-# Not recommended for user to configure this. Hyperkube image to use when creating custom resources
-hyperkube:
-  repository: quay.io/coreos/hyperkube
-  tag: v1.7.6_coreos.0
