@@ -30,3 +30,11 @@ webhooks:
     failurePolicy: Fail
     sideEffects: None
     admissionReviewVersions: ["v1beta1"]
+    {{ if .Values.AllowAdmissionSkip }}
+    namespaceSelector:
+      matchExpressions:
+      - key: securityenforcement.admission.cloud.ibm.com/namespace
+        operator: NotIn
+        values:
+        - skip
+    {{ end }}
