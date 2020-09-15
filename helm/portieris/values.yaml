@@ -68,7 +68,3 @@ affinity:
         topologyKey: "failure-domain.beta.kubernetes.io/zone"
       weight: 50
 
-# Not recommended for user to configure this. Hyperkube image to use when creating custom resources
-hyperkube:
-  repository: quay.io/coreos/hyperkube
-  tag: v1.7.6_coreos.0
