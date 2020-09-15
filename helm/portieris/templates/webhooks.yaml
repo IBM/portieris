@@ -1,8 +1,4 @@
-{{- if .Capabilities.APIVersions.Has "admissionregistration.k8s.io/v1" }}
-apiVersion: admissionregistration.k8s.io/v1
-{{- else }}
 apiVersion: admissionregistration.k8s.io/v1beta1
-{{- end }}
 kind: MutatingWebhookConfiguration
 metadata:
   name: image-admission-config

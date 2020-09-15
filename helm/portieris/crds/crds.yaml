@@ -1,4 +1,4 @@
-apiVersion: apiextensions.k8s.io/v1
+apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
   name: imagepolicies.securityenforcement.admission.cloud.ibm.com
@@ -12,44 +12,9 @@ spec:
     plural: imagepolicies
     singular: imagepolicy
   scope: Namespaced
-  versions:
-  - name: v1beta1
-    served: true
-    storage: true
-    schema:
-      openAPIV3Schema:
-        type: object
-        properties:
-          spec:
-            type: object
-            properties:
-              repositories:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    name:
-                      type: string
-                    policy:
-                      type: object
-                      nullable: true
-                      properties:
-                        trust:
-                          type: object
-                          properties:
-                            enabled:
-                              type: boolean
-                            trustServer:
-                              type: string
-                            signerSecrets:
-                              type: array
-                              items:
-                                type: object
-                                properties:
-                                  name:
-                                    type: string
+  version: v1beta1
 ---
-apiVersion: apiextensions.k8s.io/v1
+apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
   name: clusterimagepolicies.securityenforcement.admission.cloud.ibm.com
@@ -63,39 +28,4 @@ spec:
     plural: clusterimagepolicies
     singular: clusterimagepolicy
   scope: Cluster
-  versions:
-  - name: v1beta1
-    served: true
-    storage: true
-    schema:
-      openAPIV3Schema:
-        type: object
-        properties:
-          spec:
-            type: object
-            properties:
-              repositories:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    name:
-                      type: string
-                    policy:
-                      type: object
-                      nullable: true
-                      properties:
-                        trust:
-                          type: object
-                          properties:
-                            enabled:
-                              type: boolean
-                            trustServer:
-                              type: string
-                            signerSecrets:
-                              type: array
-                              items:
-                                type: object
-                                properties:
-                                  name:
-                                    type: string
+  version: v1beta1
