@@ -45,7 +45,7 @@ To manage certificates through installed [cert-manager](https://cert-manager.io/
 
 * Run `helm install portieris --set UseCertManager=true helm/portieris`.
 
-By default, Portieris' admission webhook does not run in namespaces with a skip annotation set, which includes its own install namespace, so that Portieris is able to self heal in the event where all its pods go down. You can disable this by adding `--set AllowAdmissionSkip=false` to your install command, however if all Portieris pods are down you'll have to disable the webhook to recover it manually.
+By default, Portieris' admission webhook runs in all namespaces including its own install namespace, so that Portieris is able to review all the pods in the cluster. However, this can prevent the cluster from self healing in the event where Portieris becomes unavailable. Portieris also supports skipping namespaces with a certain label set. You can enable this by adding `--set AllowAdmissionSkip=true` to your install command, but make sure to control who can add labels to namespaces and who can access namespaces with this label so that a malicious party cannot use this label to bypass Portieris.
 
 ## Uninstalling Portieris
 
@@ -61,7 +61,7 @@ Image security policies define Portieris' behavior in your cluster. You must con
 
 You can configure Kubernetes RBAC rules to define which users and applications have the ability to modify your security policies. For more information, see the [IBM Cloud docs](https://cloud.ibm.com/docs/services/Registry?topic=registry-security_enforce#assign_user_policy).
 
-You can prevent Portieris' admission webhook from being called in specific namespaces by labelling the namespace with `securityenforcement.admission.cloud.ibm.com/namespace: skip`. Doing so would allow pods in that namespace to recover when the admission webhook is down, but note that no policies are applied in that namespace. For example, the Portieris install namespace is configured with this label to allow Portieris itself to recover when it is down. Make sure to control who can add labels to namespaces and who can access namespaces with this label so that a malicious party cannot use this label to bypass Portieris.
+If Portieris is installed with `AllowAdmissionSkip=true`, you can prevent Portieris' admission webhook from being called in specific namespaces by labelling the namespace with `securityenforcement.admission.cloud.ibm.com/namespace: skip`. Doing so would allow pods in that namespace to recover when the admission webhook is down, but note that no policies are applied in that namespace. For example, the Portieris install namespace is configured with this label to allow Portieris itself to recover when it is down. Make sure to control who can add labels to namespaces and who can access namespaces with this label so that a malicious party cannot use this label to bypass Portieris.
 
 ## Reporting security issues
 
