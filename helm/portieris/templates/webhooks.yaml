@@ -1,4 +1,3 @@
-{{ define "webhooks.yaml.tpl" }}
 apiVersion: admissionregistration.k8s.io/v1beta1
 kind: MutatingWebhookConfiguration
 metadata:
@@ -29,4 +28,5 @@ webhooks:
         apiVersions: ["*"]
         resources: ["pods", "deployments", "replicationcontrollers", "replicasets", "daemonsets", "statefulsets", "jobs", "cronjobs"]
     failurePolicy: Fail
-{{ end }}
+    sideEffects: None
+    admissionReviewVersions: ["v1beta1"]

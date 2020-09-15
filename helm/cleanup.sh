@@ -10,6 +10,4 @@ kubectl delete ValidatingWebhookConfiguration image-admission-config --ignore-no
 
 kubectl delete crd clusterimagepolicies.securityenforcement.admission.cloud.ibm.com imagepolicies.securityenforcement.admission.cloud.ibm.com --ignore-not-found=true
 
-kubectl delete jobs -n "${NAMESPACE}" create-admission-webhooks create-armada-image-policies create-crds validate-crd-creation --ignore-not-found=true
-
 helm delete "${RELEASE_NAME}" --no-hooks --namespace "${NAMESPACE}"

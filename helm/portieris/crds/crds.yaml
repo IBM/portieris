@@ -1,10 +1,9 @@
-{{ define "crds.yaml.tpl" }}
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
   name: imagepolicies.securityenforcement.admission.cloud.ibm.com
   labels:
-    app: {{ template "portieris.name" . }}
+    app: portieris
 spec:
   group: securityenforcement.admission.cloud.ibm.com
   names:
@@ -20,7 +19,7 @@ kind: CustomResourceDefinition
 metadata:
   name: clusterimagepolicies.securityenforcement.admission.cloud.ibm.com
   labels:
-    app: {{ template "portieris.name" . }}
+    app: portieris
 spec:
   group: securityenforcement.admission.cloud.ibm.com
   names:
@@ -30,4 +29,3 @@ spec:
     singular: clusterimagepolicy
   scope: Cluster
   version: v1beta1
-{{ end }}
