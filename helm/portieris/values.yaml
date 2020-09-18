@@ -9,7 +9,7 @@ image:
   host:
   pullSecret:
   image: portieris
-  tag: 0.8.1
+  tag: 0.8.1next
   pullPolicy: Always
 
 service:
