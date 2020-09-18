@@ -3,6 +3,9 @@
 Notable changes recorded here.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+# v0.8.1next
+## 2020-
+
 # v0.8.1
 ## 2020-09-18
 
