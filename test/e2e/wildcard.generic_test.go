@@ -22,7 +22,7 @@ import (
 
 func TestWildcards_ImagePolicyRepositories_Wildcards(t *testing.T) {
 	utils.CheckIfTesting(t, testWildcardImagePolicy)
-	if defaultClusterPolicy := utils.DeleteThenReturnClusterImagePolicy(t, framework, "ibmcloud-default-cluster-image-policy"); defaultClusterPolicy != nil {
+	if defaultClusterPolicy := utils.DeleteThenReturnClusterImagePolicy(t, framework, "default"); defaultClusterPolicy != nil {
 		defer framework.CreateClusterImagePolicy(defaultClusterPolicy)
 	}
 

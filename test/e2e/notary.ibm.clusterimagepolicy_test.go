@@ -22,7 +22,7 @@ import (
 
 func TestNotary_ClusterImagePolicyRepositories_AllowAllDenyAll(t *testing.T) {
 	utils.CheckIfTesting(t, testTrustClusterImagePolicy)
-	if defaultClusterPolicy := utils.DeleteThenReturnClusterImagePolicy(t, framework, "ibmcloud-default-cluster-image-policy"); defaultClusterPolicy != nil {
+	if defaultClusterPolicy := utils.DeleteThenReturnClusterImagePolicy(t, framework, "default"); defaultClusterPolicy != nil {
 		defer framework.CreateClusterImagePolicy(defaultClusterPolicy)
 	}
 
@@ -43,7 +43,7 @@ func TestNotary_ClusterImagePolicyRepositories_AllowAllDenyAll(t *testing.T) {
 
 func TestNotary_ClusterImagePolicyRepositories_BasicTrust(t *testing.T) {
 	utils.CheckIfTesting(t, testTrustClusterImagePolicy)
-	if defaultClusterPolicy := utils.DeleteThenReturnClusterImagePolicy(t, framework, "ibmcloud-default-cluster-image-policy"); defaultClusterPolicy != nil {
+	if defaultClusterPolicy := utils.DeleteThenReturnClusterImagePolicy(t, framework, "default"); defaultClusterPolicy != nil {
 		defer framework.CreateClusterImagePolicy(defaultClusterPolicy)
 	}
 
@@ -61,7 +61,7 @@ func TestNotary_ClusterImagePolicyRepositories_BasicTrust(t *testing.T) {
 
 func TestNotary_ClusterImagePolicyRepositories_TrustPinning(t *testing.T) {
 	utils.CheckIfTesting(t, testTrustClusterImagePolicy)
-	if defaultClusterPolicy := utils.DeleteThenReturnClusterImagePolicy(t, framework, "ibmcloud-default-cluster-image-policy"); defaultClusterPolicy != nil {
+	if defaultClusterPolicy := utils.DeleteThenReturnClusterImagePolicy(t, framework, "default"); defaultClusterPolicy != nil {
 		defer framework.CreateClusterImagePolicy(defaultClusterPolicy)
 	}
 
