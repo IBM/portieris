@@ -10,7 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## 2020-09-18
 
 * PR checker fixed to fail when tests fail ([#167](https://github.com/IBM/portieris/issues/167))
-* Helm3 currency items ([#141](https://github.com/IBM/portieris/issues/141)) ([#41](https://github.com/IBM/portieris/issues/41)) ([#89](https://github.com/IBM/portieris/issues/89))
+* Drop support for Helm 2. You must now use Helm 3 to install Portieris ([#141](https://github.com/IBM/portieris/issues/141)) ([#41](https://github.com/IBM/portieris/issues/41)) ([#89](https://github.com/IBM/portieris/issues/89))
 * Ability to use a namespace selector for admission webhook ([#112](https://github.com/IBM/portieris/issues/112))
 * Correctly decode pull secrets where credentials are in the auth field ([#174](https://github.com/IBM/portieris/issues/174))
 * Ensure the pre-install steps create the namespace before the serviceaccount ([#181](https://github.com/IBM/portieris/issues/181))
