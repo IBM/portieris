@@ -25,7 +25,7 @@ import (
 )
 
 // TransformPolicies from Portieris to container/image lib policies
-func TransformPolicies(kWrapper kubernetes.WrapperInterface, namespace string, inPolicies []v1beta1.SimpleRequirement) (*signature.Policy, error) {
+func (v verifier) TransformPolicies(kWrapper kubernetes.WrapperInterface, namespace string, inPolicies []v1beta1.SimpleRequirement) (*signature.Policy, error) {
 	var policyRequirements []signature.PolicyRequirement
 
 	for _, inPolicy := range inPolicies {

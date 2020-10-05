@@ -34,7 +34,7 @@ import (
 var codec = serializer.NewCodecFactory(runtime.NewScheme())
 
 type Interface interface {
-	VerifyByPolicy(namespace string, img *image.Reference, credentials credential.Credentials, policy *securityenforcementv1beta1.Policy) (*bytes.Buffer, error, error)
+	VerifyByPolicy(string, *image.Reference, credential.Credentials, *securityenforcementv1beta1.Policy) (*bytes.Buffer, error, error)
 }
 
 // Verifier is the notary controller
