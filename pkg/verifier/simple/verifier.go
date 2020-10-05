@@ -9,6 +9,7 @@ import (
 	"github.com/containers/image/v5/signature"
 )
 
+// Verifier is for verifying simple signing
 type Verifier interface {
 	TransformPolicies(kWrapper kubernetes.WrapperInterface, namespace string, inPolicies []v1beta1.SimpleRequirement) (*signature.Policy, error)
 	CreateRegistryDir(storeURL, storeUser, storePassword string) (string, error)
@@ -18,6 +19,7 @@ type Verifier interface {
 
 type verifier struct{}
 
+// NewVerifier creates a new Verfier
 func NewVerifier() Verifier {
 	return &verifier{}
 }

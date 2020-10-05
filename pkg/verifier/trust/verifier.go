@@ -33,6 +33,7 @@ import (
 
 var codec = serializer.NewCodecFactory(runtime.NewScheme())
 
+// Interface is for verifying notary signatures
 type Interface interface {
 	VerifyByPolicy(string, *image.Reference, credential.Credentials, *securityenforcementv1beta1.Policy) (*bytes.Buffer, error, error)
 }
