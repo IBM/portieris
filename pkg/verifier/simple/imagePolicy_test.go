@@ -73,7 +73,7 @@ func TestVerifyByPolicy(t *testing.T) {
 					},
 				},
 			}
-			digest, deny, err := VerifyByPolicy(tt.image, tt.credentials, "", policy)
+			digest, deny, err := verifier{}.VerifyByPolicy(tt.image, tt.credentials, "", policy)
 			if tt.wantErr {
 				assert.Error(t, err)
 				assert.Contains(t, err.Error(), tt.errMsg, "unexpected error")

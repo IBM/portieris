@@ -242,7 +242,7 @@ func TestTransformPolicy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var testKubeWrapper = &TestWrapper{}
-			policy, err := TransformPolicies(testKubeWrapper, "namespace", tt.simplePolicies)
+			policy, err := verifier{}.TransformPolicies(testKubeWrapper, "namespace", tt.simplePolicies)
 			if tt.wantErr {
 				assert.Error(t, err, "error expected")
 				if err != nil {

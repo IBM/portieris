@@ -31,7 +31,7 @@ import (
 )
 
 // VerifyByPolicy verifies the image according to the supplied policy and returns the verified digest, verify error or processing error
-func VerifyByPolicy(imageToVerify string, credentials credential.Credentials, registriesConfigDir string, simplePolicy *signature.Policy) (*bytes.Buffer, error, error) {
+func (v verifier) VerifyByPolicy(imageToVerify string, credentials credential.Credentials, registriesConfigDir string, simplePolicy *signature.Policy) (*bytes.Buffer, error, error) {
 
 	policyContext, err := signature.NewPolicyContext(simplePolicy)
 	if err != nil {

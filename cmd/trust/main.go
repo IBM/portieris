@@ -27,6 +27,7 @@ import (
 	"github.com/IBM/portieris/pkg/controller/multi"
 	"github.com/IBM/portieris/pkg/kubernetes"
 	registryclient "github.com/IBM/portieris/pkg/registry"
+	notaryverifier "github.com/IBM/portieris/pkg/verifier/trust"
 	"github.com/IBM/portieris/pkg/webhook"
 	"github.com/golang/glog"
 )
@@ -87,7 +88,8 @@ func main() {
 	}
 
 	cr := registryclient.NewClient()
-	controller := multi.NewController(kubeWrapper, policyClient, trust, cr)
+	nv := notaryverifier.NewVerifier(kubeWrapper, trust, cr)
+	controller := multi.NewController(kubeWrapper, policyClient, nv)
 	webhook := webhook.NewServer("policy", controller, serverCert, serverKey)
 	webhook.Run()
 }
