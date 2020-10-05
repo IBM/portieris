@@ -15,16 +15,31 @@
 package kube
 
 import (
+	"fmt"
+	"os"
+
 	securityenforcementclientset "github.com/IBM/portieris/pkg/apis/securityenforcement/client/clientset/versioned"
 	"github.com/IBM/portieris/pkg/policy"
 	"github.com/golang/glog"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
 // GetKubeClient creates a kube clientset
 func GetKubeClient() *kubernetes.Clientset {
-	config, err := rest.InClusterConfig()
+	var config *rest.Config
+	var err error
+
+	// If KUBECONFIG ENV var is set, use that kubeconfig file location to create the kube client
+	kubeconfig, kubeconfigSet := os.LookupEnv("KUBECONFIG")
+	if kubeconfigSet {
+		glog.Info(fmt.Sprintf("KUBECONFIG env variable is set to %s, using this for kube client config", kubeconfig))
+		config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
+	} else {
+		glog.Info("KUBECONFIG env variable is NOT set, defaulting to in-cluster kube client config")
+		config, err = rest.InClusterConfig()
+	}
 	if err != nil {
 		glog.Fatal(err)
 	}
@@ -37,14 +52,24 @@ func GetKubeClient() *kubernetes.Clientset {
 
 // GetPolicyClient creates a policy clientset
 func GetPolicyClient() (*policy.Client, error) {
-	// Get configuration
-	cfg, err := rest.InClusterConfig()
+	var config *rest.Config
+	var err error
+
+	// If KUBECONFIG ENV var is set, use that kubeconfig file location to create the kube client
+	kubeconfig, kubeconfigSet := os.LookupEnv("KUBECONFIG")
+	if kubeconfigSet {
+		glog.Info(fmt.Sprintf("KUBECONFIG env variable is set to %s, using this for kube client config", kubeconfig))
+		config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
+	} else {
+		glog.Info("KUBECONFIG env variable is NOT set, defaulting to in-cluster kube client config")
+		config, err = rest.InClusterConfig()
+	}
 	if err != nil {
 		return nil, err
 	}
 
 	// Get admission policy clientset
-	clientset, err := securityenforcementclientset.NewForConfig(cfg)
+	clientset, err := securityenforcementclientset.NewForConfig(config)
 	if err != nil {
 		return nil, err
 	}
