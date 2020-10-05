@@ -19,6 +19,7 @@ package simple
 import (
 	"testing"
 
+	"github.com/IBM/portieris/helpers/credential"
 	"github.com/containers/image/v5/signature"
 	"github.com/stretchr/testify/assert"
 )
@@ -30,7 +31,7 @@ func TestVerifyByPolicy(t *testing.T) {
 	tests := []struct {
 		name        string
 		image       string
-		credentials [][]string
+		credentials credential.Credentials
 		policies    *signature.PolicyRequirement
 		wantErr     bool
 		errMsg      string
@@ -40,7 +41,7 @@ func TestVerifyByPolicy(t *testing.T) {
 		{
 			name:        "bad image",
 			image:       "blahBLAHblah",
-			credentials: [][]string{},
+			credentials: credential.Credentials{},
 			policies:    &policyRequirementInsecure,
 			wantErr:     true,
 			errMsg:      "name must be lowercase",
@@ -48,7 +49,7 @@ func TestVerifyByPolicy(t *testing.T) {
 		{
 			name:        "no creds", // fails, future enhancement to cover no-auth registries
 			image:       "docker.io/library/busybox",
-			credentials: [][]string{},
+			credentials: credential.Credentials{},
 			policies:    &policyRequirementInsecure,
 			wantErr:     true,
 			errMsg:      "no valid ImagePullSecret",
@@ -56,7 +57,7 @@ func TestVerifyByPolicy(t *testing.T) {
 		{
 			name:        "bad registry",
 			image:       "nonsuch.io/library/busybox",
-			credentials: [][]string{{"user", "password"}},
+			credentials: credential.Credentials{{Username: "user", Password: "password"}},
 			policies:    &policyRequirementInsecure,
 			wantErr:     true,
 			errMsg:      "pinging docker registry ",
