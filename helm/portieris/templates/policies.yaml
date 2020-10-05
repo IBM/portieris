@@ -2,7 +2,7 @@ apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
 kind: ImagePolicy
 metadata:
   name: default
-  namespace: {{ .Values.namespace }}
+  namespace: {{ .Release.Namespace }}
   annotations:
     helm.sh/hook: post-install
     helm.sh/hook-weight: "1"
