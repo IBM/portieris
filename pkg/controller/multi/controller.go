@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/IBM/portieris/helpers/credential"
 	"github.com/IBM/portieris/helpers/image"
 	securityenforcementv1beta1 "github.com/IBM/portieris/pkg/apis/securityenforcement/v1beta1"
 	"github.com/IBM/portieris/pkg/kubernetes"
@@ -166,21 +167,25 @@ func (c *Controller) mutatePodSpec(namespace, specPath string, pod corev1.PodSpe
 	return a.Flush()
 }
 
-func (c *Controller) getPodCredentials(namespace string, img *image.Reference, pod corev1.PodSpec) [][]string {
-	var creds [][]string
+func (c *Controller) getPodCredentials(namespace string, img *image.Reference, pod corev1.PodSpec) credential.Credentials {
+	var creds credential.Credentials
 	for _, secret := range pod.ImagePullSecrets {
 		username, password, err := c.kubeClientsetWrapper.GetSecretToken(namespace, secret.Name, img.GetHostname())
 		if err != nil {
 			glog.Error(err)
 			continue
 		}
-		creds = append(creds, []string{username, password})
+		cred := credential.Credential{
+			Username: username,
+			Password: password,
+		}
+		creds = append(creds, cred)
 		glog.Infof("ImagePullSecret %s/%s found", namespace, secret.Name)
 	}
 	return creds
 }
 
-func (c *Controller) verifiedDigestByPolicy(namespace string, img *image.Reference, credentials [][]string, policy *securityenforcementv1beta1.Policy) (*bytes.Buffer, error, error) {
+func (c *Controller) verifiedDigestByPolicy(namespace string, img *image.Reference, credentials credential.Credentials, policy *securityenforcementv1beta1.Policy) (*bytes.Buffer, error, error) {
 
 	// no policy indicates admission should be allowed, without mutation
 	if policy == nil {
