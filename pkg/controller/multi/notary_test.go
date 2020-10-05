@@ -26,6 +26,7 @@ import (
 	"github.com/IBM/portieris/pkg/kubernetes"
 	"github.com/IBM/portieris/pkg/notary/fakenotary"
 	"github.com/IBM/portieris/pkg/policy"
+	notaryverifier "github.com/IBM/portieris/pkg/verifier/trust"
 	"github.com/IBM/portieris/pkg/webhook"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -155,7 +156,8 @@ var _ = Describe("Main", func() {
 		}
 
 		updateController := func() {
-			ctrl = NewController(kubeWrapper, policyClient, trust, cr)
+			nv := notaryverifier.NewVerifier(kubeWrapper, trust, cr)
+			ctrl = NewController(kubeWrapper, policyClient, nv)
 			wh = webhook.NewServer("notary", ctrl, []byte{}, []byte{})
 		}
 

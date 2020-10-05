@@ -33,6 +33,10 @@ import (
 
 var codec = serializer.NewCodecFactory(runtime.NewScheme())
 
+type Interface interface {
+	VerifyByPolicy(namespace string, img *image.Reference, credentials credential.Credentials, policy *securityenforcementv1beta1.Policy) (*bytes.Buffer, error, error)
+}
+
 // Verifier is the notary controller
 type Verifier struct {
 	// kubeClientsetWrapper is a standard kubernetes clientset with a wrapper for retrieving podSpec from a given object
