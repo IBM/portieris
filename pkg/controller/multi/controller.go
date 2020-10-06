@@ -39,7 +39,7 @@ var codec = serializer.NewCodecFactory(runtime.NewScheme())
 type Controller struct {
 	// kubeClientsetWrapper is a standard kubernetes clientset with a wrapper for retrieving podSpec from a given object
 	kubeClientsetWrapper kubernetes.WrapperInterface
-	// policyClient is a securityenforcementclientset with a wrapper for retrieving the relevent policy spec
+	// policyClient is a securityenforcementclientset with a wrapper for retrieving the relevant policy spec
 	policyClient policy.Interface
 	// Enforcer is used to check that containers satisfy constraints set by a policy
 	Enforcer
@@ -72,10 +72,11 @@ func (c *Controller) Admit(admissionRequest *admissionv1beta1.AdmissionRequest) 
 		a.ToAdmissionResponse(err)
 		return a.Flush()
 	}
-	return c.mutatePodSpec(admissionRequest.Namespace, podSpecLocation, *ps)
+
+	return c.admitPod(admissionRequest.Namespace, podSpecLocation, *ps)
 }
 
-func (c *Controller) mutatePodSpec(namespace, specPath string, pod corev1.PodSpec) *admissionv1beta1.AdmissionResponse {
+func (c *Controller) admitPod(namespace, specPath string, pod corev1.PodSpec) *admissionv1beta1.AdmissionResponse {
 	a := &webhook.AdmissionResponder{}
 	patches := []types.JSONPatch{}
 
@@ -92,53 +93,13 @@ func (c *Controller) mutatePodSpec(namespace, specPath string, pod corev1.PodSpe
 			return a.Flush()
 		}
 
-		// for each container of this type
-		for containerIndex, container := range containers {
-
-			// move this?
-			img, err := image.NewReference(container.Image)
-			if err != nil {
-				glog.Error(err)
-				a.StringToAdmissionResponse(fmt.Sprintf("Deny %q, invalid image name", container.Image))
-				continue
-			}
-
-			glog.Infof("Getting policy for container image: %s   namespace: %s", img.String(), namespace)
-			containerPolicy, err := c.policyClient.GetPolicyToEnforce(namespace, img.String())
-			if err != nil {
-				a.ToAdmissionResponse(err)
-				continue
-			}
-
-			credentialCandidates := c.getPodCredentials(namespace, img, pod)
-
-			digest, deny, err := c.Enforcer.DigestByPolicy(namespace, img, credentialCandidates, containerPolicy)
-			if err != nil {
-				// error and return
-				a.ToAdmissionResponse(err)
-				return a.Flush()
-			}
-			if deny != nil {
-				// deny and continue
-				a.ToAdmissionResponse(deny)
-				continue
-			}
-			if digest != nil {
-				// convert digest to patch
-				glog.Infof("Mutation #: %s %d  Image name: %s", containerType, containerIndex, img.String())
-				if strings.Contains(container.Image, img.String()) {
-					// ISSUE: https://github.com/IBM/portieris/issues/90
-					glog.Infof("Mutated to: %s@sha256:%s", img.NameWithoutTag(), digest.String())
-					patch := types.JSONPatch{
-						Op:    "replace",
-						Path:  fmt.Sprintf("%s/%s/%d/image", specPath, containerType, containerIndex),
-						Value: fmt.Sprintf("%s@sha256:%s", img.NameWithoutTag(), digest.String()),
-					}
-					glog.Infof("Patch: %v", patch)
-					patches = append(patches, patch)
-				}
-			}
+		newPatches, denials, err := c.getPatchesForContainers(containerType, namespace, specPath, pod, containers)
+		a.StringsToAdmissionResponse(denials)
+		if err != nil {
+			a.ToAdmissionResponse(err)
+			a.Flush()
 		}
+		patches = append(patches, newPatches...)
 	}
 
 	if a.HasErrors() {
@@ -159,6 +120,56 @@ func (c *Controller) mutatePodSpec(namespace, specPath string, pod corev1.PodSpe
 	a.SetAllowed()
 	glog.Info("Allow")
 	return a.Flush()
+}
+
+func (c *Controller) getPatchesForContainers(containerType, namespace, specPath string, pod corev1.PodSpec, containers []corev1.Container) ([]types.JSONPatch, []string, error) {
+	patches := []types.JSONPatch{}
+	denials := []string{}
+
+	// for each container of this type
+	for containerIndex, container := range containers {
+		img, err := image.NewReference(container.Image)
+		if err != nil {
+			glog.Error(err)
+			denials = append(denials, fmt.Sprintf("Deny %q, invalid image name", container.Image))
+			continue
+		}
+
+		glog.Infof("Getting policy for container image: %s   namespace: %s", img.String(), namespace)
+		containerPolicy, err := c.policyClient.GetPolicyToEnforce(namespace, img.String())
+		if err != nil {
+			denials = append(denials, err.Error())
+			continue
+		}
+
+		credentialCandidates := c.getPodCredentials(namespace, img, pod)
+
+		digest, deny, err := c.Enforcer.DigestByPolicy(namespace, img, credentialCandidates, containerPolicy)
+		if err != nil {
+			return patches, denials, err
+		}
+		if deny != nil {
+			denials = append(denials, deny.Error())
+			continue
+		}
+		if digest != nil {
+			// convert digest to patch
+			glog.Infof("Mutation #: %s %d  Image name: %s", containerType, containerIndex, img.String())
+			if strings.Contains(container.Image, img.String()) {
+				// ISSUE: https://github.com/IBM/portieris/issues/90
+				glog.Infof("Mutated to: %s@sha256:%s", img.NameWithoutTag(), digest.String())
+				patch := types.JSONPatch{
+					Op:    "replace",
+					Path:  fmt.Sprintf("%s/%s/%d/image", specPath, containerType, containerIndex),
+					Value: fmt.Sprintf("%s@sha256:%s", img.NameWithoutTag(), digest.String()),
+				}
+				glog.Infof("Patch: %v", patch)
+				patches = append(patches, patch)
+			}
+		}
+	}
+
+	return patches, denials, nil
 }
 
 func (c *Controller) getPodCredentials(namespace string, img *image.Reference, pod corev1.PodSpec) credential.Credentials {
