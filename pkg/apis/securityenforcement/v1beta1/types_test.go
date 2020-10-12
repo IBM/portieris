@@ -76,7 +76,7 @@ var _ = Describe("Types", func() {
 		})
 
 		Context("but not policies", func() {
-			It("Should return a policy but `trust.enable` should be nil and `simple.requirements` should be empty", func() {
+			It("Should return a policy but `trust.enabled`/`vulnerability.ibmva.enabled` should be nil and `simple.requirements` should be empty", func() {
 				apl := ImagePolicyList{
 					Items: []ImagePolicy{
 						{
@@ -96,6 +96,7 @@ var _ = Describe("Types", func() {
 				Expect(policy.Trust.Enabled).To(BeNil())
 				Expect(policy.Trust.TrustServer).To(BeEmpty())
 				Expect(policy.Simple.Requirements).To(BeEmpty())
+				Expect(policy.Vulnerability.IBMVA.Enabled).To(BeNil())
 			})
 		})
 
@@ -214,6 +215,36 @@ var _ = Describe("Types", func() {
 				Expect(policy.Trust.TrustServer).To(BeEmpty())
 				Expect(*policy.Trust.Enabled).To(BeTrue())
 				Expect(policy.Simple.Requirements).To(BeEmpty())
+			})
+		})
+
+		Context("`vulnerability.IBMVA` policy is enabled", func() {
+			It("Should return a policy and `vulnerability.IBMVA.enabled` should be true", func() {
+				apl := ImagePolicyList{
+					Items: []ImagePolicy{
+						{
+							Spec: PolicySpec{
+								Repositories: []Repository{
+									{
+										Name: "test.com/namespace/hello:disabled",
+										Policy: Policy{
+											Vulnerability: Vulnerability{IBMVA{
+												Enabled: TruePointer,
+												Account: "123",
+											}},
+										},
+									},
+								},
+							},
+						},
+					},
+				}
+				policy := apl.FindImagePolicy("test.com/namespace/hello:disabled")
+				Expect(policy).ToNot(BeNil())
+				Expect(policy.Trust.Enabled).To(BeNil())
+				Expect(policy.Simple.Requirements).To(BeEmpty())
+				Expect(policy.Vulnerability.IBMVA.Enabled).ToNot(BeNil())
+				Expect(policy.Vulnerability.IBMVA.Account).To(Equal("123"))
 			})
 		})
 	})

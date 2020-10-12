@@ -17,8 +17,9 @@ spec:
       policy:
 ```
 
-* ClusterImagePolicies are configured at the cluster level, and take effect whenever there is no ImagePolicy resource defined in the namespace where the workload is being deployed. These resources have the same structure as namespace ImagePolicies and if no matching policy is found for an image deployment is denied. 
+* ClusterImagePolicies are configured at the cluster level, and take effect whenever there is no ImagePolicy resource defined in the namespace where the workload is being deployed. These resources have the same structure as namespace ImagePolicies and if no matching policy is found for an image deployment is denied.
   - this example allows all images from all registries with no checks:
+  
 ```yaml
 apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
 kind: ClusterImagePolicy
@@ -33,17 +34,20 @@ spec:
 For both types of resource if there are multiple resources, they are merged together, and can be protected by RBAC policy.
 
 ## Installation Default Policies
+
 Default policies are installed when Portieris is installed. You must review and change these according to your requirements.
 The installation [default policies](helm/portieris/templates/default/policies.yaml) should be customised. 
 
 ## Repository Matching
-When an image is evaluated for admission, the set of policies set is wildcard matched on the repository name. If there are multiple matches the most specific match is used. 
+
+When an image is evaluated for admission, the set of policies set is wildcard matched on the repository name. If there are multiple matches the most specific match is used.
 
 ## Policy 
-A policy consists of an array of objects defining requirements on the image either in `trust:` (Docker Content Trust / Notary V1)  or `simple:` (RedHat's Simple Signing) objects . 
+A policy consists of an array of objects defining requirements on the image using either `trust:` (Docker Content Trust / Notary V1), `simple:` (RedHat's Simple Signing) or `vulnerability:` objects.
 
 ### trust (Docker Content Trust/Notary)
 Portieris supports sourcing trust data from the following registries without additional configuration in the image policy:
+
 * IBM Cloud Container Registry
 * Quay.io
 * Docker Hub
@@ -62,7 +66,8 @@ spec:
         trust:
           enabled: true
           trustServer: "https://icr.io:4443" # Optional, custom trust server for repository
-```  
+```
+
 For more information, see the [IBM Cloud docs](https://cloud.ibm.com/docs/services/Registry?topic=registry-security_enforce#customize_policies).
 
 ### simple (RedHat simple signing)
@@ -132,4 +137,32 @@ spec:
 ```
 where `storeSecret` identifies an in scope Kubernetes secret which contains `username` and `password` data items which are used to authenticate with the server referenced in `storeURL`.
 
+### vulnerability
 
+Vulnerability policies enable you to admit or deny pod admission based on the security status of the container images within the pod. Vulnerability-based admission is available for:
+* Vulnerability Advisor for IBM Cloud Container Registry
+
+Example policy:
+```yaml
+apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
+kind: ImagePolicy
+metadata:
+  name: block-vulnerable-images
+spec:
+   repositories:
+    - name: "uk.icr.io/*"
+      policy:
+        vulnerability:
+          IBMVA:
+            enabled: true
+            account: "an-IBM-Cloud-account-id"
+```
+
+#### Vulnerability Advisor for IBM Cloud Container Registry details
+For each `container` in the pod being considered for admission, a [vulnerability status}(https://cloud.ibm.com/apidocs/container-registry/va#imagestatusquerypath) report is retrieved for the `image` specified by the container.
+
+The optional `account` parameter specifies the IBM Cloud account where exemptions should be fetched from for image matching the policy repository name.
+
+If the report returns an overall status of `OK`, `WARN` or `UNSUPPORTED` the pod allowed. In the event of any other status, or any error condition the pod is denied.
+
+Please note than images that were recently pushed to the registry and not yet completed scanning will be denied admission.
