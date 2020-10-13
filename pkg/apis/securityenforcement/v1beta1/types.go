@@ -91,8 +91,9 @@ type Repository struct {
 
 // Policy .
 type Policy struct {
-	Trust  Trust  `json:"trust,omitempty"`
-	Simple Simple `json:"simple,omitempty"`
+	Trust         Trust         `json:"trust,omitempty"`
+	Simple        Simple        `json:"simple,omitempty"`
+	Vulnerability Vulnerability `json:"vulnerability,omitempty"`
 }
 
 // Trust .
@@ -127,6 +128,8 @@ type IdentityRequirement struct {
 	DockerReference  string `json:"dockerReference,omitEmpty"`
 	DockerRepository string `json:"dockerRepository,omitEmpty"`
 }
+
+type Vulnerability struct{}
 
 // FindImagePolicy - Given an ImagePolicyList, find the repository whose name
 // most closely matches the image name, and returns its policy.
@@ -163,7 +166,7 @@ Exact:
 				}
 			}
 			// glog.Infof("match: %t  matchQuality: %d", match, matchQuality)
-			if match == true && matchQuality > bestMatchQuality {
+			if match && matchQuality > bestMatchQuality {
 				// glog.Info("Updating to this match")
 				bestMatchQuality = matchQuality
 				bestMatchedPolicy = repo.Policy
@@ -211,7 +214,7 @@ Exact:
 				}
 			}
 			// glog.Infof("match: %t  matchQuality: %d", match, matchQuality)
-			if match == true && matchQuality > bestMatchQuality {
+			if match && matchQuality > bestMatchQuality {
 				// glog.Info("Updating to this match")
 				bestMatchQuality = matchQuality
 				bestMatchedPolicy = repo.Policy
