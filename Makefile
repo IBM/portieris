@@ -54,40 +54,38 @@ helm.clean:
 
 e2e:
 	-helm package helm/portieris
-	@go test -v ./test/e2e --helmChart $$(pwd)/portieris-$(VERSION).tgz
+	@go test -v ./test/e2e
 
 e2e.local: helm.install.local e2e.quick
 
 e2e.local.ics: helm.install.local e2e.quick.ics
 
 e2e.quick: e2e.quick.trust.imagepolicy e2e.quick.trust.clusterimagepolicy e2e.quick.wildcards e2e.quick.generic e2e.quick.simple.imagepolicy
-	-kubectl delete namespace $$(kubectl get namespaces | grep -v ibm | grep -v kube | grep -v default | grep -v portieris | awk '{ print $$1 }' | grep -v NAME)
-
 e2e.quick.ics: e2e.quick.trust.imagepolicy e2e.quick.trust.clusterimagepolicy e2e.quick.armada e2e.quick.wildcards e2e.quick.generic e2e.quick.simple.imagepolicy
 	-kubectl delete namespace $$(kubectl get namespaces | grep -v ibm | grep -v kube | grep -v default | grep -v portieris | awk '{ print $$1 }' | grep -v NAME)
 
 e2e.quick.trust.imagepolicy:
-	@go test -v ./test/e2e --no-install --trust-image-policy --helmChart $$(pwd)/portieris-$(VERSION).tgz
+	@go test -v ./test/e2e --no-install --trust-image-policy
 	-kubectl delete namespace $$(kubectl get namespaces | grep -v ibm | grep -v kube | grep -v default | grep -v portieris | awk '{ print $$1 }' | grep -v NAME)
 
 e2e.quick.trust.clusterimagepolicy:
-	@go test -v ./test/e2e --no-install --trust-cluster-image-policy --helmChart $$(pwd)/portieris-$(VERSION).tgz
+	@go test -v ./test/e2e --no-install --trust-cluster-image-policy
 	-kubectl delete namespace $$(kubectl get namespaces | grep -v ibm | grep -v kube | grep -v default | grep -v portieris | awk '{ print $$1 }' | grep -v NAME)
 
 e2e.quick.wildcards:
-	@go test -v ./test/e2e --no-install --wildcards-image-policy --helmChart $$(pwd)/portieris-$(VERSION).tgz
+	@go test -v ./test/e2e --no-install --wildcards-image-policy
 	-kubectl delete namespace $$(kubectl get namespaces | grep -v ibm | grep -v kube | grep -v default | grep -v portieris | awk '{ print $$1 }' | grep -v NAME)
 
 e2e.quick.armada:
-	@go test -v ./test/e2e --no-install --armada --helmChart $$(pwd)/portieris-$(VERSION).tgz
+	@go test -v ./test/e2e --no-install --armada
 	-kubectl delete namespace $$(kubectl get namespaces | grep -v ibm | grep -v kube | grep -v default | grep -v portieris | awk '{ print $$1 }' | grep -v NAME)
 
 e2e.quick.generic:
-	go test -v ./test/e2e --no-install --generic --helmChart $$(pwd)/portieris-$(VERSION).tgz
+	go test -v ./test/e2e --no-install --generic
 	-kubectl delete namespace $$(kubectl get namespaces | grep -v ibm | grep -v kube | grep -v default | grep -v portieris | awk '{ print $$1 }' | grep -v NAME)
 
 e2e.quick.simple.imagepolicy:
-	@go test -v ./test/e2e --no-install --simple-image-policy --helmChart $$(pwd)/portieris-$(VERSION).tgz
+	@go test -v ./test/e2e --no-install --simple-image-policy
 	-kubectl delete namespace $$(kubectl get namespaces | grep -v ibm | grep -v kube | grep -v default | grep -v portieris | awk '{ print $$1 }' | grep -v NAME)
 
 e2e.clean: helm.clean
@@ -95,7 +93,7 @@ e2e.clean: helm.clean
 .PHONY: code-generator regenerate
 
 code-generator:
-	git clone https://github.com/kubernetes/code-generator.git --branch irelease-1.15 $(GOPATH)/src/k8s.io/code-generator
+	git clone https://github.com/kubernetes/code-generator.git --branch v0.17.3 $(GOPATH)/src/k8s.io/code-generator
 
 regenerate:
 	$(GOPATH)/src/k8s.io/code-generator/generate-groups.sh all github.com/IBM/portieris/pkg/apis/securityenforcement/client github.com/IBM/portieris/pkg/apis securityenforcement:v1beta1

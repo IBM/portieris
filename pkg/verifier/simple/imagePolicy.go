@@ -70,7 +70,7 @@ func (v verifier) VerifyByPolicy(imageToVerify string, credentials credential.Cr
 			}
 		}
 		// get the digest
-		m, _, err := unparsedImage.Manifest(context.Background())
+		m, _, _ := unparsedImage.Manifest(context.Background())
 		digest, err := manifest.Digest(m)
 		if err != nil {
 			return nil, nil, err
