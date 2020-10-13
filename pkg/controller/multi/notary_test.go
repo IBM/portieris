@@ -200,12 +200,7 @@ var _ = Describe("Main", func() {
 				It("should not enforce `trust` and allow the image without mutation", func() {
 					imageRepos := `"repositories": [
 						{
-							"name": "us.icr.io/*",
-							"policy": {
-								"va": {
-									"enabled": false
-								}
-							}
+							"name": "us.icr.io/*"
 						}
 					]`
 					clusterRepos := `"repositories": []`
@@ -226,9 +221,6 @@ var _ = Describe("Main", func() {
 							"name": "us.icr.io/*",
 							"policy": {
 								"trust": {
-									"enabled": false
-								},
-								"va": {
 									"enabled": false
 								}
 							}
@@ -253,9 +245,6 @@ var _ = Describe("Main", func() {
 							"policy": {
 								"trust": {
 									"enabled": false
-								},
-								"va": {
-									"enabled": false
 								}
 							}
 						}
@@ -278,9 +267,6 @@ var _ = Describe("Main", func() {
 							"policy": {
 								"trust": {
 									"enabled": true
-								},
-								"va": {
-									"enabled": false
 								}
 							}
 						}
@@ -303,9 +289,6 @@ var _ = Describe("Main", func() {
 							"policy": {
 								"trust": {
 									"enabled": true
-								},
-								"va": {
-									"enabled": false
 								}
 							}
 						}
@@ -330,9 +313,6 @@ var _ = Describe("Main", func() {
 							"policy": {
 								"trust": {
 									"enabled": true
-								},
-								"va": {
-									"enabled": false
 								}
 							}
 						}
@@ -356,9 +336,6 @@ var _ = Describe("Main", func() {
 							"policy": {
 								"trust": {
 									"enabled": true
-								},
-								"va": {
-									"enabled": false
 								}
 							}
 						}
@@ -383,9 +360,6 @@ var _ = Describe("Main", func() {
 							"policy": {
 								"trust": {
 									"enabled": true
-								},
-								"va": {
-									"enabled": false
 								}
 							}
 						}
@@ -413,9 +387,6 @@ var _ = Describe("Main", func() {
 							"policy": {
 								"trust": {
 									"enabled": true
-								},
-								"va": {
-									"enabled": false
 								}
 							}
 						}
@@ -443,9 +414,6 @@ var _ = Describe("Main", func() {
 								"policy": {
 									"trust": {
 										"enabled": true
-									},
-									"va": {
-										"enabled": false
 									}
 								}
 							}
@@ -469,9 +437,6 @@ var _ = Describe("Main", func() {
 								"policy": {
 									"trust": {
 										"enabled": true
-									},
-									"va": {
-										"enabled": false
 									}
 								}
 							}
@@ -495,9 +460,6 @@ var _ = Describe("Main", func() {
 								"policy": {
 									"trust": {
 										"enabled": true
-									},
-									"va": {
-										"enabled": false
 									}
 								}
 							}
@@ -521,9 +483,6 @@ var _ = Describe("Main", func() {
 								"policy": {
 									"trust": {
 										"enabled": true
-									},
-									"va": {
-										"enabled": false
 									}
 								}
 							}
@@ -547,9 +506,6 @@ var _ = Describe("Main", func() {
 								"policy": {
 									"trust": {
 										"enabled": true
-									},
-									"va": {
-										"enabled": false
 									}
 								}
 							}
@@ -573,9 +529,6 @@ var _ = Describe("Main", func() {
 								"policy": {
 									"trust": {
 										"enabled": true
-									},
-									"va": {
-										"enabled": false
 									}
 								}
 							}
@@ -599,9 +552,6 @@ var _ = Describe("Main", func() {
 								"policy": {
 									"trust": {
 										"enabled": true
-									},
-									"va": {
-										"enabled": false
 									}
 								}
 							}
@@ -630,9 +580,6 @@ var _ = Describe("Main", func() {
 									"trust": {
 										"enabled": true,
 										"trustServer": "https://some-trust-server.com:4443"
-									},
-									"va": {
-										"enabled": false
 									}
 								}
 							}
@@ -660,9 +607,6 @@ var _ = Describe("Main", func() {
 								"policy": {
 									"trust": {
 										"enabled": true
-									},
-									"va": {
-										"enabled": false
 									}
 								}
 							}
@@ -694,9 +638,6 @@ var _ = Describe("Main", func() {
 									"trust": {
 										"enabled": true,
 										"trustServer": "https://some-trust-server.com:4443"
-									},
-									"va": {
-										"enabled": false
 									}
 								}
 							}
@@ -727,9 +668,6 @@ var _ = Describe("Main", func() {
 							"policy": {
 								"trust": {
 									"enabled": false
-								},
-								"va": {
-									"enabled": false
 								}
 							}
 						},
@@ -738,9 +676,6 @@ var _ = Describe("Main", func() {
 							"policy": {
 								"trust": {
 									"enabled": true
-								},
-								"va": {
-									"enabled": false
 								}
 							}
 						}
@@ -767,9 +702,6 @@ var _ = Describe("Main", func() {
 							"policy": {
 								"trust": {
 									"enabled": true
-								},
-								"va": {
-									"enabled": false
 								}
 							}
 						},
@@ -779,9 +711,6 @@ var _ = Describe("Main", func() {
 								"trust": {
 									"enabled": true,
 									"trustServer": "https://some-trust-server.com:4443"
-								},
-								"va": {
-									"enabled": false
 								}
 							}
 						}
@@ -812,9 +741,6 @@ var _ = Describe("Main", func() {
 							"policy": {
 								"trust": {
 									"enabled": false
-								},
-								"va": {
-									"enabled": false
 								}
 							}
 						}
@@ -837,9 +763,6 @@ var _ = Describe("Main", func() {
 								"policy": {
 									"trust": {
 										"enabled": false
-									},
-									"va": {
-										"enabled": false
 									}
 								}
 							},
@@ -848,9 +771,6 @@ var _ = Describe("Main", func() {
 								"policy": {
 									"trust": {
 										"enabled": true
-									},
-									"va": {
-										"enabled": false
 									}
 								}
 							}

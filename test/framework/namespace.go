@@ -19,6 +19,7 @@ import (
 	"time"
 
 	corev1 "k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 )
@@ -32,7 +33,7 @@ func generateNamespace(name string) *corev1.Namespace {
 
 // IBMCloudSecretName secret provided to enable access to test images
 // https://github.com/IBM/portieris/issues/34 to remove the need for this
-const IBMCloudSecretName = "default-icr-io"
+var IBMCloudSecretNames = []string{"default-icr-io", "all-icr-io"}
 
 // CreateNamespace creates a namespace
 func (f *Framework) CreateNamespace(name string) (*corev1.Namespace, error) {
@@ -70,18 +71,24 @@ func (f *Framework) CreateNamespaceWithIPS(name string) (*corev1.Namespace, erro
 	if err != nil {
 		return nil, fmt.Errorf("error creating namespace: %v", err)
 	}
-	ips, err := f.KubeClient.CoreV1().Secrets("default").Get(IBMCloudSecretName, metav1.GetOptions{})
-	if err != nil {
+	var imagePullSecret *v1.Secret
+	for _, secretName := range IBMCloudSecretNames {
+		imagePullSecret, err = f.KubeClient.CoreV1().Secrets("default").Get(secretName, metav1.GetOptions{})
+		if err == nil {
+			break
+		}
+	}
+	if imagePullSecret == nil {
 		return nil, fmt.Errorf("error getting imagePullSecret: %v", err)
 	}
-	ips.Namespace = namespace.Name
-	ips.ResourceVersion = ""
-	if _, err := f.KubeClient.CoreV1().Secrets(namespace.Name).Create(ips); err != nil {
+	imagePullSecret.Namespace = namespace.Name
+	imagePullSecret.ResourceVersion = ""
+	if _, err := f.KubeClient.CoreV1().Secrets(namespace.Name).Create(imagePullSecret); err != nil {
 		return nil, fmt.Errorf("error creating imagePullSecret: %v", err)
 	}
 	sa := generateServiceAccount("default")
 	sa.ImagePullSecrets = []corev1.LocalObjectReference{
-		{Name: IBMCloudSecretName},
+		{Name: imagePullSecret.GetName()},
 	}
 	if _, err := f.KubeClient.CoreV1().ServiceAccounts(namespace.Name).Update(sa); err != nil {
 		return nil, fmt.Errorf("error adding imagePullSecret to ServiceAccount: %v", err)
