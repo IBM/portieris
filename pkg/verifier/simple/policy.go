@@ -62,7 +62,6 @@ func (v verifier) TransformPolicies(kWrapper kubernetes.WrapperInterface, namesp
 			if err != nil {
 				return nil, err
 			}
-			break
 
 		default:
 			return nil, fmt.Errorf("simple policy invalid Type: %s", inPolicy.Type)
