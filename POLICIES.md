@@ -4,7 +4,7 @@
 
 Portieris defines two custom resource types for policy:
 
-* ImagePolicies can be configured in a Kubernetes namespace, and define Portieris' behavior in that namespace. If ImagePolicies exists in a namespace, the policies from those ImagePolicy resources are used exclusively, if there is no match for the workload image in ImagePolicies ClusterImagePolicies are not examined. Images in deployed workloads are wildcard matched against the set of policies defined, if there is no policy matching the workload image then deployment is denied. 
+* ImagePolicies can be configured in a Kubernetes namespace, and define Portieris' behavior in that namespace. If ImagePolicies exists in a namespace, the policies from those ImagePolicy resources are used exclusively, if there is no match for the workload image in ImagePolicies ClusterImagePolicies are not examined. Images in deployed workloads are wildcard matched against the set of policies defined, if there is no policy matching the workload image then deployment is denied.
   - this example allows any image from the "icr.io" registry with no further checks (the policy is empty):
 ```yaml
 apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
@@ -19,7 +19,7 @@ spec:
 
 * ClusterImagePolicies are configured at the cluster level, and take effect whenever there is no ImagePolicy resource defined in the namespace where the workload is being deployed. These resources have the same structure as namespace ImagePolicies and if no matching policy is found for an image deployment is denied.
   - this example allows all images from all registries with no checks:
-  
+
 ```yaml
 apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
 kind: ClusterImagePolicy
@@ -36,13 +36,13 @@ For both types of resource if there are multiple resources, they are merged toge
 ## Installation Default Policies
 
 Default policies are installed when Portieris is installed. You must review and change these according to your requirements.
-The installation [default policies](helm/portieris/templates/default/policies.yaml) should be customised. 
+The installation [default policies](helm/portieris/templates/default/policies.yaml) should be customised.
 
 ## Repository Matching
 
 When an image is evaluated for admission, the set of policies set is wildcard matched on the repository name. If there are multiple matches the most specific match is used.
 
-## Policy 
+## Policy
 A policy consists of an array of objects defining requirements on the image using either `trust:` (Docker Content Trust / Notary V1), `simple:` (RedHat's Simple Signing) or `vulnerability:` objects.
 
 ### trust (Docker Content Trust/Notary)
@@ -73,7 +73,7 @@ For more information, see the [IBM Cloud docs](https://cloud.ibm.com/docs/servic
 ### simple (RedHat simple signing)
 The policy requirements are similar to those defined for configuration files consulted when using the RedHat tools [policy requirements](https://github.com/containers/image/blob/master/docs/containers-policy.json.5.md#policy-requirements). However there are some differences, the main difference is that the public key in a`signedBy` requirement is defined in a `keySecret` attribute, the value is the name of an in-scope Kubernetes secret containing a public key block. The value of `keyType`, `keyPath` and `keyData` (seen in [policy requirements](https://github.com/containers/image/blob/master/docs/containers-policy.json.5.md#policy-requirements)) cannot be provided. If multiple keys are present in the keyring then the requirement is satisfied if the signature is signed by any of them.
 
-To export a single public key identified by `<finger-print>` from gpg and create a KeySecret from it you could use: 
+To export a single public key identified by `<finger-print>` from gpg and create a KeySecret from it you could use:
 ```bash
 gpg --export --armour <finger-print> > my.pubkey
 kubectl create secret generic my-pubkey --from-file=key=my.pubkey
@@ -113,7 +113,7 @@ spec:
           requirements:
           - type: "signedBy"
             keySecret: db2-pubkey
-            signedIdentity: 
+            signedIdentity:
                 type: "matchExactRepository"
                 dockerRepository: "icr.io/ibm/db2/db2manager"
 ```
@@ -159,10 +159,10 @@ spec:
 ```
 
 #### Vulnerability Advisor for IBM Cloud Container Registry details
-For each `container` in the pod being considered for admission, a [vulnerability status}(https://cloud.ibm.com/apidocs/container-registry/va#imagestatusquerypath) report is retrieved for the `image` specified by the container.
+For each `container` in the pod being considered for admission, a [vulnerability status](https://cloud.ibm.com/apidocs/container-registry/va#imagestatusquerypath) report is retrieved for the `image` specified by the container.
 
 The optional `account` parameter specifies the IBM Cloud account where exemptions should be fetched from for image matching the policy repository name.
 
-If the report returns an overall status of `OK`, `WARN` or `UNSUPPORTED` the pod allowed. In the event of any other status, or any error condition the pod is denied.
+If the report returns an overall status of `OK`, `WARN` or `UNSUPPORTED` the pod is allowed. In the event of any other status, or any error condition the pod is denied.
 
-Please note than images that were recently pushed to the registry and not yet completed scanning will be denied admission.
+Please note that images that were recently pushed to the registry and have not yet completed scanning will be denied admission.
