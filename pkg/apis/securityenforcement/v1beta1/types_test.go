@@ -96,7 +96,7 @@ var _ = Describe("Types", func() {
 				Expect(policy.Trust.Enabled).To(BeNil())
 				Expect(policy.Trust.TrustServer).To(BeEmpty())
 				Expect(policy.Simple.Requirements).To(BeEmpty())
-				Expect(policy.Vulnerability.IBMVA.Enabled).To(BeNil())
+				Expect(policy.Vulnerability.ICCRVA.Enabled).To(BeNil())
 			})
 		})
 
@@ -218,8 +218,8 @@ var _ = Describe("Types", func() {
 			})
 		})
 
-		Context("`vulnerability.IBMVA` policy is enabled", func() {
-			It("Should return a policy and `vulnerability.IBMVA.enabled` should be true", func() {
+		Context("`vulnerability.ICCRVA` policy is enabled", func() {
+			It("Should return a policy and `vulnerability.ICCRVA.enabled` should be true", func() {
 				apl := ImagePolicyList{
 					Items: []ImagePolicy{
 						{
@@ -228,7 +228,7 @@ var _ = Describe("Types", func() {
 									{
 										Name: "test.com/namespace/hello:disabled",
 										Policy: Policy{
-											Vulnerability: Vulnerability{IBMVA{
+											Vulnerability: Vulnerability{ICCRVA{
 												Enabled: TruePointer,
 												Account: "123",
 											}},
@@ -243,8 +243,8 @@ var _ = Describe("Types", func() {
 				Expect(policy).ToNot(BeNil())
 				Expect(policy.Trust.Enabled).To(BeNil())
 				Expect(policy.Simple.Requirements).To(BeEmpty())
-				Expect(policy.Vulnerability.IBMVA.Enabled).ToNot(BeNil())
-				Expect(policy.Vulnerability.IBMVA.Account).To(Equal("123"))
+				Expect(policy.Vulnerability.ICCRVA.Enabled).ToNot(BeNil())
+				Expect(policy.Vulnerability.ICCRVA.Account).To(Equal("123"))
 			})
 		})
 	})

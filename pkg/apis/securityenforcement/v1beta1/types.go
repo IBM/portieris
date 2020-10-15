@@ -130,10 +130,10 @@ type IdentityRequirement struct {
 }
 
 type Vulnerability struct {
-	IBMVA IBMVA `json:"IBMVA,omitempty"`
+	ICCRVA ICCRVA `json:"ICCRVA,omitempty"`
 }
 
-type IBMVA struct {
+type ICCRVA struct {
 	Enabled *bool  `json:"enabled,omitempty"`
 	Account string `json:"account,omitempty"`
 }

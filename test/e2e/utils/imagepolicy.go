@@ -32,12 +32,12 @@ func CreateImagePolicyInstalledNamespace(t *testing.T, fw *framework.Framework, 
 		t.Fatalf("error loading %q ImagePolicy manifest: %v", manifestPath, err)
 	}
 	for idx := range imagePolicy.Spec.Repositories {
-		if imagePolicy.Spec.Repositories[idx].Policy.Vulnerability.IBMVA.Account == "ENV" {
-			imagePolicy.Spec.Repositories[idx].Policy.Vulnerability.IBMVA.Account = os.Getenv("E2E_ACCOUNT_HEADER")
-			if imagePolicy.Spec.Repositories[idx].Policy.Vulnerability.IBMVA.Account == "" {
+		if imagePolicy.Spec.Repositories[idx].Policy.Vulnerability.ICCRVA.Account == "ENV" {
+			imagePolicy.Spec.Repositories[idx].Policy.Vulnerability.ICCRVA.Account = os.Getenv("E2E_ACCOUNT_HEADER")
+			if imagePolicy.Spec.Repositories[idx].Policy.Vulnerability.ICCRVA.Account == "" {
 				t.Fatalf("Unable to set Account header, did you export E2E_ACCOUNT_HEADER")
 			}
-			t.Log(imagePolicy.Spec.Repositories[idx].Policy.Vulnerability.IBMVA.Account)
+			t.Log(imagePolicy.Spec.Repositories[idx].Policy.Vulnerability.ICCRVA.Account)
 		}
 	}
 	namespace, err := fw.CreateNamespaceWithIPS(ns)

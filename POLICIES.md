@@ -140,7 +140,8 @@ where `storeSecret` identifies an in scope Kubernetes secret which contains `use
 ### vulnerability
 
 Vulnerability policies enable you to admit or deny pod admission based on the security status of the container images within the pod. Vulnerability-based admission is available for:
-* Vulnerability Advisor for IBM Cloud Container Registry
+* [Vulnerability Advisor for IBM Cloud Container Registry](https://cloud.ibm.com/docs/Registry?topic=va-va_index)
+    * This is available for any image in the [IBM Cloud Container Registry](https://www.ibm.com/uk-en/cloud/container-registry)
 
 Example policy:
 ```yaml
@@ -153,7 +154,7 @@ spec:
     - name: "uk.icr.io/*"
       policy:
         vulnerability:
-          IBMVA:
+          ICCRVA:
             enabled: true
             account: "an-IBM-Cloud-account-id"
 ```
