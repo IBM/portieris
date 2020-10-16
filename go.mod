@@ -3,6 +3,7 @@ module github.com/IBM/portieris
 go 1.13
 
 require (
+	github.com/IBM/go-sdk-core/v4 v4.6.0
 	github.com/Shopify/logrus-bugsnag v0.0.0-20171204204709-577dee27f20d // indirect
 	github.com/agl/ed25519 v0.0.0-20170116200512-5312a6153412 // indirect
 	github.com/bitly/go-hostpool v0.1.0 // indirect
