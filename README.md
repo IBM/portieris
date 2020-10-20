@@ -34,14 +34,14 @@ To install Portieris in the default namespace (portieris):
 * Change directory into the Portieris Git repository.
 * Checkout the tag commit that you want to install , example: `git checkout 0.7.0`
 * Run `./helm/portieris/gencerts`. The `gencerts` script generates new SSL certificates and keys for Portieris. Portieris presents this certificates to the Kubernetes API server when the API server makes admission requests. If you do not generate new certificates, it could be possible for an attacker to spoof Portieris in your cluster.
-* Run `helm install portieris --create-namespace --namespace portieris helm/portieris`. `portieris` is the default namespace defined in the charts' `values.yaml` file.
+* Run `helm install portieris --create-namespace --namespace portieris helm/portieris`. 
 
-You can also use a different namespace if you choose. The Portieris install creates the namespace automatically, and the namespace will be deleted if you uninstall the Portieris chart, so make sure that Portieris is the only thing running in that namespace! To use an alternative namespace:
+You can use a different namespace if you choose including an exsiting one if you omit the `--create-namespace` option, but note that the namespace forms part of the webhook certificate common name so you need to generate the certificate for the target namespace.
 
 * Run `./helm/portieris/gencerts <namespace>`.
-* Run `helm install portieris --create <namespace> --namespace <namespace> --set namespace=<namespace> helm/portieris`.
+* Run `helm install portieris --create-namespace --namespace <namespace> helm/portieris`.
 
-To manage certificates through installed [cert-manager](https://cert-manager.io/):
+To manage certificates through an installed [cert-manager](https://cert-manager.io/):
 
 * Run `helm install portieris --set UseCertManager=true helm/portieris`.
 
@@ -49,9 +49,12 @@ By default, Portieris' admission webhook runs in all namespaces including its ow
 
 ## Uninstalling Portieris
 
-You can uninstall Portieris, at any time, by running `helm delete portieris --namespace <namespace>`. Note that 1.) all your image security policies are deleted when you uninstall Portieris and 2.) the namespace you created will need to be manually deleted. ie. `kubectl delete namespace/<namespace>`
+You can uninstall Portieris, at any time, by running `helm delete portieris --namespace <namespace>`.
 
-**Note**: if you have issues uninstalling portieris, via helm, try running the cleanup script: `helm/cleanup.sh portieris <namespace>`
+**Uninstall Notes**: 
+1. All your image security policies are deleted when you uninstall Portieris.
+1. The namespace you created will need to be manually deleted. i.e. `kubectl delete namespace/<namespace>`
+1. If you have issues uninstalling portieris, via helm, try running the cleanup script: `helm/cleanup.sh portieris <namespace>`
 
 ## Image security policies
 
