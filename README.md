@@ -30,7 +30,7 @@ Portieris is installed using a Helm chart. Before you begin, make sure that you 
 
 To install Portieris in the default namespace (portieris):
 
-* Clone the Portieris Git repository to your workstation.
+* Clone the Portieris Git repository to your workstation. `git clone git@github.com:IBM/portieris.git`
 * Change directory into the Portieris Git repository.
 * Checkout the tag commit that you want to install , example: `git checkout 0.7.0`
 * Run `./helm/portieris/gencerts`. The `gencerts` script generates new SSL certificates and keys for Portieris. Portieris presents this certificates to the Kubernetes API server when the API server makes admission requests. If you do not generate new certificates, it could be possible for an attacker to spoof Portieris in your cluster.
