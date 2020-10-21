@@ -21,19 +21,37 @@ import (
 	"github.com/IBM/portieris/helpers/credential"
 	"github.com/IBM/portieris/helpers/image"
 	"github.com/IBM/portieris/pkg/apis/securityenforcement/v1beta1"
-	securityenforcementv1beta1 "github.com/IBM/portieris/pkg/apis/securityenforcement/v1beta1"
 	"github.com/IBM/portieris/pkg/kubernetes"
+	"github.com/IBM/portieris/pkg/verifier/vulnerability"
 	"github.com/containers/image/v5/signature"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
 
+type mockScannerFactory struct {
+	mock.Mock
+}
+
+func (msf *mockScannerFactory) GetScanners(img image.Reference, credentials credential.Credentials, policy v1beta1.Policy) (scanners []vulnerability.Scanner) {
+	args := msf.Called(img, credentials, policy)
+	return args.Get(0).([]vulnerability.Scanner)
+}
+
+type mockScanner struct {
+	mock.Mock
+}
+
+func (ms *mockScanner) CanImageDeployBasedOnVulnerabilities(img image.Reference) (vulnerability.ScanResponse, error) {
+	args := ms.Called(img)
+	return args.Get(0).(vulnerability.ScanResponse), args.Error(1)
+}
+
 type mockNotaryVerifier struct {
 	mock.Mock
 }
 
-func (mnv *mockNotaryVerifier) VerifyByPolicy(namespace string, img *image.Reference, credentials credential.Credentials, policy *securityenforcementv1beta1.Policy) (*bytes.Buffer, error, error) {
+func (mnv *mockNotaryVerifier) VerifyByPolicy(namespace string, img *image.Reference, credentials credential.Credentials, policy *v1beta1.Policy) (*bytes.Buffer, error, error) {
 	args := mnv.Called(namespace, img, credentials, policy)
 	return args.Get(0).(*bytes.Buffer), args.Error(1), args.Error(2)
 }
@@ -386,6 +404,126 @@ func Test_enforcer_DigestByPolicy(t *testing.T) {
 			}
 			assert.Equal(t, tt.wantDeny, gotDeny)
 			assert.Equal(t, tt.wantErr, gotErr)
+		})
+	}
+}
+
+func Test_enforcer_VulnerabilityPolicy(t *testing.T) {
+	type canImageDeployBasedOnVulnerabilitiesMock struct {
+		response vulnerability.ScanResponse
+		err      error
+	}
+	tests := []struct {
+		name         string
+		imageName    string
+		credentials  credential.Credentials
+		policy       *v1beta1.Policy
+		scanners     []canImageDeployBasedOnVulnerabilitiesMock
+		wantResponse vulnerability.ScanResponse
+	}{
+		{
+			name:         "If policy is nil, allow deploy",
+			imageName:    "icr.io/nspc/some:thing",
+			policy:       nil,
+			wantResponse: vulnerability.ScanResponse{CanDeploy: true},
+		},
+		{
+			name:         "If there are no scanners for the policy, allow deploy",
+			imageName:    "icr.io/nspc/some:thing",
+			policy:       &v1beta1.Policy{},
+			scanners:     []canImageDeployBasedOnVulnerabilitiesMock{},
+			wantResponse: vulnerability.ScanResponse{CanDeploy: true},
+		},
+		{
+			name:      "If CanImageDeployBasedOnVulnerabilities errors, deny access",
+			imageName: "icr.io/nspc/some:thing",
+			policy:    &v1beta1.Policy{},
+			scanners: []canImageDeployBasedOnVulnerabilitiesMock{
+				{
+					err: fmt.Errorf("something's broken something's broken"),
+				},
+			},
+			wantResponse: vulnerability.ScanResponse{
+				CanDeploy:  false,
+				DenyReason: "something's broken something's broken",
+			},
+		},
+		{
+			name:      "If CanImageDeployBasedOnVulnerabilities says denied, deny access",
+			imageName: "icr.io/nspc/some:thing",
+			policy:    &v1beta1.Policy{},
+			scanners: []canImageDeployBasedOnVulnerabilitiesMock{
+				{
+					response: vulnerability.ScanResponse{
+						CanDeploy:  false,
+						DenyReason: "because",
+					},
+				},
+			},
+			wantResponse: vulnerability.ScanResponse{
+				CanDeploy:  false,
+				DenyReason: "because",
+			},
+		},
+		{
+			name:      "First scanner says yes, but second says no",
+			imageName: "icr.io/nspc/some:thing",
+			policy:    &v1beta1.Policy{},
+			scanners: []canImageDeployBasedOnVulnerabilitiesMock{
+				{
+					response: vulnerability.ScanResponse{
+						CanDeploy: true,
+					},
+				},
+				{
+					response: vulnerability.ScanResponse{
+						CanDeploy:  false,
+						DenyReason: "because",
+					},
+				},
+			},
+			wantResponse: vulnerability.ScanResponse{
+				CanDeploy:  false,
+				DenyReason: "because",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			img, err := image.NewReference(tt.imageName)
+			require.NoError(t, err)
+
+			scanners := []vulnerability.Scanner{}
+			for _, scannerResponse := range tt.scanners {
+				scanner := mockScanner{}
+				scanner.Test(t)
+				defer scanner.AssertExpectations(t)
+				scanner.
+					On("CanImageDeployBasedOnVulnerabilities", *img).
+					Return(scannerResponse.response, scannerResponse.err).
+					Once()
+
+				scanners = append(scanners, &scanner)
+			}
+
+			scannerFactory := mockScannerFactory{}
+			scannerFactory.Test(t)
+			defer scannerFactory.AssertExpectations(t)
+
+			if tt.policy != nil {
+				scannerFactory.
+					On("GetScanners", *img, tt.credentials, *tt.policy).
+					Return(scanners).
+					Once()
+			}
+
+			e := enforcer{
+				scannerFactory: &scannerFactory,
+			}
+
+			gotResponse := e.VulnerabilityPolicy(img, tt.credentials, tt.policy)
+
+			assert.Equal(t, tt.wantResponse, gotResponse)
 		})
 	}
 }

@@ -3,8 +3,13 @@
 Notable changes recorded here.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-# v0.8.1next
+# v0.8.2next
 ## 2020-
+
+# v0.8.2
+## 2020-10-12
+
+* Provide option to run out of cluster ([#180](https://github.com/IBM/portieris/issues/180))
 
 # v0.8.1
 ## 2020-09-18

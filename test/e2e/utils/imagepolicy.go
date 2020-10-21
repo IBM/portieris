@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2020 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 package utils
 
 import (
+	"os"
 	"testing"
 
 	uuid "github.com/satori/go.uuid"
@@ -29,6 +30,15 @@ func CreateImagePolicyInstalledNamespace(t *testing.T, fw *framework.Framework, 
 	imagePolicy, err := fw.LoadImagePolicyManifest(manifestPath)
 	if err != nil {
 		t.Fatalf("error loading %q ImagePolicy manifest: %v", manifestPath, err)
+	}
+	for idx := range imagePolicy.Spec.Repositories {
+		if imagePolicy.Spec.Repositories[idx].Policy.Vulnerability.ICCRVA.Account == "ENV" {
+			imagePolicy.Spec.Repositories[idx].Policy.Vulnerability.ICCRVA.Account = os.Getenv("E2E_ACCOUNT_HEADER")
+			if imagePolicy.Spec.Repositories[idx].Policy.Vulnerability.ICCRVA.Account == "" {
+				t.Fatalf("Unable to set Account header, did you export E2E_ACCOUNT_HEADER")
+			}
+			t.Log(imagePolicy.Spec.Repositories[idx].Policy.Vulnerability.ICCRVA.Account)
+		}
 	}
 	namespace, err := fw.CreateNamespaceWithIPS(ns)
 	if err != nil {

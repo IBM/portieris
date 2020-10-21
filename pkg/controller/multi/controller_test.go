@@ -24,6 +24,7 @@ import (
 	"github.com/IBM/portieris/pkg/apis/securityenforcement/v1beta1"
 	"github.com/IBM/portieris/pkg/verifier/simple"
 	notaryverifier "github.com/IBM/portieris/pkg/verifier/trust"
+	"github.com/IBM/portieris/pkg/verifier/vulnerability"
 	"github.com/IBM/portieris/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -76,13 +77,20 @@ func (me *mockEnforcer) DigestByPolicy(namespace string, img *image.Reference, c
 	return args.Get(0).(*bytes.Buffer), args.Error(1), args.Error(2)
 }
 
+func (me *mockEnforcer) VulnerabilityPolicy(img *image.Reference, credentials credential.Credentials, policy *v1beta1.Policy) vulnerability.ScanResponse {
+	args := me.Called(img, credentials, policy)
+	return args.Get(0).(vulnerability.ScanResponse)
+}
+
 func TestNewController(t *testing.T) {
 	wantKubeWrapper := &mockKubeWrapper{}
 	wantPolicyClient := &mockPolicyClient{}
 	wantNV := &notaryverifier.Verifier{}
+	wantScannerFactory := vulnerability.NewScannerFactory()
 	wantEnforcer := &enforcer{
 		kubeClientsetWrapper: wantKubeWrapper,
 		nv:                   wantNV,
+		scannerFactory:       &wantScannerFactory,
 		sv:                   simple.NewVerifier(),
 	}
 	wantController := Controller{
@@ -101,16 +109,20 @@ func TestController_getPatchesForContainers(t *testing.T) {
 		outPolicy *v1beta1.Policy
 		outErr    error
 	}
+	type enforcerVulnerabilityPolicyMock struct {
+		outScanResponse vulnerability.ScanResponse
+	}
 	type enforceDigestByPolicyMock struct {
 		outDigest string
 		outDeny   error
 		outErr    error
 	}
 	type mocks struct {
-		getPolicyToEnforce    *getPolicyToEnforceMock
-		inImage               string
-		credentials           credential.Credentials
-		enforceDigestByPolicy *enforceDigestByPolicyMock
+		getPolicyToEnforce          *getPolicyToEnforceMock
+		inImage                     string
+		credentials                 credential.Credentials
+		enforcerVulnerabilityPolicy *enforcerVulnerabilityPolicyMock
+		enforceDigestByPolicy       *enforceDigestByPolicyMock
 	}
 	tests := []struct {
 		name             string
@@ -177,6 +189,39 @@ func TestController_getPatchesForContainers(t *testing.T) {
 			wantErr:     nil,
 		},
 		{
+			name:      "Not vulnerable with no signing enforcement",
+			namespace: "some-namespace",
+			imagePullSecrets: []corev1.LocalObjectReference{
+				{
+					Name: "wibble",
+				},
+			},
+			containers: []corev1.Container{
+				{Image: "icr.io/some-namespace/image:tag"},
+			},
+			mocks: []mocks{
+				{
+					inImage: "icr.io/some-namespace/image:tag",
+					getPolicyToEnforce: &getPolicyToEnforceMock{
+						outPolicy: &v1beta1.Policy{},
+					},
+					credentials: credential.Credentials{{
+						Username: "wibble",
+						Password: "dibble",
+					}},
+					enforcerVulnerabilityPolicy: &enforcerVulnerabilityPolicyMock{
+						outScanResponse: vulnerability.ScanResponse{
+							CanDeploy: true,
+						},
+					},
+					enforceDigestByPolicy: &enforceDigestByPolicyMock{},
+				},
+			},
+			wantPatches: []types.JSONPatch{},
+			wantDenials: []string{},
+			wantErr:     nil,
+		},
+		{
 			name:      "digest by policy errors",
 			namespace: "some-namespace",
 			imagePullSecrets: []corev1.LocalObjectReference{
@@ -197,6 +242,11 @@ func TestController_getPatchesForContainers(t *testing.T) {
 						Username: "wibble",
 						Password: "dibble",
 					}},
+					enforcerVulnerabilityPolicy: &enforcerVulnerabilityPolicyMock{
+						outScanResponse: vulnerability.ScanResponse{
+							CanDeploy: true,
+						},
+					},
 					enforceDigestByPolicy: &enforceDigestByPolicyMock{
 						outErr: fmt.Errorf("failed"),
 					},
@@ -227,6 +277,11 @@ func TestController_getPatchesForContainers(t *testing.T) {
 						Username: "wibble",
 						Password: "dibble",
 					}},
+					enforcerVulnerabilityPolicy: &enforcerVulnerabilityPolicyMock{
+						outScanResponse: vulnerability.ScanResponse{
+							CanDeploy: true,
+						},
+					},
 					enforceDigestByPolicy: &enforceDigestByPolicyMock{
 						outDeny: fmt.Errorf("I don't think so"),
 					},
@@ -257,6 +312,11 @@ func TestController_getPatchesForContainers(t *testing.T) {
 						Username: "wibble",
 						Password: "dibble",
 					}},
+					enforcerVulnerabilityPolicy: &enforcerVulnerabilityPolicyMock{
+						outScanResponse: vulnerability.ScanResponse{
+							CanDeploy: true,
+						},
+					},
 					enforceDigestByPolicy: &enforceDigestByPolicyMock{
 						outDigest: "somedigest",
 					},
@@ -264,6 +324,42 @@ func TestController_getPatchesForContainers(t *testing.T) {
 			},
 			wantPatches: []types.JSONPatch{},
 			wantDenials: []string{},
+			wantErr:     nil,
+		},
+		{
+			name:      "allowed by signing but vulnerable",
+			namespace: "some-namespace",
+			imagePullSecrets: []corev1.LocalObjectReference{
+				{
+					Name: "wibble",
+				},
+			},
+			containers: []corev1.Container{
+				{Image: "icr.io/some-namespace/image:tag"},
+			},
+			mocks: []mocks{
+				{
+					inImage: "icr.io/some-namespace/image:tag",
+					getPolicyToEnforce: &getPolicyToEnforceMock{
+						outPolicy: &v1beta1.Policy{},
+					},
+					credentials: credential.Credentials{{
+						Username: "wibble",
+						Password: "dibble",
+					}},
+					enforcerVulnerabilityPolicy: &enforcerVulnerabilityPolicyMock{
+						outScanResponse: vulnerability.ScanResponse{
+							CanDeploy:  false,
+							DenyReason: "I don't want to",
+						},
+					},
+					enforceDigestByPolicy: &enforceDigestByPolicyMock{
+						outDigest: "somedigest",
+					},
+				},
+			},
+			wantPatches: []types.JSONPatch{},
+			wantDenials: []string{"I don't want to"},
 			wantErr:     nil,
 		},
 	}
@@ -306,6 +402,11 @@ func TestController_getPatchesForContainers(t *testing.T) {
 					secretName := tt.imagePullSecrets[idx].Name
 					kubeWrapper.On("GetSecretToken", namespace, secretName, img.GetHostname()).
 						Return(cred.Username, cred.Password, nil).Once()
+				}
+
+				if m.enforcerVulnerabilityPolicy != nil {
+					response := m.enforcerVulnerabilityPolicy.outScanResponse
+					enforcer.On("VulnerabilityPolicy", img, creds, policy).Return(response).Once()
 				}
 
 				if m.enforceDigestByPolicy != nil {
