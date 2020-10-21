@@ -36,7 +36,7 @@ To install Portieris in the default namespace (portieris):
 * Run `./helm/portieris/gencerts`. The `gencerts` script generates new SSL certificates and keys for Portieris. Portieris presents this certificates to the Kubernetes API server when the API server makes admission requests. If you do not generate new certificates, it could be possible for an attacker to spoof Portieris in your cluster.
 * Run `helm install portieris --create-namespace --namespace portieris helm/portieris`. 
 
-You can use a different namespace if you choose including an exsiting one if you omit the `--create-namespace` option, but note that the namespace forms part of the webhook certificate common name so you need to generate the certificate for the target namespace.
+You can use a different namespace if you choose including an existing one if you omit the `--create-namespace` option, but note that the namespace forms part of the webhook certificate common name so you need to generate the certificate for the target namespace.
 
 * Run `./helm/portieris/gencerts <namespace>`.
 * Run `helm install portieris --create-namespace --namespace <namespace> helm/portieris`.
