@@ -1,4 +1,4 @@
-# webhook which is inoperative (no match in namespaceSelector) but in the helm manifest such that it it uninstalled on chart delete
+# an inoperative webhook, establishes the object in the helm manifest such that it is uninstalled on chart delete
 apiVersion: admissionregistration.k8s.io/v1beta1
 kind: MutatingWebhookConfiguration
 metadata:
@@ -7,7 +7,6 @@ metadata:
   {{ if .Values.UseCertManager }}
     cert-manager.io/inject-ca-from: {{ .Release.Namespace }}/portieris-certs
   {{ end }}
-  namespace: {{ .Release.Namespace }}
   labels:
     app: {{ template "portieris.name" . }}
     chart: {{ template "portieris.chart" . }}
@@ -24,21 +23,9 @@ webhooks:
       caBundle: {{ .Files.Get "certs/ca.crt" | b64enc }}
       {{ end }}
     rules:
-      - operations: [ "CREATE", "UPDATE" ]
-        apiGroups: ["*"]
-        apiVersions: ["*"]
-        resources: ["pods", "deployments", "replicationcontrollers", "replicasets", "daemonsets", "statefulsets", "jobs", "cronjobs"]
-    failurePolicy: Fail
-    sideEffects: None
     admissionReviewVersions: ["v1beta1"]
-    namespaceSelector:
-      matchExpressions:
-      - key: securityenforcement.admission.cloud.ibm.com/namespace
-        operator: In
-        values:
-        - notExist
 ---
-# webhook similar to the above installed by a post-install helm hook to activate (remove or update the namesapceSelector)
+# webhook replaces the inoperative one, after the service is installed
 apiVersion: admissionregistration.k8s.io/v1beta1
 kind: MutatingWebhookConfiguration
 metadata:
@@ -48,7 +35,6 @@ metadata:
   {{ if .Values.UseCertManager }}
     cert-manager.io/inject-ca-from: {{ .Release.Namespace }}/portieris-certs
   {{ end }}
-  namespace: {{ .Release.Namespace }}
   labels:
     app: {{ template "portieris.name" . }}
     chart: {{ template "portieris.chart" . }}
@@ -80,4 +66,3 @@ webhooks:
         values:
         - skip
     {{ end }}
-
