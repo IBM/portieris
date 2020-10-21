@@ -1,3 +1,4 @@
+# webhook which is inoperative (no match in namespaceSelector) but in the helm manifest such that it it uninstalled on chart delete
 apiVersion: admissionregistration.k8s.io/v1beta1
 kind: MutatingWebhookConfiguration
 metadata:
@@ -37,6 +38,7 @@ webhooks:
         values:
         - notExist
 ---
+# webhook similar to the above installed by a post-install helm hook to activate (remove or update the namesapceSelector)
 apiVersion: admissionregistration.k8s.io/v1beta1
 kind: MutatingWebhookConfiguration
 metadata:
