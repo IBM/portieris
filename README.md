@@ -53,7 +53,7 @@ You can uninstall Portieris, at any time, by running `helm delete portieris --na
 
 **Uninstall Notes**: 
 1. All your image security policies are deleted when you uninstall Portieris.
-1. The namespace you created will need to be manually deleted. i.e. `kubectl delete namespace/<namespace>`
+1. If you no longer need the namespace it will have to be manually deleted. i.e. `kubectl delete namespace/<namespace>`
 1. If you have issues uninstalling portieris, via helm, try running the cleanup script: `helm/cleanup.sh portieris <namespace>`
 
 ## Image security policies
