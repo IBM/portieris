@@ -32,7 +32,7 @@ var (
 
 	noInstall bool
 
-	testTrustImagePolicy, testTrustClusterImagePolicy, testArmada, testVAImagePolicy, testVAClusterImagePolicy, testWildcardImagePolicy, testGeneric, testSimpleImagePolicy bool
+	testTrustImagePolicy, testTrustClusterImagePolicy, testArmada, testVAImagePolicy, testVAClusterImagePolicy, testWildcardImagePolicy, testGeneric, testSimpleImagePolicy, testVulnerability bool
 )
 
 const (
@@ -52,6 +52,7 @@ func TestMain(m *testing.M) {
 	flag.BoolVar(&testWildcardImagePolicy, "wildcards-image-policy", false, "runs tests for wildcards in image policies")
 	flag.BoolVar(&testGeneric, "generic", false, "runs generic enforment tests")
 	flag.BoolVar(&testSimpleImagePolicy, "simple-image-policy", false, "runs tests for simple signing policies")
+	flag.BoolVar(&testVulnerability, "vulnerability", false, "runs tests for vulnerability enforcement")
 
 	flag.Parse()
 

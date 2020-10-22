@@ -1,12 +1,12 @@
+# an inoperative webhook, establishes the object in the helm manifest such that it is uninstalled on chart delete
 apiVersion: admissionregistration.k8s.io/v1beta1
 kind: MutatingWebhookConfiguration
 metadata:
   name: image-admission-config
-  {{ if .Values.UseCertManager }}
   annotations:
-    cert-manager.io/inject-ca-from: {{ .Values.namespace }}/portieris-certs
+  {{ if .Values.UseCertManager }}
+    cert-manager.io/inject-ca-from: {{ .Release.Namespace }}/portieris-certs
   {{ end }}
-  namespace: {{ .Values.namespace }}
   labels:
     app: {{ template "portieris.name" . }}
     chart: {{ template "portieris.chart" . }}
@@ -17,7 +17,35 @@ webhooks:
     clientConfig:
       service:
         name: {{ template "portieris.name" . }}
-        namespace: {{ .Values.namespace }}
+        namespace: {{ .Release.Namespace }}
+        path: "/admit"
+      {{ if not .Values.UseCertManager }}
+      caBundle: {{ .Files.Get "certs/ca.crt" | b64enc }}
+      {{ end }}
+    rules: []
+    admissionReviewVersions: ["v1beta1"]
+---
+# webhook replaces the inoperative one, after the service is installed
+apiVersion: admissionregistration.k8s.io/v1beta1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: image-admission-config
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade,post-rollback
+  {{ if .Values.UseCertManager }}
+    cert-manager.io/inject-ca-from: {{ .Release.Namespace }}/portieris-certs
+  {{ end }}
+  labels:
+    app: {{ template "portieris.name" . }}
+    chart: {{ template "portieris.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+webhooks:
+  - name: trust.hooks.securityenforcement.admission.cloud.ibm.com
+    clientConfig:
+      service:
+        name: {{ template "portieris.name" . }}
+        namespace: {{ .Release.Namespace }}
         path: "/admit"
       {{ if not .Values.UseCertManager }}
       caBundle: {{ .Files.Get "certs/ca.crt" | b64enc }}

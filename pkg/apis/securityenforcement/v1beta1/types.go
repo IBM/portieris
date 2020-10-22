@@ -129,7 +129,14 @@ type IdentityRequirement struct {
 	DockerRepository string `json:"dockerRepository,omitEmpty"`
 }
 
-type Vulnerability struct{}
+type Vulnerability struct {
+	ICCRVA ICCRVA `json:"ICCRVA,omitempty"`
+}
+
+type ICCRVA struct {
+	Enabled *bool  `json:"enabled,omitempty"`
+	Account string `json:"account,omitempty"`
+}
 
 // FindImagePolicy - Given an ImagePolicyList, find the repository whose name
 // most closely matches the image name, and returns its policy.
