@@ -60,6 +60,7 @@ spec:
     - name: "icr.io/armada/*"
     - name: "icr.io/armada-worker/*"
     - name: "icr.io/armada-master/*"
+    - name: "icr.io/ext/istio/*"
 ---
 {{ end }}
 apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
