@@ -3,13 +3,12 @@
 # Declare variables to be passed into your templates.
 
 replicaCount: 3
-namespace: portieris
 
 image:
   host:
   pullSecret:
   image: portieris
-  tag: 0.8.0next
+  tag: 0.8.2next
   pullPolicy: Always
 
 service:

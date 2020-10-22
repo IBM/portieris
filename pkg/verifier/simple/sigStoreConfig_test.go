@@ -78,7 +78,7 @@ func TestCreateRegistryFile(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			dirName, err := CreateRegistryDir(tt.sigStore, tt.sigUser, tt.sigPassword)
+			dirName, err := verifier{}.CreateRegistryDir(tt.sigStore, tt.sigUser, tt.sigPassword)
 			if tt.expectedErr {
 				assert.Error(t, err)
 				return
@@ -105,7 +105,7 @@ func TestCreateRegistryFile(t *testing.T) {
 			assert.NotZero(t, out)
 			assert.Equal(t, out.DefaultDocker.SigStore, tt.expectedConfig)
 
-			err = RemoveRegistryDir(dirName)
+			err = verifier{}.RemoveRegistryDir(dirName)
 			assert.NoError(t, err)
 		})
 	}

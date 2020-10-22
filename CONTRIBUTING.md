@@ -25,6 +25,10 @@ Before you start work on a new feature or an architectural change, open an issue
 
 Try to keep your PRs as small as possible. It's a lot easier to review many smaller PRs than one enormous one. If you need to make a large change, consider whether you can break the change down into a number of smaller changes.
 
+## Changes to policy files
+
+If you add new elements to the Portieris policy files (pkg/apis/securityenforcement/v1beta1/*) you will need to run the code generator. Please see: [Generator Readme](pkg/apis/securityenforcement/v1beta1/README.md)
+
 ## Coding style
 
 Generally, code should be written using idiomatic Go. Check out [Effective Go](https://golang.org/doc/effective_go.html) for loads of well-written tips on how to write Go... effectively!

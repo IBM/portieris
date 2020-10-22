@@ -26,6 +26,7 @@ import (
 	"github.com/IBM/portieris/pkg/kubernetes"
 	"github.com/IBM/portieris/pkg/notary/fakenotary"
 	"github.com/IBM/portieris/pkg/policy"
+	notaryverifier "github.com/IBM/portieris/pkg/verifier/trust"
 	"github.com/IBM/portieris/pkg/webhook"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -155,7 +156,8 @@ var _ = Describe("Main", func() {
 		}
 
 		updateController := func() {
-			ctrl = NewController(kubeWrapper, policyClient, trust, cr)
+			nv := notaryverifier.NewVerifier(kubeWrapper, trust, cr)
+			ctrl = NewController(kubeWrapper, policyClient, nv)
 			wh = webhook.NewServer("notary", ctrl, []byte{}, []byte{})
 		}
 
@@ -198,12 +200,7 @@ var _ = Describe("Main", func() {
 				It("should not enforce `trust` and allow the image without mutation", func() {
 					imageRepos := `"repositories": [
 						{
-							"name": "us.icr.io/*",
-							"policy": {
-								"va": {
-									"enabled": false
-								}
-							}
+							"name": "us.icr.io/*"
 						}
 					]`
 					clusterRepos := `"repositories": []`
@@ -224,9 +221,6 @@ var _ = Describe("Main", func() {
 							"name": "us.icr.io/*",
 							"policy": {
 								"trust": {
-									"enabled": false
-								},
-								"va": {
 									"enabled": false
 								}
 							}
@@ -251,9 +245,6 @@ var _ = Describe("Main", func() {
 							"policy": {
 								"trust": {
 									"enabled": false
-								},
-								"va": {
-									"enabled": false
 								}
 							}
 						}
@@ -276,9 +267,6 @@ var _ = Describe("Main", func() {
 							"policy": {
 								"trust": {
 									"enabled": true
-								},
-								"va": {
-									"enabled": false
 								}
 							}
 						}
@@ -301,9 +289,6 @@ var _ = Describe("Main", func() {
 							"policy": {
 								"trust": {
 									"enabled": true
-								},
-								"va": {
-									"enabled": false
 								}
 							}
 						}
@@ -328,9 +313,6 @@ var _ = Describe("Main", func() {
 							"policy": {
 								"trust": {
 									"enabled": true
-								},
-								"va": {
-									"enabled": false
 								}
 							}
 						}
@@ -354,9 +336,6 @@ var _ = Describe("Main", func() {
 							"policy": {
 								"trust": {
 									"enabled": true
-								},
-								"va": {
-									"enabled": false
 								}
 							}
 						}
@@ -381,9 +360,6 @@ var _ = Describe("Main", func() {
 							"policy": {
 								"trust": {
 									"enabled": true
-								},
-								"va": {
-									"enabled": false
 								}
 							}
 						}
@@ -411,9 +387,6 @@ var _ = Describe("Main", func() {
 							"policy": {
 								"trust": {
 									"enabled": true
-								},
-								"va": {
-									"enabled": false
 								}
 							}
 						}
@@ -441,9 +414,6 @@ var _ = Describe("Main", func() {
 								"policy": {
 									"trust": {
 										"enabled": true
-									},
-									"va": {
-										"enabled": false
 									}
 								}
 							}
@@ -467,9 +437,6 @@ var _ = Describe("Main", func() {
 								"policy": {
 									"trust": {
 										"enabled": true
-									},
-									"va": {
-										"enabled": false
 									}
 								}
 							}
@@ -493,9 +460,6 @@ var _ = Describe("Main", func() {
 								"policy": {
 									"trust": {
 										"enabled": true
-									},
-									"va": {
-										"enabled": false
 									}
 								}
 							}
@@ -519,9 +483,6 @@ var _ = Describe("Main", func() {
 								"policy": {
 									"trust": {
 										"enabled": true
-									},
-									"va": {
-										"enabled": false
 									}
 								}
 							}
@@ -545,9 +506,6 @@ var _ = Describe("Main", func() {
 								"policy": {
 									"trust": {
 										"enabled": true
-									},
-									"va": {
-										"enabled": false
 									}
 								}
 							}
@@ -571,9 +529,6 @@ var _ = Describe("Main", func() {
 								"policy": {
 									"trust": {
 										"enabled": true
-									},
-									"va": {
-										"enabled": false
 									}
 								}
 							}
@@ -597,9 +552,6 @@ var _ = Describe("Main", func() {
 								"policy": {
 									"trust": {
 										"enabled": true
-									},
-									"va": {
-										"enabled": false
 									}
 								}
 							}
@@ -628,9 +580,6 @@ var _ = Describe("Main", func() {
 									"trust": {
 										"enabled": true,
 										"trustServer": "https://some-trust-server.com:4443"
-									},
-									"va": {
-										"enabled": false
 									}
 								}
 							}
@@ -658,9 +607,6 @@ var _ = Describe("Main", func() {
 								"policy": {
 									"trust": {
 										"enabled": true
-									},
-									"va": {
-										"enabled": false
 									}
 								}
 							}
@@ -692,9 +638,6 @@ var _ = Describe("Main", func() {
 									"trust": {
 										"enabled": true,
 										"trustServer": "https://some-trust-server.com:4443"
-									},
-									"va": {
-										"enabled": false
 									}
 								}
 							}
@@ -725,9 +668,6 @@ var _ = Describe("Main", func() {
 							"policy": {
 								"trust": {
 									"enabled": false
-								},
-								"va": {
-									"enabled": false
 								}
 							}
 						},
@@ -736,9 +676,6 @@ var _ = Describe("Main", func() {
 							"policy": {
 								"trust": {
 									"enabled": true
-								},
-								"va": {
-									"enabled": false
 								}
 							}
 						}
@@ -765,9 +702,6 @@ var _ = Describe("Main", func() {
 							"policy": {
 								"trust": {
 									"enabled": true
-								},
-								"va": {
-									"enabled": false
 								}
 							}
 						},
@@ -777,9 +711,6 @@ var _ = Describe("Main", func() {
 								"trust": {
 									"enabled": true,
 									"trustServer": "https://some-trust-server.com:4443"
-								},
-								"va": {
-									"enabled": false
 								}
 							}
 						}
@@ -810,9 +741,6 @@ var _ = Describe("Main", func() {
 							"policy": {
 								"trust": {
 									"enabled": false
-								},
-								"va": {
-									"enabled": false
 								}
 							}
 						}
@@ -835,9 +763,6 @@ var _ = Describe("Main", func() {
 								"policy": {
 									"trust": {
 										"enabled": false
-									},
-									"va": {
-										"enabled": false
 									}
 								}
 							},
@@ -846,9 +771,6 @@ var _ = Describe("Main", func() {
 								"policy": {
 									"trust": {
 										"enabled": true
-									},
-									"va": {
-										"enabled": false
 									}
 								}
 							}

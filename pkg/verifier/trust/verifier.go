@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2020 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/IBM/portieris/helpers/credential"
 	"github.com/IBM/portieris/helpers/image"
 	securityenforcementv1beta1 "github.com/IBM/portieris/pkg/apis/securityenforcement/v1beta1"
 	"github.com/IBM/portieris/pkg/kubernetes"
@@ -31,6 +32,11 @@ import (
 )
 
 var codec = serializer.NewCodecFactory(runtime.NewScheme())
+
+// Interface is for verifying notary signatures
+type Interface interface {
+	VerifyByPolicy(string, *image.Reference, credential.Credentials, *securityenforcementv1beta1.Policy) (*bytes.Buffer, error, error)
+}
 
 // Verifier is the notary controller
 type Verifier struct {
@@ -52,7 +58,7 @@ func NewVerifier(kubeWrapper kubernetes.WrapperInterface, trust notary.Interface
 }
 
 // VerifyByPolicy ...
-func (v *Verifier) VerifyByPolicy(namespace string, img *image.Reference, credentials [][]string, policy *securityenforcementv1beta1.Policy) (*bytes.Buffer, error, error) {
+func (v *Verifier) VerifyByPolicy(namespace string, img *image.Reference, credentials credential.Credentials, policy *securityenforcementv1beta1.Policy) (*bytes.Buffer, error, error) {
 	notaryURL := policy.Trust.TrustServer
 	var err error
 	if notaryURL == "" {
@@ -74,9 +80,9 @@ func (v *Verifier) VerifyByPolicy(namespace string, img *image.Reference, creden
 		}
 	}
 
-	credentials = append(credentials, []string{"", ""})
-	for _, cred := range credentials {
-		notaryToken, err := v.cr.GetContentTrustToken(cred[0], cred[1], img.NameWithoutTag(), img.GetRegistryURL())
+	credentials = append(credentials, credential.Credential{})
+	for _, credential := range credentials {
+		notaryToken, err := v.cr.GetContentTrustToken(credential.Username, credential.Password, img.NameWithoutTag(), img.GetRegistryURL())
 		if err != nil {
 			glog.Error(err)
 			continue

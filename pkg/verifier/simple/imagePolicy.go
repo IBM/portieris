@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/IBM/portieris/helpers/credential"
 	"github.com/containers/image/v5/docker"
 	"github.com/containers/image/v5/image"
 	"github.com/containers/image/v5/manifest"
@@ -30,7 +31,7 @@ import (
 )
 
 // VerifyByPolicy verifies the image according to the supplied policy and returns the verified digest, verify error or processing error
-func VerifyByPolicy(imageToVerify string, credentials [][]string, registriesConfigDir string, simplePolicy *signature.Policy) (*bytes.Buffer, error, error) {
+func (v verifier) VerifyByPolicy(imageToVerify string, credentials credential.Credentials, registriesConfigDir string, simplePolicy *signature.Policy) (*bytes.Buffer, error, error) {
 
 	policyContext, err := signature.NewPolicyContext(simplePolicy)
 	if err != nil {
@@ -48,10 +49,10 @@ func VerifyByPolicy(imageToVerify string, credentials [][]string, registriesConf
 	}
 
 	// support no-auth ?
-	for _, cred := range credentials {
+	for _, credential := range credentials {
 		dockerAuthConfig := &types.DockerAuthConfig{
-			Username: cred[0],
-			Password: cred[1],
+			Username: credential.Username,
+			Password: credential.Password,
 		}
 		systemContext.DockerAuthConfig = dockerAuthConfig
 		imageSource, err := imageReference.NewImageSource(context.Background(), systemContext)
@@ -69,7 +70,7 @@ func VerifyByPolicy(imageToVerify string, credentials [][]string, registriesConf
 			}
 		}
 		// get the digest
-		m, _, err := unparsedImage.Manifest(context.Background())
+		m, _, _ := unparsedImage.Manifest(context.Background())
 		digest, err := manifest.Digest(m)
 		if err != nil {
 			return nil, nil, err

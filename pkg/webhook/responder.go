@@ -93,3 +93,10 @@ func (a *AdmissionResponder) StringToAdmissionResponse(msg string) {
 	glog.Info(msg)
 	a.errors = append(a.errors, msg)
 }
+
+// StringsToAdmissionResponse adds a slice of strings as errors to the response
+func (a *AdmissionResponder) StringsToAdmissionResponse(msgs []string) {
+	for _, msg := range msgs {
+		a.StringToAdmissionResponse(msg)
+	}
+}

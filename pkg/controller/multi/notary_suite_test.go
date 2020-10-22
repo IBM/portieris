@@ -26,6 +26,7 @@ import (
 	"github.com/IBM/portieris/pkg/notary/fakenotary"
 	"github.com/IBM/portieris/pkg/policy"
 	"github.com/IBM/portieris/pkg/registry/fakeregistry"
+	notaryverifier "github.com/IBM/portieris/pkg/verifier/trust"
 	"github.com/IBM/portieris/pkg/webhook"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -76,7 +77,8 @@ func resetAllFakes() {
 	policyClient = policy.NewClient(secClientset)
 	trust = &fakenotary.FakeNotary{}
 	cr = &fakeregistry.FakeRegistry{}
-	ctrl = NewController(kubeWrapper, policyClient, trust, cr)
+	nv := notaryverifier.NewVerifier(kubeWrapper, trust, cr)
+	ctrl = NewController(kubeWrapper, policyClient, nv)
 	wh = webhook.NewServer("notary", ctrl, []byte{}, []byte{})
 }
 

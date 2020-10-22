@@ -25,7 +25,7 @@ import (
 )
 
 // TransformPolicies from Portieris to container/image lib policies
-func TransformPolicies(kWrapper kubernetes.WrapperInterface, namespace string, inPolicies []v1beta1.SimpleRequirement) (*signature.Policy, error) {
+func (v verifier) TransformPolicies(kWrapper kubernetes.WrapperInterface, namespace string, inPolicies []v1beta1.SimpleRequirement) (*signature.Policy, error) {
 	var policyRequirements []signature.PolicyRequirement
 
 	for _, inPolicy := range inPolicies {
@@ -62,7 +62,6 @@ func TransformPolicies(kWrapper kubernetes.WrapperInterface, namespace string, i
 			if err != nil {
 				return nil, err
 			}
-			break
 
 		default:
 			return nil, fmt.Errorf("simple policy invalid Type: %s", inPolicy.Type)
