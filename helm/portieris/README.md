@@ -12,7 +12,7 @@ This chart installs Portieris in your cluster.
 This chart:
 * Installs Portieris.
 * Adds a resource definition for security policies.
-* Adds a default security policies
+* Adds some default security policies
 * Configures Kubernetes admission webhooks to direct admission requests to Portieris.
 
 ## Installing the chart
