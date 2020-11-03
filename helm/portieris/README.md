@@ -20,12 +20,7 @@ This chart:
 ### !!! Regenerate Certs !!!
 The install will use the default certs if you do not run the gencerts script. **This means you will deploying with certs that are publically accessible on GitHub.**
 
-To avoid this you should checkout the source project at the release level and run the 
-```
-./gencerts
-```
-
-script.
+To avoid this you should checkout the source project at the release level and run the `./gencerts` script.
 
 ### IBM Cloud Container Service
 
