@@ -4,15 +4,15 @@ This chart installs Portieris in your cluster.
 
 ## Prerequisites
 
-* Kubernetes v1.9+
-* Tiller v2.8+
+* Kubernetes v1.16+
+* Helm 3.0+
 
 ## Chart details
 
 This chart:
 * Installs Portieris.
 * Adds a resource definition for security policies.
-* Adds a default cluster-wide security policy, and a default security policy in the kube-system and ibm-system Kubernetes namespaces.
+* Adds some default security policies
 * Configures Kubernetes admission webhooks to direct admission requests to Portieris.
 
 ## Installing the chart
@@ -20,9 +20,7 @@ This chart:
 ### !!! Regenerate Certs !!!
 The install will use the default certs if you do not run the gencerts script. **This means you will deploying with certs that are publically accessible on GitHub.**
 
-```
-./gencerts
-```
+To avoid this you should checkout the source project at the release level and run the `./gencerts` script.
 
 ### IBM Cloud Container Service
 
