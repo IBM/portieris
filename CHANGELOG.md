@@ -4,7 +4,7 @@ Notable changes recorded here.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 # v0.9.0
-## 2020-11-04
+## 2020-11-05
 
 * Introduce a policy type to enforce an image vulnerability check ([#71](https://github.com/IBM/portieris/issues/71))
 * Normalise the usage of helm, allow --create-namespace, remove webhook on uninstall ([PR#189](https://github.com/IBM/portieris/pull/189))
