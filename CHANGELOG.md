@@ -3,8 +3,13 @@
 Notable changes recorded here.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-# v0.8.2next
-## 2020-
+# v0.9.0
+## 2020-11-05
+
+* Introduce a policy type to enforce an image vulnerability check ([#71](https://github.com/IBM/portieris/issues/71))
+* Normalise the usage of helm, allow --create-namespace, remove webhook on uninstall ([PR#189](https://github.com/IBM/portieris/pull/189))
+* Add a default policy for istio image when running on IBM Kubernetes Service ([PR#198](https://github.com/IBM/portieris/pull/198))
+* Fix certificate incompatibility in Kubernetes 1.19 ([#196](https://github.com/IBM/portieris/issues/196))
 
 # v0.8.2
 ## 2020-10-12
