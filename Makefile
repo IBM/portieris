@@ -44,10 +44,10 @@ helm.package:
 helm.install.local: helm.package
 	-kubectl create ns portieris
 	-kubectl get secret $(PULLSECRET) -o yaml | sed 's/namespace: default/namespace: portieris/' | kubectl create -f - 
-	helm install portieris $$(pwd)/portieris-$(VERSION).tgz --set image.host=$(HUB) --set image.tag=$(TAG) --set image.pullSecret=$(PULLSECRET) 
+	helm install -n portieris portieris $$(pwd)/portieris-$(VERSION).tgz --set image.host=$(HUB) --set image.tag=$(TAG) --set image.pullSecret=$(PULLSECRET)
 
 helm.install: helm.package
-	helm install portieris $$(pwd)/portieris-$(VERSION).tgz
+	helm install -n portieris portieris $$(pwd)/portieris-$(VERSION).tgz
 
 helm.clean:
 	-helm/cleanup.sh portieris
