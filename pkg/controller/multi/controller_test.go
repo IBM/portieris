@@ -22,6 +22,7 @@ import (
 	"github.com/IBM/portieris/helpers/credential"
 	"github.com/IBM/portieris/helpers/image"
 	"github.com/IBM/portieris/pkg/apis/securityenforcement/v1beta1"
+	"github.com/IBM/portieris/pkg/metrics"
 	"github.com/IBM/portieris/pkg/verifier/simple"
 	notaryverifier "github.com/IBM/portieris/pkg/verifier/trust"
 	"github.com/IBM/portieris/pkg/verifier/vulnerability"
@@ -93,13 +94,17 @@ func TestNewController(t *testing.T) {
 		scannerFactory:       &wantScannerFactory,
 		sv:                   simple.NewVerifier(),
 	}
+	wantMetrics := metrics.NewMetrics()
+	defer wantMetrics.UnregisterAll()
+
 	wantController := Controller{
 		kubeClientsetWrapper: wantKubeWrapper,
 		policyClient:         wantPolicyClient,
 		Enforcer:             wantEnforcer,
+		PMetrics:             wantMetrics,
 	}
 
-	gotController := NewController(wantKubeWrapper, wantPolicyClient, wantNV)
+	gotController := NewController(wantKubeWrapper, wantPolicyClient, wantNV, wantMetrics)
 
 	assert.Equal(t, wantController, *gotController)
 }
@@ -133,14 +138,14 @@ func TestController_getPatchesForContainers(t *testing.T) {
 		containers       []corev1.Container
 		mocks            []mocks
 		wantPatches      []types.JSONPatch
-		wantDenials      []string
+		wantDenials      map[string][]string
 		wantErr          error
 	}{
 		{
 			name:        "No containers, return no patches or denials",
 			containers:  []corev1.Container{},
 			wantPatches: []types.JSONPatch{},
-			wantDenials: []string{},
+			wantDenials: map[string][]string{},
 			wantErr:     nil,
 		},
 		{
@@ -149,44 +154,62 @@ func TestController_getPatchesForContainers(t *testing.T) {
 				{Image: "Invalid&Image%Name"},
 			},
 			wantPatches: []types.JSONPatch{},
-			wantDenials: []string{"Deny \"Invalid&Image%Name\", invalid image name"},
-			wantErr:     nil,
+			wantDenials: map[string][]string{
+				"invalidimagename": {"Deny \"Invalid&Image%Name\", invalid image name"},
+			},
+			wantErr: nil,
 		},
 		{
 			name:      "Fail to get policy, deny",
 			namespace: "some-namespace",
 			containers: []corev1.Container{
-				{Image: "icr.io/some-namespace/image:tag"},
+				{Image: "icr.io/some-namespace/image:tag@sha256:abc"},
 			},
 			mocks: []mocks{
 				{
-					inImage: "icr.io/some-namespace/image:tag",
+					inImage: "icr.io/some-namespace/image:tag@sha256:abc",
 					getPolicyToEnforce: &getPolicyToEnforceMock{
 						outErr: fmt.Errorf("no sorry"),
 					},
 				},
 			},
 			wantPatches: []types.JSONPatch{},
-			wantDenials: []string{"no sorry"},
-			wantErr:     nil,
+			wantDenials: map[string][]string{
+				"icr.io/some-namespace/image:tag:abc": {"no sorry"},
+			},
+			wantErr: nil,
 		},
 		{
-			name:      "Fail to get policy, deny",
+			name:      "Fail to get policy, deny, multiple containers",
 			namespace: "some-namespace",
 			containers: []corev1.Container{
-				{Image: "icr.io/some-namespace/image:tag"},
+				{
+					Image: "icr.io/some-namespace/image:tag@sha256:abc",
+				},
+				{
+					Image: "icr.io/some-namespace/anotherimage:tag@sha256:def",
+				},
 			},
 			mocks: []mocks{
 				{
-					inImage: "icr.io/some-namespace/image:tag",
+					inImage: "icr.io/some-namespace/image:tag@sha256:abc",
+					getPolicyToEnforce: &getPolicyToEnforceMock{
+						outErr: fmt.Errorf("no sorry"),
+					},
+				},
+				{
+					inImage: "icr.io/some-namespace/anotherimage:tag@sha256:def",
 					getPolicyToEnforce: &getPolicyToEnforceMock{
 						outErr: fmt.Errorf("no sorry"),
 					},
 				},
 			},
 			wantPatches: []types.JSONPatch{},
-			wantDenials: []string{"no sorry"},
-			wantErr:     nil,
+			wantDenials: map[string][]string{
+				"icr.io/some-namespace/image:tag:abc":        {"no sorry"},
+				"icr.io/some-namespace/anotherimage:tag:def": {"no sorry"},
+			},
+			wantErr: nil,
 		},
 		{
 			name:      "Not vulnerable with no signing enforcement",
@@ -197,11 +220,11 @@ func TestController_getPatchesForContainers(t *testing.T) {
 				},
 			},
 			containers: []corev1.Container{
-				{Image: "icr.io/some-namespace/image:tag"},
+				{Image: "icr.io/some-namespace/image:tag@sha256:abc"},
 			},
 			mocks: []mocks{
 				{
-					inImage: "icr.io/some-namespace/image:tag",
+					inImage: "icr.io/some-namespace/image:tag@sha256:abc",
 					getPolicyToEnforce: &getPolicyToEnforceMock{
 						outPolicy: &v1beta1.Policy{},
 					},
@@ -218,8 +241,10 @@ func TestController_getPatchesForContainers(t *testing.T) {
 				},
 			},
 			wantPatches: []types.JSONPatch{},
-			wantDenials: []string{},
-			wantErr:     nil,
+			wantDenials: map[string][]string{
+				"icr.io/some-namespace/image:tag:abc": {},
+			},
+			wantErr: nil,
 		},
 		{
 			name:      "digest by policy errors",
@@ -230,11 +255,11 @@ func TestController_getPatchesForContainers(t *testing.T) {
 				},
 			},
 			containers: []corev1.Container{
-				{Image: "icr.io/some-namespace/image:tag"},
+				{Image: "icr.io/some-namespace/image:tag@sha256:abc"},
 			},
 			mocks: []mocks{
 				{
-					inImage: "icr.io/some-namespace/image:tag",
+					inImage: "icr.io/some-namespace/image:tag@sha256:abc",
 					getPolicyToEnforce: &getPolicyToEnforceMock{
 						outPolicy: &v1beta1.Policy{},
 					},
@@ -253,8 +278,10 @@ func TestController_getPatchesForContainers(t *testing.T) {
 				},
 			},
 			wantPatches: []types.JSONPatch{},
-			wantDenials: []string{},
-			wantErr:     fmt.Errorf("failed"),
+			wantDenials: map[string][]string{
+				"icr.io/some-namespace/image:tag:abc": {},
+			},
+			wantErr: fmt.Errorf("failed"),
 		},
 		{
 			name:      "digest by policy says denied",
@@ -265,11 +292,11 @@ func TestController_getPatchesForContainers(t *testing.T) {
 				},
 			},
 			containers: []corev1.Container{
-				{Image: "icr.io/some-namespace/image:tag"},
+				{Image: "icr.io/some-namespace/image:tag@sha256:abc"},
 			},
 			mocks: []mocks{
 				{
-					inImage: "icr.io/some-namespace/image:tag",
+					inImage: "icr.io/some-namespace/image:tag@sha256:abc",
 					getPolicyToEnforce: &getPolicyToEnforceMock{
 						outPolicy: &v1beta1.Policy{},
 					},
@@ -288,8 +315,10 @@ func TestController_getPatchesForContainers(t *testing.T) {
 				},
 			},
 			wantPatches: []types.JSONPatch{},
-			wantDenials: []string{"I don't think so"},
-			wantErr:     nil,
+			wantDenials: map[string][]string{
+				"icr.io/some-namespace/image:tag:abc": {"I don't think so"},
+			},
+			wantErr: nil,
 		},
 		{
 			name:      "digest by policy returns a digest",
@@ -300,11 +329,11 @@ func TestController_getPatchesForContainers(t *testing.T) {
 				},
 			},
 			containers: []corev1.Container{
-				{Image: "icr.io/some-namespace/image:tag"},
+				{Image: "icr.io/some-namespace/image:tag@sha256:abc"},
 			},
 			mocks: []mocks{
 				{
-					inImage: "icr.io/some-namespace/image:tag",
+					inImage: "icr.io/some-namespace/image:tag@sha256:abc",
 					getPolicyToEnforce: &getPolicyToEnforceMock{
 						outPolicy: &v1beta1.Policy{},
 					},
@@ -323,8 +352,10 @@ func TestController_getPatchesForContainers(t *testing.T) {
 				},
 			},
 			wantPatches: []types.JSONPatch{},
-			wantDenials: []string{},
-			wantErr:     nil,
+			wantDenials: map[string][]string{
+				"icr.io/some-namespace/image:tag:abc": {},
+			},
+			wantErr: nil,
 		},
 		{
 			name:      "allowed by signing but vulnerable",
@@ -335,11 +366,11 @@ func TestController_getPatchesForContainers(t *testing.T) {
 				},
 			},
 			containers: []corev1.Container{
-				{Image: "icr.io/some-namespace/image:tag"},
+				{Image: "icr.io/some-namespace/image:tag@sha256:abc"},
 			},
 			mocks: []mocks{
 				{
-					inImage: "icr.io/some-namespace/image:tag",
+					inImage: "icr.io/some-namespace/image:tag@sha256:abc",
 					getPolicyToEnforce: &getPolicyToEnforceMock{
 						outPolicy: &v1beta1.Policy{},
 					},
@@ -359,8 +390,10 @@ func TestController_getPatchesForContainers(t *testing.T) {
 				},
 			},
 			wantPatches: []types.JSONPatch{},
-			wantDenials: []string{"I don't want to"},
-			wantErr:     nil,
+			wantDenials: map[string][]string{
+				"icr.io/some-namespace/image:tag:abc": {"I don't want to"},
+			},
+			wantErr: nil,
 		},
 	}
 	for _, tt := range tests {
@@ -431,7 +464,9 @@ func TestController_getPatchesForContainers(t *testing.T) {
 				policyClient:         &policyClient,
 				Enforcer:             &enforcer,
 				kubeClientsetWrapper: &kubeWrapper,
+				PMetrics:             metrics.NewMetrics(),
 			}
+			defer c.PMetrics.UnregisterAll()
 
 			gotPatches, gotDenials, gotErr := c.getPatchesForContainers(tt.containerType, tt.namespace, tt.specPath, podSpec, tt.containers)
 

@@ -22,6 +22,7 @@ import (
 	"github.com/IBM/portieris/helpers/credential"
 	"github.com/IBM/portieris/helpers/image"
 	"github.com/IBM/portieris/pkg/kubernetes"
+	"github.com/IBM/portieris/pkg/metrics"
 	"github.com/IBM/portieris/pkg/policy"
 	notaryverifier "github.com/IBM/portieris/pkg/verifier/trust"
 	"github.com/IBM/portieris/pkg/webhook"
@@ -43,15 +44,18 @@ type Controller struct {
 	policyClient policy.Interface
 	// Enforcer is used to check that containers satisfy constraints set by a policy
 	Enforcer
+	// PMetrics is used to provide scrapable metrics for prometheus
+	PMetrics *metrics.PortierisMetrics
 }
 
 // NewController creates a new controller object from the various clients passed in
-func NewController(kubeWrapper kubernetes.WrapperInterface, policyClient policy.Interface, nv *notaryverifier.Verifier) *Controller {
+func NewController(kubeWrapper kubernetes.WrapperInterface, policyClient policy.Interface, nv *notaryverifier.Verifier, pm *metrics.PortierisMetrics) *Controller {
 	enforcer := NewEnforcer(kubeWrapper, nv)
 	return &Controller{
 		kubeClientsetWrapper: kubeWrapper,
 		policyClient:         policyClient,
 		Enforcer:             enforcer,
+		PMetrics:             pm,
 	}
 }
 
@@ -79,6 +83,7 @@ func (c *Controller) Admit(admissionRequest *admissionv1beta1.AdmissionRequest) 
 func (c *Controller) admitPod(namespace, specPath string, pod corev1.PodSpec) *admissionv1beta1.AdmissionResponse {
 	a := &webhook.AdmissionResponder{}
 	patches := []types.JSONPatch{}
+	denials := map[string][]string{}
 
 	// for each container image subtype
 	for _, containerType := range []string{"initContainers", "containers"} {
@@ -94,7 +99,7 @@ func (c *Controller) admitPod(namespace, specPath string, pod corev1.PodSpec) *a
 		}
 
 		newPatches, denials, err := c.getPatchesForContainers(containerType, namespace, specPath, pod, containers)
-		a.StringsToAdmissionResponse(denials)
+		a.MapStringsToAdmissionResponse(denials)
 		if err != nil {
 			a.ToAdmissionResponse(err)
 			a.Flush()
@@ -103,7 +108,14 @@ func (c *Controller) admitPod(namespace, specPath string, pod corev1.PodSpec) *a
 	}
 
 	if a.HasErrors() {
-		glog.Info("Deny")
+		c.PMetrics.DenyDecisionCount.Inc()
+		denyStr := "Deny for images (image:tag:digest)"
+		for key, msgs := range denials {
+			if len(msgs) > 0 {
+				denyStr = fmt.Sprintf("%s [%s]", denyStr, key)
+			}
+		}
+		glog.Info(denyStr)
 		return a.Flush()
 	}
 
@@ -117,28 +129,39 @@ func (c *Controller) admitPod(namespace, specPath string, pod corev1.PodSpec) *a
 		glog.Infof("Mutation patch: %s", string(jsonPatch))
 		a.SetPatch(jsonPatch)
 	}
+	c.PMetrics.AllowDecisionCount.Inc()
+	allowStr := "Allow for images (image:tag:digest)"
 	a.SetAllowed()
-	glog.Info("Allow")
+	for key := range denials {
+		allowStr = fmt.Sprintf("%s [%s]", allowStr, key)
+	}
+	glog.Info(allowStr)
 	return a.Flush()
 }
 
-func (c *Controller) getPatchesForContainers(containerType, namespace, specPath string, pod corev1.PodSpec, containers []corev1.Container) ([]types.JSONPatch, []string, error) {
+func (c *Controller) getPatchesForContainers(containerType, namespace, specPath string, pod corev1.PodSpec, containers []corev1.Container) ([]types.JSONPatch, map[string][]string, error) {
 	patches := []types.JSONPatch{}
-	denials := []string{}
+	denials := map[string][]string{}
 
 	// for each container of this type
 	for containerIndex, container := range containers {
 		img, err := image.NewReference(container.Image)
 		if err != nil {
 			glog.Error(err)
-			denials = append(denials, fmt.Sprintf("Deny %q, invalid image name", container.Image))
+			denials["invalidimagename"] = []string{fmt.Sprintf("Deny %q, invalid image name", container.Image)}
 			continue
 		}
+		key := fmt.Sprintf("%s:%s", img.NameWithTag(), img.GetDigest())
+		denials[key] = []string{}
 
 		glog.Infof("Getting policy for container image: %s   namespace: %s", img.String(), namespace)
 		containerPolicy, err := c.policyClient.GetPolicyToEnforce(namespace, img.String())
 		if err != nil {
-			denials = append(denials, err.Error())
+			if _, ok := denials[key]; !ok {
+				denials[key] = []string{err.Error()}
+			} else {
+				denials[key] = append(denials[key], err.Error())
+			}
 			continue
 		}
 
@@ -146,7 +169,11 @@ func (c *Controller) getPatchesForContainers(containerType, namespace, specPath 
 
 		scanResponse := c.Enforcer.VulnerabilityPolicy(img, credentialCandidates, containerPolicy)
 		if !scanResponse.CanDeploy {
-			denials = append(denials, scanResponse.DenyReason)
+			if _, ok := denials[key]; !ok {
+				denials[key] = []string{scanResponse.DenyReason}
+			} else {
+				denials[key] = append(denials[key], scanResponse.DenyReason)
+			}
 		}
 
 		digest, deny, err := c.Enforcer.DigestByPolicy(namespace, img, credentialCandidates, containerPolicy)
@@ -154,7 +181,11 @@ func (c *Controller) getPatchesForContainers(containerType, namespace, specPath 
 			return patches, denials, err
 		}
 		if deny != nil {
-			denials = append(denials, deny.Error())
+			if _, ok := denials[key]; !ok {
+				denials[key] = []string{deny.Error()}
+			} else {
+				denials[key] = append(denials[key], deny.Error())
+			}
 			continue
 		}
 		if digest != nil {
