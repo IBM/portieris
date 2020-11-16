@@ -5,6 +5,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 # v0.9.0next 
 ##
+* Add metrics counting allow and deny events. ([#106](https://github.com/IBM/portieris/issues/162))
 
 # v0.9.0
 ## 2020-11-05
