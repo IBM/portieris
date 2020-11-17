@@ -15,6 +15,10 @@ spec:
       targetPort: {{ .Values.service.targetPort }}
       protocol: TCP
       name: https
+    - port: {{ .Values.service.metricsPort }}
+      targetPort: {{ .Values.service.metricsPort }}
+      protocol: TCP
+      name: metrics
   selector:
     app: {{ template "portieris.name" . }}
     release: {{ .Release.Name }}

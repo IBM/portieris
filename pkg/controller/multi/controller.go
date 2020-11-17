@@ -109,7 +109,7 @@ func (c *Controller) admitPod(namespace, specPath string, pod corev1.PodSpec) *a
 
 	if a.HasErrors() {
 		c.PMetrics.DenyDecisionCount.Inc()
-		denyStr := "Deny for images (image:tag:digest)"
+		denyStr := "Deny for images (image:digest)"
 		for key, msgs := range denials {
 			if len(msgs) > 0 {
 				denyStr = fmt.Sprintf("%s [%s]", denyStr, key)
@@ -130,7 +130,7 @@ func (c *Controller) admitPod(namespace, specPath string, pod corev1.PodSpec) *a
 		a.SetPatch(jsonPatch)
 	}
 	c.PMetrics.AllowDecisionCount.Inc()
-	allowStr := "Allow for images (image:tag:digest)"
+	allowStr := "Allow for images (image:digest)"
 	a.SetAllowed()
 	for key := range denials {
 		allowStr = fmt.Sprintf("%s [%s]", allowStr, key)
@@ -151,7 +151,7 @@ func (c *Controller) getPatchesForContainers(containerType, namespace, specPath 
 			denials["invalidimagename"] = []string{fmt.Sprintf("Deny %q, invalid image name", container.Image)}
 			continue
 		}
-		key := fmt.Sprintf("%s:%s", img.NameWithTag(), img.GetDigest())
+		key := fmt.Sprintf("%s:%s", img.NameWithoutTag(), img.GetDigest())
 		denials[key] = []string{}
 
 		glog.Infof("Getting policy for container image: %s   namespace: %s", img.String(), namespace)

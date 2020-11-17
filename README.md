@@ -24,6 +24,16 @@ Portieris receives AdmissionRequests for creation of or edits to all types of wo
 
 Portieris' Admission Webhook is configured to fail closed. Three instances of Portieris make sure that it is able to approve its own upgrades and auto-recovery. If all instance of Portieris are unavailable, Kubernetes will not auto-recover it, and you must delete the MutatingAdmissionWebhook to allow Portieris to recover.
 
+## Portieris Metrics
+Portieris exposes two metrics for monitoring the policy decisions made for workload images, these metrics
+are available on port 8080, and are exposed via annotations to prometheus. The metrics are
+```
+portieris_pod_admission_decision_allow_count
+portieris_pod_admission_decision_deny_count
+```
+and are counters that increment each time a decision is made.
+To locally view these metrics, they are available on the `:8080/metrics` path for each pod running.
+
 ## Installing Portieris
 
 Portieris is installed using a Helm chart. Before you begin, make sure that you have Kubernetes 1.16 or above on your cluster and Helm 3.0 or above installed on your workstation.

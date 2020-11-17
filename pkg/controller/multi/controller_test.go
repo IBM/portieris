@@ -175,7 +175,7 @@ func TestController_getPatchesForContainers(t *testing.T) {
 			},
 			wantPatches: []types.JSONPatch{},
 			wantDenials: map[string][]string{
-				"icr.io/some-namespace/image:tag:abc": {"no sorry"},
+				"icr.io/some-namespace/image:abc": {"no sorry"},
 			},
 			wantErr: nil,
 		},
@@ -206,8 +206,8 @@ func TestController_getPatchesForContainers(t *testing.T) {
 			},
 			wantPatches: []types.JSONPatch{},
 			wantDenials: map[string][]string{
-				"icr.io/some-namespace/image:tag:abc":        {"no sorry"},
-				"icr.io/some-namespace/anotherimage:tag:def": {"no sorry"},
+				"icr.io/some-namespace/image:abc":        {"no sorry"},
+				"icr.io/some-namespace/anotherimage:def": {"no sorry"},
 			},
 			wantErr: nil,
 		},
@@ -242,7 +242,7 @@ func TestController_getPatchesForContainers(t *testing.T) {
 			},
 			wantPatches: []types.JSONPatch{},
 			wantDenials: map[string][]string{
-				"icr.io/some-namespace/image:tag:abc": {},
+				"icr.io/some-namespace/image:abc": {},
 			},
 			wantErr: nil,
 		},
@@ -279,7 +279,7 @@ func TestController_getPatchesForContainers(t *testing.T) {
 			},
 			wantPatches: []types.JSONPatch{},
 			wantDenials: map[string][]string{
-				"icr.io/some-namespace/image:tag:abc": {},
+				"icr.io/some-namespace/image:abc": {},
 			},
 			wantErr: fmt.Errorf("failed"),
 		},
@@ -316,7 +316,7 @@ func TestController_getPatchesForContainers(t *testing.T) {
 			},
 			wantPatches: []types.JSONPatch{},
 			wantDenials: map[string][]string{
-				"icr.io/some-namespace/image:tag:abc": {"I don't think so"},
+				"icr.io/some-namespace/image:abc": {"I don't think so"},
 			},
 			wantErr: nil,
 		},
@@ -353,7 +353,7 @@ func TestController_getPatchesForContainers(t *testing.T) {
 			},
 			wantPatches: []types.JSONPatch{},
 			wantDenials: map[string][]string{
-				"icr.io/some-namespace/image:tag:abc": {},
+				"icr.io/some-namespace/image:abc": {},
 			},
 			wantErr: nil,
 		},
@@ -391,7 +391,7 @@ func TestController_getPatchesForContainers(t *testing.T) {
 			},
 			wantPatches: []types.JSONPatch{},
 			wantDenials: map[string][]string{
-				"icr.io/some-namespace/image:tag:abc": {"I don't want to"},
+				"icr.io/some-namespace/image:abc": {"I don't want to"},
 			},
 			wantErr: nil,
 		},
