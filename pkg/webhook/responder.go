@@ -100,3 +100,10 @@ func (a *AdmissionResponder) StringsToAdmissionResponse(msgs []string) {
 		a.StringToAdmissionResponse(msg)
 	}
 }
+
+// MapStringsToAdmissionResponse adds a map of a slice of strings as errors to the reponse
+func (a *AdmissionResponder) MapStringsToAdmissionResponse(mapofmsgs map[string][]string) {
+	for _, msgs := range mapofmsgs {
+		a.StringsToAdmissionResponse(msgs)
+	}
+}

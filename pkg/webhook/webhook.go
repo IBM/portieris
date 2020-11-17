@@ -46,6 +46,7 @@ type Server struct {
 
 // NewServer creates a new admission webhook server with the passed controller handling the admissions
 func NewServer(name string, ctrl controller.Interface, cert, key []byte) *Server {
+
 	return &Server{
 		name:       name,
 		mux:        http.NewServeMux(),

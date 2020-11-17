@@ -15,6 +15,7 @@ service:
   type: ClusterIP
   port: 443
   targetPort: 8000
+  metricsPort: 8080
 
 securityContext:
   runAsUser: 1000060001

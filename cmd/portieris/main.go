@@ -18,10 +18,14 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"strings"
 
+	"github.com/IBM/portieris/pkg/metrics"
 	notaryclient "github.com/IBM/portieris/pkg/notary"
+	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	kube "github.com/IBM/portieris/helpers/kube"
 	"github.com/IBM/portieris/pkg/controller/multi"
@@ -89,7 +93,16 @@ func main() {
 
 	cr := registryclient.NewClient()
 	nv := notaryverifier.NewVerifier(kubeWrapper, trust, cr)
-	controller := multi.NewController(kubeWrapper, policyClient, nv)
+	pmetrics := metrics.NewMetrics()
+	controller := multi.NewController(kubeWrapper, policyClient, nv, pmetrics)
+
+	// Setup http handler for metrics
+	go func() {
+		r := mux.NewRouter()
+		r.Handle("/metrics", promhttp.Handler())
+		http.ListenAndServe(":8080", r)
+	}()
+
 	webhook := webhook.NewServer("policy", controller, serverCert, serverKey)
 	webhook.Run()
 }

@@ -16,6 +16,9 @@ spec:
       release: {{ .Release.Name }}
   template:
     metadata:
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '8080'
       labels:
         app: portieris
         release: {{ .Release.Name }}
@@ -29,6 +32,8 @@ spec:
             - name: http
               containerPort: 80
               protocol: TCP
+            - name: metrics-port
+              containerPort: 8080
           volumeMounts:
           - name: portieris-certs
             readOnly: true
