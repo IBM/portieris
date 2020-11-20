@@ -15,9 +15,11 @@
 package framework
 
 import (
+	"encoding/json"
 	"fmt"
 	"time"
 
+	pk "github.com/IBM/portieris/pkg/kubernetes"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -33,7 +35,10 @@ func generateNamespace(name string) *corev1.Namespace {
 
 // IBMCloudSecretName secret provided to enable access to test images
 // https://github.com/IBM/portieris/issues/34 to remove the need for this
-var IBMCloudSecretNames = []string{"default-icr-io", "all-icr-io"}
+var IBMCloudSecretNames = []string{"all-icr-io", "default-icr-io"}
+
+// IBMGlobalRegistry is the default location of the test images used in these e2e tests
+var IBMGlobalRegistry = "icr.io"
 
 // CreateNamespace creates a namespace
 func (f *Framework) CreateNamespace(name string) (*corev1.Namespace, error) {
@@ -86,8 +91,33 @@ func (f *Framework) CreateNamespaceWithIPS(name string) (*corev1.Namespace, erro
 	if _, err := f.KubeClient.CoreV1().Secrets(namespace.Name).Create(imagePullSecret); err != nil {
 		return nil, fmt.Errorf("error creating imagePullSecret: %v", err)
 	}
+
+	// Create a bad pull secret based off the good one (hard-code password to a bad value)
+	badPullSecret := imagePullSecret.DeepCopy()
+	badPullSecret.Name = "bad-" + badPullSecret.GetName()
+	clientWrapper := pk.NewKubeClientsetWrapper(f.KubeClient)
+	goodUser, _, err := clientWrapper.GetSecretToken(namespace.Name, imagePullSecret.GetName(), IBMGlobalRegistry)
+	if err == nil {
+		badAuths := pk.Auths{
+			Registries: pk.RegistriesStruct{
+				IBMGlobalRegistry: pk.RegistryCredentials{
+					Username: goodUser,
+					Password: "iamnotanapikey",
+					Email:    "a@b.c",
+				},
+			},
+		}
+		badAuthData, _ := json.Marshal(badAuths)
+		badPullSecret.Data[".dockerconfigjson"] = badAuthData
+		if _, err := f.KubeClient.CoreV1().Secrets(namespace.Name).Create(badPullSecret); err != nil {
+			return nil, fmt.Errorf("error creating bad imagePullSecret: %v", err)
+		}
+	}
+
 	sa := generateServiceAccount("default")
+	// Ensure the bad imagePullSecret is before the good one in the ServiceAccount's list
 	sa.ImagePullSecrets = []corev1.LocalObjectReference{
+		{Name: badPullSecret.GetName()},
 		{Name: imagePullSecret.GetName()},
 	}
 	if _, err := f.KubeClient.CoreV1().ServiceAccounts(namespace.Name).Update(sa); err != nil {
