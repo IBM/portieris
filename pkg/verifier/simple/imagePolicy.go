@@ -28,6 +28,7 @@ import (
 	"github.com/containers/image/v5/manifest"
 	"github.com/containers/image/v5/signature"
 	"github.com/containers/image/v5/types"
+	"github.com/golang/glog"
 )
 
 // VerifyByPolicy verifies the image according to the supplied policy and returns the verified digest, verify error or processing error
@@ -49,7 +50,8 @@ func (v verifier) VerifyByPolicy(imageToVerify string, credentials credential.Cr
 	}
 
 	// support no-auth ?
-	for _, credential := range credentials {
+	numCreds := len(credentials)
+	for i, credential := range credentials {
 		dockerAuthConfig := &types.DockerAuthConfig{
 			Username: credential.Username,
 			Password: credential.Password,
@@ -57,17 +59,18 @@ func (v verifier) VerifyByPolicy(imageToVerify string, credentials credential.Cr
 		systemContext.DockerAuthConfig = dockerAuthConfig
 		imageSource, err := imageReference.NewImageSource(context.Background(), systemContext)
 		if err != nil {
-			return nil, nil, err
+			if i == numCreds-1 {
+				glog.Errorf("SimpleSigning verification: ImagePullSecret with username %s for image %s failed, no more secrets in scope (secret %d/%d). Failing. Error %v", credential.Username, imageToVerify, i+1, numCreds, err)
+				return nil, nil, err
+			}
+			glog.Warningf("SimpleSigning verification: ImagePullSecret with username %s for image %s failed, trying the next secret in scope (secret %d/%d). Error %v", credential.Username, imageToVerify, i+1, numCreds, err)
+			continue
 		}
+		glog.Infof("SimpleSigning verification: ImagePullSecret with username %s for image %s was valid (secret %d/%d), continuing to next stage", credential.Username, imageToVerify, i+1, numCreds)
 		unparsedImage := image.UnparsedInstance(imageSource, nil)
 		_, deny := policyContext.IsRunningImageAllowed(context.Background(), unparsedImage)
 		if deny != nil {
-			switch deny.(type) {
-			case *docker.ErrUnauthorizedForCredentials:
-				continue
-			default:
-				return nil, deny, nil
-			}
+			return nil, deny, nil
 		}
 		// get the digest
 		m, _, _ := unparsedImage.Manifest(context.Background())
