@@ -3,9 +3,13 @@
 Notable changes recorded here.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-# v0.9.0next 
-##
+# v0.9.1next
+
+# v0.9.1
+## 2020-11-23
 * Add metrics counting allow and deny events. ([#106](https://github.com/IBM/portieris/issues/162))
+* Fix a problem with multiple pull secrets and simple signing ([#209](https://github.com/IBM/portieris/issues/209))
+
 
 # v0.9.0
 ## 2020-11-05
