@@ -83,7 +83,7 @@ func (c *Controller) Admit(admissionRequest *admissionv1beta1.AdmissionRequest) 
 func (c *Controller) admitPod(namespace, specPath string, pod corev1.PodSpec) *admissionv1beta1.AdmissionResponse {
 	a := &webhook.AdmissionResponder{}
 	patches := []types.JSONPatch{}
-	denials := map[string][]string{}
+	decisions := map[string][]string{}
 
 	// for each container image subtype
 	for _, containerType := range []string{"initContainers", "containers"} {
@@ -105,12 +105,19 @@ func (c *Controller) admitPod(namespace, specPath string, pod corev1.PodSpec) *a
 			a.Flush()
 		}
 		patches = append(patches, newPatches...)
+		for key, value := range denials {
+			if _, ok := decisions[key]; !ok {
+				decisions[key] = value
+			} else {
+				decisions[key] = append(decisions[key], value...)
+			}
+		}
 	}
 
 	if a.HasErrors() {
 		c.PMetrics.DenyDecisionCount.Inc()
-		denyStr := "Deny for images (image:digest)"
-		for key, msgs := range denials {
+		denyStr := "Deny for images [image:digest]"
+		for key, msgs := range decisions {
 			if len(msgs) > 0 {
 				denyStr = fmt.Sprintf("%s [%s]", denyStr, key)
 			}
@@ -130,9 +137,9 @@ func (c *Controller) admitPod(namespace, specPath string, pod corev1.PodSpec) *a
 		a.SetPatch(jsonPatch)
 	}
 	c.PMetrics.AllowDecisionCount.Inc()
-	allowStr := "Allow for images (image:digest)"
+	allowStr := "Allow for images [image:digest]"
 	a.SetAllowed()
-	for key := range denials {
+	for key := range decisions {
 		allowStr = fmt.Sprintf("%s [%s]", allowStr, key)
 	}
 	glog.Info(allowStr)
