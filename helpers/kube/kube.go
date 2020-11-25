@@ -27,17 +27,33 @@ import (
 )
 
 // GetKubeClient creates a kube clientset
-func GetKubeClient() *kubernetes.Clientset {
+func GetKubeClient(kubeconfigFileLoc *string) *kubernetes.Clientset {
 	var config *rest.Config
 	var err error
 
-	// If KUBECONFIG ENV var is set, use that kubeconfig file location to create the kube client
-	kubeconfig, kubeconfigSet := os.LookupEnv("KUBECONFIG")
-	if kubeconfigSet {
-		glog.Info(fmt.Sprintf("KUBECONFIG env variable is set to %s, using this for kube client config", kubeconfig))
-		config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
+	// If --kubeconfig command-line flag is set, use that kubeconfig file location to create the kube client
+	if kubeconfigFileLoc != nil && *kubeconfigFileLoc != "" {
+		glog.Info(fmt.Sprintf("--kubeconfig command line flag set to %s", *kubeconfigFileLoc))
+		// need to confirm that the specified file actually exists before using it
+		if _, err = os.Stat(*kubeconfigFileLoc); err == nil {
+			glog.Info(fmt.Sprintf("Using %s for kube client config", *kubeconfigFileLoc))
+			config, err = clientcmd.BuildConfigFromFlags("", *kubeconfigFileLoc)
+		} else {
+			glog.Fatal(fmt.Sprintf("%s is not a valid file location", *kubeconfigFileLoc))
+		}
+		// If KUBECONFIG ENV var is set, use that kubeconfig file location to create the kube client
+	} else if kubeconfig, kubeconfigSet := os.LookupEnv("KUBECONFIG"); kubeconfigSet {
+		glog.Info(fmt.Sprintf("KUBECONFIG env variable is set to %s", kubeconfig))
+		// need to confirm that the specified file actually exists before using it
+		if _, err = os.Stat(kubeconfig); err == nil {
+			glog.Info(fmt.Sprintf("Using %s for kube client config", kubeconfig))
+			config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
+		} else {
+			glog.Fatal(fmt.Sprintf("%s is not a valid file location", kubeconfig))
+		}
+		// If neither the --kubeconfig flag or the KUBECONFIG env var are set, default to using an in-cluster kube client configuration
 	} else {
-		glog.Info("KUBECONFIG env variable is NOT set, defaulting to in-cluster kube client config")
+		glog.Info("No --kubeconfig flag found and KUBECONFIG env variable is NOT set, defaulting to in-cluster kube client config")
 		config, err = rest.InClusterConfig()
 	}
 	if err != nil {

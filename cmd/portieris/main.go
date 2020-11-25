@@ -38,6 +38,7 @@ import (
 
 func main() {
 	mkdir := flag.String("mkdir", "", "create directories needed for Portieris to run")
+	kubeconfig := flag.String("kubeconfig", "", "location of kubeconfig file to use for an out-of-cluster kube client configuration")
 
 	flag.Parse() // glog flags
 
@@ -62,7 +63,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	kubeClientset := kube.GetKubeClient()
+	kubeClientset := kube.GetKubeClient(kubeconfig)
 	kubeWrapper := kubernetes.NewKubeClientsetWrapper(kubeClientset)
 	policyClient, err := kube.GetPolicyClient()
 	if err != nil {
