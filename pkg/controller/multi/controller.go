@@ -116,7 +116,7 @@ func (c *Controller) admitPod(namespace, specPath string, pod corev1.PodSpec) *a
 
 	if a.HasErrors() {
 		c.PMetrics.DenyDecisionCount.Inc()
-		denyStr := "Deny for images [image:digest]"
+		denyStr := "Deny for images: "
 		for key, msgs := range decisions {
 			if len(msgs) > 0 {
 				denyStr = fmt.Sprintf("%s [%s]", denyStr, key)
@@ -137,7 +137,7 @@ func (c *Controller) admitPod(namespace, specPath string, pod corev1.PodSpec) *a
 		a.SetPatch(jsonPatch)
 	}
 	c.PMetrics.AllowDecisionCount.Inc()
-	allowStr := "Allow for images [image:digest]"
+	allowStr := "Allow for images: "
 	a.SetAllowed()
 	for key := range decisions {
 		allowStr = fmt.Sprintf("%s [%s]", allowStr, key)
@@ -158,7 +158,13 @@ func (c *Controller) getPatchesForContainers(containerType, namespace, specPath 
 			denials["invalidimagename"] = []string{fmt.Sprintf("Deny %q, invalid image name", container.Image)}
 			continue
 		}
-		key := fmt.Sprintf("%s:%s", img.NameWithoutTag(), img.GetDigest())
+		// If digest isn't available use tag
+		var key string
+		if img.GetDigest() == "" {
+			key = img.NameWithTag()
+		} else {
+			key = fmt.Sprintf("%s:%s", img.NameWithoutTag(), img.GetDigest())
+		}
 		denials[key] = []string{}
 
 		glog.Infof("Getting policy for container image: %s   namespace: %s", img.String(), namespace)
@@ -187,6 +193,17 @@ func (c *Controller) getPatchesForContainers(containerType, namespace, specPath 
 		if err != nil {
 			return patches, denials, err
 		}
+		// Update map key from image:tag to image:digest
+		if digest != nil {
+			oldkey := key
+			key = fmt.Sprintf("%s:%s", img.NameWithoutTag(), digest.String())
+			if _, ok := denials[oldkey]; !ok {
+				denials[key] = []string{}
+			} else {
+				denials[key] = denials[oldkey]
+			}
+			delete(denials, oldkey)
+		}
 		if deny != nil {
 			if _, ok := denials[key]; !ok {
 				denials[key] = []string{deny.Error()}
@@ -195,6 +212,7 @@ func (c *Controller) getPatchesForContainers(containerType, namespace, specPath 
 			}
 			continue
 		}
+
 		if digest != nil {
 			// convert digest to patch
 			glog.Infof("Mutation #: %s %d  Image name: %s", containerType, containerIndex, img.String())
