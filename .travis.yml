@@ -1,13 +1,7 @@
 language: go
 
 go:
-  - "1.14"
-
-cache:
-  bundler: true
-
-services:
-  - docker
+  - "1.14.7"
 
 script:
   - make alltests
