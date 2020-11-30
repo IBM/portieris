@@ -3,8 +3,15 @@
 Notable changes recorded here.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-# v0.9.1next
+# v0.9.2next
 
+# v0.9.2
+## 2020-11-30
+* Additional logging container image name ([#216](https://github.com/IBM/portieris/issues/216))
+* Accept a --kubeconfig command line parameter ([PR#218](https://github.com/IBM/portieris/pull/218))
+
+
+* 
 # v0.9.1
 ## 2020-11-23
 * Add metrics counting allow and deny events. ([#106](https://github.com/IBM/portieris/issues/162))
