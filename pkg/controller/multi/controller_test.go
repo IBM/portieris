@@ -163,11 +163,11 @@ func TestController_getPatchesForContainers(t *testing.T) {
 			name:      "Fail to get policy, deny",
 			namespace: "some-namespace",
 			containers: []corev1.Container{
-				{Image: "icr.io/some-namespace/image:tag@sha256:abc"},
+				{Image: "icr.io/some-namespace/image:tag"},
 			},
 			mocks: []mocks{
 				{
-					inImage: "icr.io/some-namespace/image:tag@sha256:abc",
+					inImage: "icr.io/some-namespace/image:tag",
 					getPolicyToEnforce: &getPolicyToEnforceMock{
 						outErr: fmt.Errorf("no sorry"),
 					},
@@ -175,7 +175,7 @@ func TestController_getPatchesForContainers(t *testing.T) {
 			},
 			wantPatches: []types.JSONPatch{},
 			wantDenials: map[string][]string{
-				"icr.io/some-namespace/image:abc": {"no sorry"},
+				"icr.io/some-namespace/image:tag": {"no sorry"},
 			},
 			wantErr: nil,
 		},
@@ -184,7 +184,7 @@ func TestController_getPatchesForContainers(t *testing.T) {
 			namespace: "some-namespace",
 			containers: []corev1.Container{
 				{
-					Image: "icr.io/some-namespace/image:tag@sha256:abc",
+					Image: "icr.io/some-namespace/image:tag",
 				},
 				{
 					Image: "icr.io/some-namespace/anotherimage:tag@sha256:def",
@@ -192,7 +192,7 @@ func TestController_getPatchesForContainers(t *testing.T) {
 			},
 			mocks: []mocks{
 				{
-					inImage: "icr.io/some-namespace/image:tag@sha256:abc",
+					inImage: "icr.io/some-namespace/image:tag",
 					getPolicyToEnforce: &getPolicyToEnforceMock{
 						outErr: fmt.Errorf("no sorry"),
 					},
@@ -206,7 +206,7 @@ func TestController_getPatchesForContainers(t *testing.T) {
 			},
 			wantPatches: []types.JSONPatch{},
 			wantDenials: map[string][]string{
-				"icr.io/some-namespace/image:abc":        {"no sorry"},
+				"icr.io/some-namespace/image:tag":        {"no sorry"},
 				"icr.io/some-namespace/anotherimage:def": {"no sorry"},
 			},
 			wantErr: nil,
@@ -220,11 +220,11 @@ func TestController_getPatchesForContainers(t *testing.T) {
 				},
 			},
 			containers: []corev1.Container{
-				{Image: "icr.io/some-namespace/image:tag@sha256:abc"},
+				{Image: "icr.io/some-namespace/image:tag"},
 			},
 			mocks: []mocks{
 				{
-					inImage: "icr.io/some-namespace/image:tag@sha256:abc",
+					inImage: "icr.io/some-namespace/image:tag",
 					getPolicyToEnforce: &getPolicyToEnforceMock{
 						outPolicy: &v1beta1.Policy{},
 					},
@@ -242,7 +242,7 @@ func TestController_getPatchesForContainers(t *testing.T) {
 			},
 			wantPatches: []types.JSONPatch{},
 			wantDenials: map[string][]string{
-				"icr.io/some-namespace/image:abc": {},
+				"icr.io/some-namespace/image:tag": {},
 			},
 			wantErr: nil,
 		},
@@ -255,11 +255,11 @@ func TestController_getPatchesForContainers(t *testing.T) {
 				},
 			},
 			containers: []corev1.Container{
-				{Image: "icr.io/some-namespace/image:tag@sha256:abc"},
+				{Image: "icr.io/some-namespace/image:tag"},
 			},
 			mocks: []mocks{
 				{
-					inImage: "icr.io/some-namespace/image:tag@sha256:abc",
+					inImage: "icr.io/some-namespace/image:tag",
 					getPolicyToEnforce: &getPolicyToEnforceMock{
 						outPolicy: &v1beta1.Policy{},
 					},
@@ -279,7 +279,7 @@ func TestController_getPatchesForContainers(t *testing.T) {
 			},
 			wantPatches: []types.JSONPatch{},
 			wantDenials: map[string][]string{
-				"icr.io/some-namespace/image:abc": {},
+				"icr.io/some-namespace/image:tag": {},
 			},
 			wantErr: fmt.Errorf("failed"),
 		},
@@ -292,11 +292,11 @@ func TestController_getPatchesForContainers(t *testing.T) {
 				},
 			},
 			containers: []corev1.Container{
-				{Image: "icr.io/some-namespace/image:tag@sha256:abc"},
+				{Image: "icr.io/some-namespace/image:tag"},
 			},
 			mocks: []mocks{
 				{
-					inImage: "icr.io/some-namespace/image:tag@sha256:abc",
+					inImage: "icr.io/some-namespace/image:tag",
 					getPolicyToEnforce: &getPolicyToEnforceMock{
 						outPolicy: &v1beta1.Policy{},
 					},
@@ -316,7 +316,7 @@ func TestController_getPatchesForContainers(t *testing.T) {
 			},
 			wantPatches: []types.JSONPatch{},
 			wantDenials: map[string][]string{
-				"icr.io/some-namespace/image:abc": {"I don't think so"},
+				"icr.io/some-namespace/image:tag": {"I don't think so"},
 			},
 			wantErr: nil,
 		},
@@ -329,11 +329,11 @@ func TestController_getPatchesForContainers(t *testing.T) {
 				},
 			},
 			containers: []corev1.Container{
-				{Image: "icr.io/some-namespace/image:tag@sha256:abc"},
+				{Image: "icr.io/some-namespace/image:tag"},
 			},
 			mocks: []mocks{
 				{
-					inImage: "icr.io/some-namespace/image:tag@sha256:abc",
+					inImage: "icr.io/some-namespace/image:tag",
 					getPolicyToEnforce: &getPolicyToEnforceMock{
 						outPolicy: &v1beta1.Policy{},
 					},
@@ -353,7 +353,7 @@ func TestController_getPatchesForContainers(t *testing.T) {
 			},
 			wantPatches: []types.JSONPatch{},
 			wantDenials: map[string][]string{
-				"icr.io/some-namespace/image:abc": {},
+				"icr.io/some-namespace/image:somedigest": {},
 			},
 			wantErr: nil,
 		},
@@ -366,11 +366,11 @@ func TestController_getPatchesForContainers(t *testing.T) {
 				},
 			},
 			containers: []corev1.Container{
-				{Image: "icr.io/some-namespace/image:tag@sha256:abc"},
+				{Image: "icr.io/some-namespace/image:tag"},
 			},
 			mocks: []mocks{
 				{
-					inImage: "icr.io/some-namespace/image:tag@sha256:abc",
+					inImage: "icr.io/some-namespace/image:tag",
 					getPolicyToEnforce: &getPolicyToEnforceMock{
 						outPolicy: &v1beta1.Policy{},
 					},
@@ -391,7 +391,7 @@ func TestController_getPatchesForContainers(t *testing.T) {
 			},
 			wantPatches: []types.JSONPatch{},
 			wantDenials: map[string][]string{
-				"icr.io/some-namespace/image:abc": {"I don't want to"},
+				"icr.io/some-namespace/image:somedigest": {"I don't want to"},
 			},
 			wantErr: nil,
 		},
