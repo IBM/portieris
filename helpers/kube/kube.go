@@ -26,13 +26,13 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-// GetKubeClient creates a kube clientset
-func GetKubeClient(kubeconfigFileLoc *string) *kubernetes.Clientset {
+// GetKubeClientConfig creates a kube client config
+func GetKubeClientConfig(kubeconfigFileLoc *string) *rest.Config {
 	var config *rest.Config
 	var err error
 
-	// If --kubeconfig command-line flag is set, use that kubeconfig file location to create the kube client
 	if kubeconfigFileLoc != nil && *kubeconfigFileLoc != "" {
+		// If --kubeconfig command-line flag is set, use that kubeconfig file location to create the kube client
 		glog.Info(fmt.Sprintf("--kubeconfig command line flag set to %s", *kubeconfigFileLoc))
 		// need to confirm that the specified file actually exists before using it
 		if _, err = os.Stat(*kubeconfigFileLoc); err == nil {
@@ -41,8 +41,8 @@ func GetKubeClient(kubeconfigFileLoc *string) *kubernetes.Clientset {
 		} else {
 			glog.Fatal(fmt.Sprintf("%s is not a valid file location", *kubeconfigFileLoc))
 		}
-		// If KUBECONFIG ENV var is set, use that kubeconfig file location to create the kube client
 	} else if kubeconfig, kubeconfigSet := os.LookupEnv("KUBECONFIG"); kubeconfigSet {
+		// If KUBECONFIG ENV var is set, use that kubeconfig file location to create the kube client
 		glog.Info(fmt.Sprintf("KUBECONFIG env variable is set to %s", kubeconfig))
 		// need to confirm that the specified file actually exists before using it
 		if _, err = os.Stat(kubeconfig); err == nil {
@@ -51,14 +51,22 @@ func GetKubeClient(kubeconfigFileLoc *string) *kubernetes.Clientset {
 		} else {
 			glog.Fatal(fmt.Sprintf("%s is not a valid file location", kubeconfig))
 		}
-		// If neither the --kubeconfig flag or the KUBECONFIG env var are set, default to using an in-cluster kube client configuration
 	} else {
+		// If neither the --kubeconfig flag or the KUBECONFIG env var are set, default to using an in-cluster kube client configuration
 		glog.Info("No --kubeconfig flag found and KUBECONFIG env variable is NOT set, defaulting to in-cluster kube client config")
 		config, err = rest.InClusterConfig()
 	}
 	if err != nil {
 		glog.Fatal(err)
 	}
+
+	return config
+}
+
+// GetKubeClient creates a kube clientset
+func GetKubeClient(config *rest.Config) *kubernetes.Clientset {
+	var err error
+
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		glog.Fatal(err)
@@ -67,29 +75,16 @@ func GetKubeClient(kubeconfigFileLoc *string) *kubernetes.Clientset {
 }
 
 // GetPolicyClient creates a policy clientset
-func GetPolicyClient() (*policy.Client, error) {
+func GetPolicyClient(*rest.Config) *policy.Client {
 	var config *rest.Config
 	var err error
-
-	// If KUBECONFIG ENV var is set, use that kubeconfig file location to create the kube client
-	kubeconfig, kubeconfigSet := os.LookupEnv("KUBECONFIG")
-	if kubeconfigSet {
-		glog.Info(fmt.Sprintf("KUBECONFIG env variable is set to %s, using this for kube client config", kubeconfig))
-		config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
-	} else {
-		glog.Info("KUBECONFIG env variable is NOT set, defaulting to in-cluster kube client config")
-		config, err = rest.InClusterConfig()
-	}
-	if err != nil {
-		return nil, err
-	}
 
 	// Get admission policy clientset
 	clientset, err := securityenforcementclientset.NewForConfig(config)
 	if err != nil {
-		return nil, err
+		glog.Fatal("Could not get policy client", err)
 	}
 
 	policyClient := policy.NewClient(clientset)
-	return policyClient, nil
+	return policyClient
 }

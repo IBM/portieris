@@ -63,12 +63,10 @@ func main() {
 		os.Exit(0)
 	}
 
-	kubeClientset := kube.GetKubeClient(kubeconfig)
+	kubeClientConfig := kube.GetKubeClientConfig(kubeconfig)
+	kubeClientset := kube.GetKubeClient(kubeClientConfig)
 	kubeWrapper := kubernetes.NewKubeClientsetWrapper(kubeClientset)
-	policyClient, err := kube.GetPolicyClient()
-	if err != nil {
-		glog.Fatal("Could not get policy client", err)
-	}
+	policyClient := kube.GetPolicyClient(kubeClientConfig)
 
 	ca, err := ioutil.ReadFile("/etc/certs/ca.pem")
 	if err != nil {
