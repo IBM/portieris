@@ -20,4 +20,7 @@ jobs:
         export PATH=$PATH:/usr/local/go/bin/
         export GOPATH=$HOME/go
         export PATH=$PATH:$HOME/go/bin/
+	pwd
+        ls -l scripts
+        ls -l /bin/bash 
         make alltests
