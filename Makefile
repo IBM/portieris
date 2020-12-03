@@ -20,13 +20,13 @@ test-deps:
 alltests: test-deps fmt lint vet copyright-check test
 
 test:
-	@${GOPATH}/src/github.com/IBM/portieris/scripts/makeTest.sh "${GOPACKAGES}" ${GOTAGS}
+	./scripts/makeTest.sh "${GOPACKAGES}" ${GOTAGS}
 
 copyright:
-	@${GOPATH}/src/github.com/IBM/portieris/scripts/copyright.sh
+	./scripts/copyright.sh
 
 copyright-check:
-	@${GOPATH}/src/github.com/IBM/portieris/scripts/copyright-check.sh
+	./scripts/copyright-check.sh
 
 fmt:
 	@if [ -n "$$(gofmt -l ${GOFILES})" ]; then echo 'Please run gofmt -l -w on your code.' && exit 1; fi
