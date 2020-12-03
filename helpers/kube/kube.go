@@ -65,8 +65,6 @@ func GetKubeClientConfig(kubeconfigFileLoc *string) *rest.Config {
 
 // GetKubeClient creates a kube clientset
 func GetKubeClient(config *rest.Config) *kubernetes.Clientset {
-	var err error
-
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		glog.Fatal(err)
@@ -75,16 +73,11 @@ func GetKubeClient(config *rest.Config) *kubernetes.Clientset {
 }
 
 // GetPolicyClient creates a policy clientset
-func GetPolicyClient(*rest.Config) *policy.Client {
-	var config *rest.Config
-	var err error
-
-	// Get admission policy clientset
+func GetPolicyClient(config *rest.Config) *policy.Client {
 	clientset, err := securityenforcementclientset.NewForConfig(config)
 	if err != nil {
-		glog.Fatal("Could not get policy client", err)
+		glog.Fatal(err)
 	}
-
 	policyClient := policy.NewClient(clientset)
 	return policyClient
 }
