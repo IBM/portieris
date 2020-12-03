@@ -1,7 +1,0 @@
-language: go
-
-go:
-  - "1.14.7"
-
-script:
-  - make alltests
