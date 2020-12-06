@@ -1,0 +1,26 @@
+name: Go
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  test:
+    name: alltests
+    runs-on: [self-hosted,go]
+    steps:
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+
+    - name: alltests
+      run: |
+        mkdir -p /root/go/src/github.com/IBM/
+        mv /tmp/github-runner-your-repo/portieris/portieris /root/go/src/github.com/IBM/
+        cd /root/go/src/github.com/IBM/portieris/
+        export PATH=$PATH:/usr/local/go/bin/
+        export GOPATH=$HOME/go
+        export PATH=$PATH:$HOME/go/bin/
+        make alltests
+        mv /root/go/src/github.com/IBM/portieris/ /tmp/github-runner-your-repo/portieris/
