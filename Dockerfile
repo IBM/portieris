@@ -1,4 +1,4 @@
-FROM golang:1.13.2 as golang
+FROM golang:1.14.12 as golang
 
 WORKDIR /go/src/github.com/IBM/portieris
 RUN mkdir -p /go/src/github.com/IBM/portieris

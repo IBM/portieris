@@ -8,7 +8,7 @@ image:
   host:
   pullSecret:
   image: portieris
-  tag: 0.9.2next
+  tag: 0.9.4
   pullPolicy: Always
 
 service:
@@ -19,6 +19,9 @@ service:
 
 securityContext:
   runAsUser: 1000060001
+
+webHooks:
+  failurePolicy: Fail
 
 # If not running on IBM Cloud Container Service set to false
 IBMContainerService: true
