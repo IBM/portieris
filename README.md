@@ -40,22 +40,23 @@ Portieris is installed using a Helm chart. Before you begin, make sure that you 
 
 To install Portieris in the default namespace (portieris):
 
-* Clone the Portieris Git repository to your workstation. `git clone git@github.com:IBM/portieris.git`
-* Change directory into the Portieris Git repository.
-* Checkout the tag commit that you want to install , example: `git checkout 0.7.0`
-* Run `./helm/portieris/gencerts`. The `gencerts` script generates new SSL certificates and keys for Portieris. Portieris presents this certificates to the Kubernetes API server when the API server makes admission requests. If you do not generate new certificates, it could be possible for an attacker to spoof Portieris in your cluster.
-* Run `helm install portieris --create-namespace --namespace portieris helm/portieris`. 
+* Find the release you want to run in [releases](https://github.com/IBM/portieris/releases) and download the helm chart package. 
+* Unpack the charts, for example `tar xzvf portieris-0.9.4.tgz`
+* Run `sh ./portieris/gencerts`. The `gencerts` script generates new SSL certificates and keys for Portieris. Portieris presents this certificates to the Kubernetes API server when the API server makes admission requests. If you do not generate new certificates, it could be possible for an attacker to spoof Portieris in your cluster.
+* Run `helm install portieris --create-namespace --namespace portieris ./portieris`. 
 
-You can use a different namespace if you choose including an existing one if you omit the `--create-namespace` option, but note that the namespace forms part of the webhook certificate common name so you need to generate the certificate for the target namespace.
+You can use a different namespace if you choose, including an existing one if you omit the `--create-namespace` option, but note that the namespace forms part of the webhook certificate common name so you need to generate the certificate for the target namespace.
 
-* Run `./helm/portieris/gencerts <namespace>`.
-* Run `helm install portieris --create-namespace --namespace <namespace> helm/portieris`.
+* Run `sh portieris/gencerts <namespace>`.
+* Run `helm install portieris --create-namespace --namespace <namespace> ./portieris`.
 
-To manage certificates through an installed [cert-manager](https://cert-manager.io/):
+To manage certificates through an installed [cert-manager](https://cert-manager.io/), you do not need to unpack the charts in this case:
 
-* Run `helm install portieris --set UseCertManager=true helm/portieris`.
+* Run `helm install portieris --set UseCertManager=true portieris-0.9.4.tgz`.
 
 By default, Portieris' admission webhook runs in all namespaces including its own install namespace, so that Portieris is able to review all the pods in the cluster. However, this can prevent the cluster from self healing in the event where Portieris becomes unavailable. Portieris also supports skipping namespaces with a certain label set. You can enable this by adding `--set AllowAdmissionSkip=true` to your install command, but make sure to control who can add labels to namespaces and who can access namespaces with this label so that a malicious party cannot use this label to bypass Portieris.
+
+Another way to avoid update deadlock is to specify `--set webHooks.failurePolicy=Ignore`. 
 
 ## Uninstalling Portieris
 
