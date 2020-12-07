@@ -152,6 +152,12 @@ func (c *Controller) getPatchesForContainers(containerType, namespace, specPath 
 
 	// for each container of this type
 	for containerIndex, container := range containers {
+		// https://github.com/IBM/portieris/issues/227 allow blank images
+		if strings.TrimSpace(container.Image) == "" {
+			continue
+		}
+
+		// parse image
 		img, err := image.NewReference(container.Image)
 		if err != nil {
 			glog.Error(err)
