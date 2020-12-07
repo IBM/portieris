@@ -5,8 +5,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 # v0.9.4
 ## 2020-12-06
-* Complile with to go 1.4.12
+* Complile with go 1.14.12
 * Support OpenShift projects which create deployments with blank image names ([#227](https://github.com/IBM/portieris/issues/227))
+* add webHooks.failurePolicy value/option
 
 # v0.9.2
 ## 2020-11-30

@@ -55,7 +55,7 @@ webhooks:
         apiGroups: ["*"]
         apiVersions: ["*"]
         resources: ["pods", "deployments", "replicationcontrollers", "replicasets", "daemonsets", "statefulsets", "jobs", "cronjobs"]
-    failurePolicy: Fail
+    failurePolicy: {{ .Values.webHooks.failurePolicy }}
     sideEffects: None
     admissionReviewVersions: ["v1beta1"]
     {{ if .Values.AllowAdmissionSkip }}
