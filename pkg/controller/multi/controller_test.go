@@ -149,6 +149,16 @@ func TestController_getPatchesForContainers(t *testing.T) {
 			wantErr:     nil,
 		},
 		{
+			name: "Container with blank image names",
+			containers: []corev1.Container{
+				{Image: " "},
+				{Image: ""},
+			},
+			wantPatches: []types.JSONPatch{},
+			wantDenials: map[string][]string{},
+			wantErr:     nil,
+		},
+		{
 			name: "Invalid image name in container, deny",
 			containers: []corev1.Container{
 				{Image: "Invalid&Image%Name"},
