@@ -127,12 +127,16 @@ type IdentityRequirement struct {
 	Type             string `json:"type"`
 	DockerReference  string `json:"dockerReference,omitEmpty"`
 	DockerRepository string `json:"dockerRepository,omitEmpty"`
+	Prefix           string `json:"prefix,omitEmpty"`
+	SignedPrefix     string `json:"signedPrefix,omitEmpty"`
 }
 
+// Vulnerability policy
 type Vulnerability struct {
 	ICCRVA ICCRVA `json:"ICCRVA,omitempty"`
 }
 
+// ICCRVA IBM Cloud Container Registry Vulnerability Advisor policy
 type ICCRVA struct {
 	Enabled *bool  `json:"enabled,omitempty"`
 	Account string `json:"account,omitempty"`

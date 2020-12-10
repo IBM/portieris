@@ -1,6 +1,6 @@
 module github.com/IBM/portieris
 
-go 1.13
+go 1.14
 
 require (
 	github.com/IBM/go-sdk-core/v4 v4.9.0
@@ -12,7 +12,7 @@ require (
 	github.com/bugsnag/bugsnag-go v1.5.3 // indirect
 	github.com/bugsnag/panicwrap v1.2.0 // indirect
 	github.com/cloudflare/cfssl v1.5.0 // indirect
-	github.com/containers/image/v5 v5.8.1
+	github.com/containers/image/v5 v5.9.0
 	github.com/docker/distribution v2.7.1+incompatible
 	github.com/docker/go v1.5.1-1 // indirect
 	github.com/gofrs/uuid v3.2.0+incompatible // indirect
@@ -33,7 +33,6 @@ require (
 	github.com/stretchr/testify v1.6.1
 	github.com/theupdateframework/notary v0.6.1
 	golang.org/x/crypto v0.0.0-20201012173705-84dcc777aaee
-	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
 	gopkg.in/dancannon/gorethink.v3 v3.0.5 // indirect
 	gopkg.in/fatih/pool.v2 v2.0.0 // indirect
 	gopkg.in/gorethink/gorethink.v3 v3.0.5 // indirect
