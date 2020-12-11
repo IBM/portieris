@@ -72,6 +72,4 @@ metadata:
     helm.sh/hook-weight: "1"
 spec:
    repositories:
-    # This permissive policy allows all images in namespaces which do not have an ImagePolicy.
-    # IMPORTANT: Review this policy and replace it with one that meets your requirements.
-    - name: "*"
+   {{- .Values.clusterPolicy.allowedRepositories | toYaml | nindent 4 }}
