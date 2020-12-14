@@ -133,7 +133,7 @@ spec:
           - type: "signedBy"
             keySecret: db2-pubkey
             signedIdentity:
-                type: "remapIdentity""
+                type: "remapIdentity"
 	        prefix: "registry.myco.com:5000/mymirror/ibmdb2"
                 signedPrefix: "icr.io/db2"
 ```
