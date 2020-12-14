@@ -75,4 +75,11 @@ func TestSimple_ImagePolicyRepositories_Basic(t *testing.T) {
 		utils.TestDeploymentNotRunnable(t, framework, "./testdata/deployment/global-nginx-another.yaml", namespace.Name)
 		utils.CleanUpImagePolicyTest(t, framework, namespace.Name)
 	})
+	t.Run("Allow images matched with remapIdentity policy", func(t *testing.T) {
+		t.Parallel()
+		namespace := utils.CreateImagePolicyInstalledNamespace(t, framework, "./testdata/imagepolicy/simple-remap.yaml")
+		utils.CreateSecret(t, framework, "./testdata/secret/simple1pubkey.yaml", namespace.Name)
+		utils.TestDeploymentRunnable(t, framework, "./testdata/deployment/global-nginx-remapped.yaml", namespace.Name)
+		utils.CleanUpImagePolicyTest(t, framework, namespace.Name)
+	})
 }
