@@ -5,6 +5,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 # v-next
 ##
+* Support remapIdentity simple signature identity type ([#92](https://github.com/IBM/portieris/issues/92)) 
 
 # v0.9.4
 ## 2020-12-06

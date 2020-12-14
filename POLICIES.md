@@ -99,7 +99,7 @@ spec:
             keySecret: my-pubkey
 ```
 
-This example requires that a given image is signed but allows the location to have changed:
+This example requires that a given image is signed but it allows the registry location to have changed, in this pattern a policy per image is required to exactly define the new location (but see the next example):
 ```yaml
 apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
 kind: ImagePolicy
@@ -117,6 +117,27 @@ spec:
                 type: "matchExactRepository"
                 dockerRepository: "icr.io/ibm/db2/db2manager"
 ```
+
+This example allows many images with a common origin which have been moved with their original signature, for example by mirroring, in this case from `icr.io/db2` to `registry.myco.com:5000/mymirror/ibmdb2`:
+```yaml
+apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
+kind: ImagePolicy
+metadata:
+  name: remapDB2Example
+spec:
+   repositories:
+    - name: "registry.myco.com:5000/mymirror/ibmdb2"
+      policy:
+        simple:
+          requirements:
+          - type: "signedBy"
+            keySecret: db2-pubkey
+            signedIdentity:
+                type: "remapIdentity"
+                prefix: "registry.myco.com:5000/mymirror/ibmdb2"
+                signedPrefix: "icr.io/db2"
+```
+
 
 It is also possible to specify the location of signature storage for registries which do not support the registry extension:
 ```yaml

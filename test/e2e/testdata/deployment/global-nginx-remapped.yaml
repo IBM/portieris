@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: global-nginx-simple
+  name: global-nginx-remap
   labels:
-    app: global-nginx-simple
+    app: global-nginx-remap
     test: "true"
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: global-nginx-simple
+      app: global-nginx-remap
   template:
     metadata:
       labels:
-        app: global-nginx-simple
+        app: global-nginx-remap
     spec:
       containers:
       - name: nginx
-        image: icr.io/cise/nginx:simple
+        image: icr.io/cise/remap/nginx:simple
         ports:
         - containerPort: 80
