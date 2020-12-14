@@ -78,3 +78,9 @@ affinity:
 # setting the annotation on their namespaces. Therefore, be careful with your RBAC policies if you
 # enable this option!
 AllowAdmissionSkip: false
+
+clusterPolicy:
+  allowedRepositories:
+    # This permissive policy allows all images in namespaces which do not have an ImagePolicy.
+    # IMPORTANT: Review this policy and replace it with one that meets your requirements.
+    - name: "*"
