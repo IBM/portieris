@@ -1,7 +1,7 @@
 GOFILES=$(shell find . -type f -name '*.go' -not -path "./code-generator/*")
 GOPACKAGES=$(shell go list ./... | grep -v test/ | grep -v pkg/apis/)
 
-VERSION=0.9.4
+VERSION=v0.9.5
 TAG=$(VERSION)
 GOTAGS='containers_image_openpgp'
 
@@ -44,7 +44,7 @@ helm.package:
 helm.install.local: helm.package
 	-kubectl create ns portieris
 	-kubectl get secret $(PULLSECRET) -o yaml | sed 's/namespace: default/namespace: portieris/' | kubectl create -f - 
-	helm install -n portieris portieris $$(pwd)/portieris-$(VERSION).tgz --set image.host=$(HUB) --set image.tag=$(TAG) --set image.pullSecret=$(PULLSECRET)
+	helm install -n portieris portieris $$(pwd)/portieris-$(VERSION).tgz --set image.host=$(HUB) --set image.tag=$(TAG) --set image.pullSecret=$(PULLSECRET) --set webHooks.failurePolicy=Ignore
 
 helm.install: helm.package
 	helm install -n portieris portieris $$(pwd)/portieris-$(VERSION).tgz
