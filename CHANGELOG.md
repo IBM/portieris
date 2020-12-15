@@ -6,6 +6,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 # v-next
 ##
 * Support remapIdentity simple signature identity type ([#92](https://github.com/IBM/portieris/issues/92)) 
+* Switch to pull image from icr.io/portieris ([#205](https://github.com/IBM/portieris/issues/205))
 
 # v0.9.4
 ## 2020-12-06
@@ -18,13 +19,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Additional logging container image name ([#216](https://github.com/IBM/portieris/issues/216))
 * Accept a --kubeconfig command line parameter ([PR#218](https://github.com/IBM/portieris/pull/218))
 
-
 * 
 # v0.9.1
 ## 2020-11-23
 * Add metrics counting allow and deny events. ([#106](https://github.com/IBM/portieris/issues/162))
 * Fix a problem with multiple pull secrets and simple signing ([#209](https://github.com/IBM/portieris/issues/209))
-
 
 # v0.9.0
 ## 2020-11-05

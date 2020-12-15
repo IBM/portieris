@@ -5,7 +5,7 @@
 replicaCount: 3
 
 image:
-  host:
+  host: icr.io/portieris
   pullSecret:
   image: portieris
   tag: 0.9.4
