@@ -5,8 +5,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 # v-next
 ##
+
+# v0.9.5
+## 2020-12-15
 * Support remapIdentity simple signature identity type ([#92](https://github.com/IBM/portieris/issues/92)) 
 * Switch to pull image from icr.io/portieris ([#205](https://github.com/IBM/portieris/issues/205))
+* Get default ClusterImagePolicy setting from values ([PR#233](https://github.com/IBM/portieris/pull/233))
 
 # v0.9.4
 ## 2020-12-06
