@@ -4,7 +4,7 @@ metadata:
   name: simple-accept-anything
 spec:
    repositories:
-    - name: "icr.io/cise/*"
+    - name: "*"
       policy:
          simple:
            requirements:

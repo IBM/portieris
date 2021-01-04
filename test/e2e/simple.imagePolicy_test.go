@@ -82,4 +82,18 @@ func TestSimple_ImagePolicyRepositories_Basic(t *testing.T) {
 		utils.TestDeploymentRunnable(t, framework, "./testdata/deployment/global-nginx-remapped.yaml", namespace.Name)
 		utils.CleanUpImagePolicyTest(t, framework, namespace.Name)
 	})
+	t.Run("Allow images without a pullSecret", func(t *testing.T) {
+		t.Parallel()
+		namespace := utils.CreateImagePolicyInstalledNamespaceNoSecrets(t, framework, "./testdata/imagepolicy/simple-accept-anything.yaml")
+		utils.TestDeploymentRunnable(t, framework, "./testdata/deployment/global-nginx-another.yaml", namespace.Name)
+		utils.TestDeploymentRunnable(t, framework, "./testdata/deployment/dockerhub-nginx-unsigned.yaml", namespace.Name)
+		utils.CleanUpImagePolicyTest(t, framework, namespace.Name)
+	})
+	t.Run("Allow images which require a signature without a pullSecret", func(t *testing.T) {
+		t.Parallel()
+		namespace := utils.CreateImagePolicyInstalledNamespaceNoSecrets(t, framework, "./testdata/imagepolicy/simple-signedby1.yaml")
+		utils.CreateSecret(t, framework, "./testdata/secret/simple1pubkey.yaml", namespace.Name)
+		utils.TestDeploymentRunnable(t, framework, "./testdata/deployment/global-nginx-simple.yaml", namespace.Name)
+		utils.CleanUpImagePolicyTest(t, framework, namespace.Name)
+	})
 }

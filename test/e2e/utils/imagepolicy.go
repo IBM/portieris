@@ -24,8 +24,8 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
-// CreateImagePolicyInstalledNamespace ...
-func CreateImagePolicyInstalledNamespace(t *testing.T, fw *framework.Framework, manifestPath string) *corev1.Namespace {
+// CreateImagePolicyInstalledNamespaceOptionalSecrets ...
+func CreateImagePolicyInstalledNamespaceOptionalSecrets(t *testing.T, fw *framework.Framework, manifestPath string, ips bool) *corev1.Namespace {
 	ns := uuid.NewV4().String()
 	imagePolicy, err := fw.LoadImagePolicyManifest(manifestPath)
 	if err != nil {
@@ -40,15 +40,35 @@ func CreateImagePolicyInstalledNamespace(t *testing.T, fw *framework.Framework, 
 			t.Log(imagePolicy.Spec.Repositories[idx].Policy.Vulnerability.ICCRVA.Account)
 		}
 	}
-	namespace, err := fw.CreateNamespaceWithIPS(ns)
-	if err != nil {
-		t.Fatalf("error creating %q namespace: %v", ns, err)
+
+	var namespace *corev1.Namespace
+	if ips {
+		namespace, err = fw.CreateNamespaceWithIPS(ns)
+		if err != nil {
+			t.Fatalf("error creating %q namespace: %v", ns, err)
+		}
+	} else {
+		namespace, err = fw.CreateNamespace(ns)
+		if err != nil {
+			t.Fatalf("error creating %q namespace: %v", ns, err)
+		}
 	}
+
 	if err := fw.CreateImagePolicy(ns, imagePolicy); err != nil {
 		t.Fatalf("error creating %q ImagePolicy: %v", imagePolicy.Name, err)
 	}
 
 	return namespace
+}
+
+// CreateImagePolicyInstalledNamespace ...
+func CreateImagePolicyInstalledNamespace(t *testing.T, fw *framework.Framework, manifestPath string) *corev1.Namespace {
+	return CreateImagePolicyInstalledNamespaceOptionalSecrets(t, fw, manifestPath, true)
+}
+
+// CreateImagePolicyInstalledNamespaceNoSecrets ...
+func CreateImagePolicyInstalledNamespaceNoSecrets(t *testing.T, fw *framework.Framework, manifestPath string) *corev1.Namespace {
+	return CreateImagePolicyInstalledNamespaceOptionalSecrets(t, fw, manifestPath, false)
 }
 
 // CleanUpImagePolicyTest ...

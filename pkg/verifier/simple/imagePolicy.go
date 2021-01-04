@@ -55,7 +55,6 @@ func (v verifier) VerifyByPolicy(imageToVerify string, credentials credential.Cr
 		glog.Infof("SimpleSigning verification: anonymous access allowed for image %s, continuing with anonymous verify", imageToVerify)
 		return verifyAttempt(imageSource, policyContext)
 	}
-
 	glog.Errorf("SimpleSigning verification: anonymous access denied for image %s, continuing with ImagePullSecrets... Error %v", imageToVerify, err)
 
 	numCreds := len(credentials)
