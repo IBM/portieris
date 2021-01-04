@@ -18,21 +18,27 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"strings"
 
+	"github.com/IBM/portieris/pkg/metrics"
 	notaryclient "github.com/IBM/portieris/pkg/notary"
+	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	kube "github.com/IBM/portieris/helpers/kube"
 	"github.com/IBM/portieris/pkg/controller/multi"
 	"github.com/IBM/portieris/pkg/kubernetes"
 	registryclient "github.com/IBM/portieris/pkg/registry"
+	notaryverifier "github.com/IBM/portieris/pkg/verifier/trust"
 	"github.com/IBM/portieris/pkg/webhook"
 	"github.com/golang/glog"
 )
 
 func main() {
 	mkdir := flag.String("mkdir", "", "create directories needed for Portieris to run")
+	kubeconfig := flag.String("kubeconfig", "", "location of kubeconfig file to use for an out-of-cluster kube client configuration")
 
 	flag.Parse() // glog flags
 
@@ -57,12 +63,10 @@ func main() {
 		os.Exit(0)
 	}
 
-	kubeClientset := kube.GetKubeClient()
+	kubeClientConfig := kube.GetKubeClientConfig(kubeconfig)
+	kubeClientset := kube.GetKubeClient(kubeClientConfig)
 	kubeWrapper := kubernetes.NewKubeClientsetWrapper(kubeClientset)
-	policyClient, err := kube.GetPolicyClient()
-	if err != nil {
-		glog.Fatal("Could not get policy client", err)
-	}
+	policyClient := kube.GetPolicyClient(kubeClientConfig)
 
 	ca, err := ioutil.ReadFile("/etc/certs/ca.pem")
 	if err != nil {
@@ -77,17 +81,27 @@ func main() {
 		glog.Fatal("Could not get trust client", err)
 	}
 
-	serverCert, err := ioutil.ReadFile("/etc/certs/serverCert.pem")
+	serverCert, err := ioutil.ReadFile("/etc/certs/tls.crt")
 	if err != nil {
-		glog.Fatal("Could not read /etc/certs/serverCert.pem", err)
+		glog.Fatal("Could not read /etc/certs/tls.crt", err)
 	}
-	serverKey, err := ioutil.ReadFile("/etc/certs/serverKey.pem")
+	serverKey, err := ioutil.ReadFile("/etc/certs/tls.key")
 	if err != nil {
-		glog.Fatal("Could not read /etc/certs/serverKey.pem", err)
+		glog.Fatal("Could not read /etc/certs/tls.key", err)
 	}
 
 	cr := registryclient.NewClient()
-	controller := multi.NewController(kubeWrapper, policyClient, trust, cr)
+	nv := notaryverifier.NewVerifier(kubeWrapper, trust, cr)
+	pmetrics := metrics.NewMetrics()
+	controller := multi.NewController(kubeWrapper, policyClient, nv, pmetrics)
+
+	// Setup http handler for metrics
+	go func() {
+		r := mux.NewRouter()
+		r.Handle("/metrics", promhttp.Handler())
+		http.ListenAndServe(":8080", r)
+	}()
+
 	webhook := webhook.NewServer("policy", controller, serverCert, serverKey)
 	webhook.Run()
 }

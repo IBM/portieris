@@ -23,9 +23,11 @@ import (
 	securityenforcementfake "github.com/IBM/portieris/pkg/apis/securityenforcement/client/clientset/versioned/fake"
 	securityenforcementv1beta1 "github.com/IBM/portieris/pkg/apis/securityenforcement/v1beta1"
 	"github.com/IBM/portieris/pkg/kubernetes"
+	"github.com/IBM/portieris/pkg/metrics"
 	"github.com/IBM/portieris/pkg/notary/fakenotary"
 	"github.com/IBM/portieris/pkg/policy"
 	"github.com/IBM/portieris/pkg/registry/fakeregistry"
+	notaryverifier "github.com/IBM/portieris/pkg/verifier/trust"
 	"github.com/IBM/portieris/pkg/webhook"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -64,6 +66,7 @@ var (
 	trust               *fakenotary.FakeNotary
 	cr                  *fakeregistry.FakeRegistry
 	wh                  *webhook.Server
+	pm                  *metrics.PortierisMetrics
 )
 
 // resetAllFakes should be call before any test
@@ -74,9 +77,14 @@ func resetAllFakes() {
 	imageObjects = []runtime.Object{}
 	secClientset = securityenforcementfake.NewSimpleClientset(imageObjects...)
 	policyClient = policy.NewClient(secClientset)
+	if pm != nil {
+		pm.UnregisterAll()
+	}
+	pm = metrics.NewMetrics()
 	trust = &fakenotary.FakeNotary{}
 	cr = &fakeregistry.FakeRegistry{}
-	ctrl = NewController(kubeWrapper, policyClient, trust, cr)
+	nv := notaryverifier.NewVerifier(kubeWrapper, trust, cr)
+	ctrl = NewController(kubeWrapper, policyClient, nv, pm)
 	wh = webhook.NewServer("notary", ctrl, []byte{}, []byte{})
 }
 

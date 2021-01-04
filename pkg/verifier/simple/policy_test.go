@@ -172,7 +172,7 @@ func TestTransformPolicy(t *testing.T) {
 			errMsg:  "KeySecret missing in signedBy requirement",
 		},
 		{
-			name: "signedByEmptyKey",
+			name: "signedBy emptyKey",
 			simplePolicies: []v1beta1.SimpleRequirement{{
 				Type:      "signedBy",
 				KeySecret: "emptyKeySecret",
@@ -238,11 +238,37 @@ func TestTransformPolicy(t *testing.T) {
 			}},
 			wantErr: false,
 		},
+		{
+			name: "SignedIdentity remapIdentity",
+			simplePolicies: []v1beta1.SimpleRequirement{{
+				Type:      "signedBy",
+				KeySecret: "validKeySecret",
+				SignedIdentity: v1beta1.IdentityRequirement{
+					Type:         "remapIdentity",
+					Prefix:       "reg.io/another/repo",
+					SignedPrefix: "reg.io/orig",
+				},
+			}},
+			wantErr: false,
+		},
+		{
+			name: "SignedIdentity remapIdentity error",
+			simplePolicies: []v1beta1.SimpleRequirement{{
+				Type:      "signedBy",
+				KeySecret: "validKeySecret",
+				SignedIdentity: v1beta1.IdentityRequirement{
+					Type:         "remapIdentity",
+					Prefix:       "invalid+prefix",
+					SignedPrefix: "reg.io/orig",
+				},
+			}},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var testKubeWrapper = &TestWrapper{}
-			policy, err := TransformPolicies(testKubeWrapper, "namespace", tt.simplePolicies)
+			policy, err := verifier{}.TransformPolicies(testKubeWrapper, "namespace", tt.simplePolicies)
 			if tt.wantErr {
 				assert.Error(t, err, "error expected")
 				if err != nil {

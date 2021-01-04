@@ -32,7 +32,7 @@ type config struct {
 }
 
 // CreateRegistryDir write a file in a new directory containing the desired default docker configuration
-func CreateRegistryDir(storeURL, storeUser, storePassword string) (string, error) {
+func (v verifier) CreateRegistryDir(storeURL, storeUser, storePassword string) (string, error) {
 	if storeURL == "" {
 		glog.Infof("No lookaside signature store.")
 		return "", nil
@@ -91,7 +91,7 @@ func CreateRegistryDir(storeURL, storeUser, storePassword string) (string, error
 }
 
 // RemoveRegistryDir .
-func RemoveRegistryDir(dirName string) error {
+func (v verifier) RemoveRegistryDir(dirName string) error {
 	if dirName == "" {
 		return nil
 	}

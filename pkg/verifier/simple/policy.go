@@ -25,7 +25,7 @@ import (
 )
 
 // TransformPolicies from Portieris to container/image lib policies
-func TransformPolicies(kWrapper kubernetes.WrapperInterface, namespace string, inPolicies []v1beta1.SimpleRequirement) (*signature.Policy, error) {
+func (v verifier) TransformPolicies(kWrapper kubernetes.WrapperInterface, namespace string, inPolicies []v1beta1.SimpleRequirement) (*signature.Policy, error) {
 	var policyRequirements []signature.PolicyRequirement
 
 	for _, inPolicy := range inPolicies {
@@ -62,7 +62,6 @@ func TransformPolicies(kWrapper kubernetes.WrapperInterface, namespace string, i
 			if err != nil {
 				return nil, err
 			}
-			break
 
 		default:
 			return nil, fmt.Errorf("simple policy invalid Type: %s", inPolicy.Type)
@@ -89,17 +88,11 @@ func policySignedIdentity(inPolicy *v1beta1.SimpleRequirement) (signature.Policy
 	case "matchRepository":
 		return signature.NewPRMMatchRepository(), nil
 	case "matchExactReference":
-		prm, err := signature.NewPRMExactReference(inPolicy.SignedIdentity.DockerReference)
-		if err != nil {
-			return nil, err
-		}
-		return prm, nil
+		return signature.NewPRMExactReference(inPolicy.SignedIdentity.DockerReference)
 	case "matchExactRepository":
-		prm, err := signature.NewPRMExactRepository(inPolicy.SignedIdentity.DockerRepository)
-		if err != nil {
-			return nil, err
-		}
-		return prm, nil
+		return signature.NewPRMExactRepository(inPolicy.SignedIdentity.DockerRepository)
+	case "remapIdentity":
+		return signature.NewPRMRemapIdentity(inPolicy.SignedIdentity.Prefix, inPolicy.SignedIdentity.SignedPrefix)
 	default:
 		return nil, fmt.Errorf("invalid SignedIdentity Type: %s", inPolicy.SignedIdentity.Type)
 	}

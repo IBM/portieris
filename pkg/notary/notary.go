@@ -90,9 +90,17 @@ func (c Client) makeHubTransport(notaryToken string) http.RoundTripper {
 
 	modifiers := []transport.RequestModifier{
 		transport.NewHeaderRequestModifier(http.Header{
-			"User-Agent":    []string{"portieris-client"},
-			"Authorization": []string{fmt.Sprintf("Bearer %s", notaryToken)},
+			"User-Agent": []string{"portieris-client"},
 		}),
+	}
+
+	if notaryToken != "" {
+		modifiers = []transport.RequestModifier{
+			transport.NewHeaderRequestModifier(http.Header{
+				"User-Agent":    []string{"portieris-client"},
+				"Authorization": []string{fmt.Sprintf("Bearer %s", notaryToken)},
+			}),
+		}
 	}
 
 	return transport.NewTransport(base, modifiers...)

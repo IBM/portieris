@@ -1,4 +1,4 @@
-// Copyright 2020 Portieris Authors.
+// Copyright 2020-2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package simple
 import (
 	"testing"
 
+	"github.com/IBM/portieris/helpers/credential"
 	"github.com/containers/image/v5/signature"
 	"github.com/stretchr/testify/assert"
 )
@@ -30,7 +31,7 @@ func TestVerifyByPolicy(t *testing.T) {
 	tests := []struct {
 		name        string
 		image       string
-		credentials [][]string
+		credentials credential.Credentials
 		policies    *signature.PolicyRequirement
 		wantErr     bool
 		errMsg      string
@@ -40,23 +41,29 @@ func TestVerifyByPolicy(t *testing.T) {
 		{
 			name:        "bad image",
 			image:       "blahBLAHblah",
-			credentials: [][]string{},
+			credentials: credential.Credentials{},
 			policies:    &policyRequirementInsecure,
 			wantErr:     true,
 			errMsg:      "name must be lowercase",
 		},
 		{
-			name:        "no creds", // fails, future enhancement to cover no-auth registries
+			name:        "no creds",
 			image:       "docker.io/library/busybox",
-			credentials: [][]string{},
+			credentials: credential.Credentials{},
 			policies:    &policyRequirementInsecure,
-			wantErr:     true,
-			errMsg:      "no valid ImagePullSecret",
+			wantErr:     false,
+		},
+		{
+			name:        "extra creds",
+			image:       "docker.io/library/busybox",
+			credentials: credential.Credentials{{Username: "user", Password: "password"}},
+			policies:    &policyRequirementInsecure,
+			wantErr:     false,
 		},
 		{
 			name:        "bad registry",
 			image:       "nonsuch.io/library/busybox",
-			credentials: [][]string{{"user", "password"}},
+			credentials: credential.Credentials{{Username: "user", Password: "password"}},
 			policies:    &policyRequirementInsecure,
 			wantErr:     true,
 			errMsg:      "pinging docker registry ",
@@ -72,7 +79,7 @@ func TestVerifyByPolicy(t *testing.T) {
 					},
 				},
 			}
-			digest, deny, err := VerifyByPolicy(tt.image, tt.credentials, "", policy)
+			digest, deny, err := verifier{}.VerifyByPolicy(tt.image, tt.credentials, "", policy)
 			if tt.wantErr {
 				assert.Error(t, err)
 				assert.Contains(t, err.Error(), tt.errMsg, "unexpected error")

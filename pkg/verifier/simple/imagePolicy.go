@@ -1,4 +1,4 @@
-// Copyright 2020 Portieris Authors.
+// Copyright 2020-2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,15 +22,17 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/IBM/portieris/helpers/credential"
 	"github.com/containers/image/v5/docker"
 	"github.com/containers/image/v5/image"
 	"github.com/containers/image/v5/manifest"
 	"github.com/containers/image/v5/signature"
 	"github.com/containers/image/v5/types"
+	"github.com/golang/glog"
 )
 
 // VerifyByPolicy verifies the image according to the supplied policy and returns the verified digest, verify error or processing error
-func VerifyByPolicy(imageToVerify string, credentials [][]string, registriesConfigDir string, simplePolicy *signature.Policy) (*bytes.Buffer, error, error) {
+func (v verifier) VerifyByPolicy(imageToVerify string, credentials credential.Credentials, registriesConfigDir string, simplePolicy *signature.Policy) (*bytes.Buffer, error, error) {
 
 	policyContext, err := signature.NewPolicyContext(simplePolicy)
 	if err != nil {
@@ -47,43 +49,40 @@ func VerifyByPolicy(imageToVerify string, credentials [][]string, registriesConf
 		RegistriesDirPath:            registriesConfigDir,
 	}
 
-	switch len(credentials) {
-	case 0:
-		return verifyAttempt(imageReference, systemContext, policyContext)
-
-	case 1:
-		systemContext.DockerAuthConfig = &types.DockerAuthConfig{
-			Username: credentials[0][0],
-			Password: credentials[0][1],
-		}
-		return verifyAttempt(imageReference, systemContext, policyContext)
+	imageSource, err := imageReference.NewImageSource(context.Background(), systemContext)
+	if err == nil {
+		defer imageSource.Close()
+		glog.Infof("SimpleSigning verification: anonymous access allowed for image %s, continuing with anonymous verify", imageToVerify)
+		return verifyAttempt(imageSource, policyContext)
 	}
 
-	for _, credential := range credentials {
-		systemContext.DockerAuthConfig = &types.DockerAuthConfig{
-			Username: credential[0],
-			Password: credential[1],
-		}
+	glog.Errorf("SimpleSigning verification: anonymous access denied for image %s, continuing with ImagePullSecrets... Error %v", imageToVerify, err)
 
-		digest, deny, err := verifyAttempt(imageReference, systemContext, policyContext)
-		if deny != nil {
-			switch deny.(type) {
-			case *docker.ErrUnauthorizedForCredentials:
-				continue
-			}
+	numCreds := len(credentials)
+	for i, credential := range credentials {
+		dockerAuthConfig := &types.DockerAuthConfig{
+			Username: credential.Username,
+			Password: credential.Password,
 		}
-		return digest, deny, err
+		systemContext.DockerAuthConfig = dockerAuthConfig
+		imageSource, err := imageReference.NewImageSource(context.Background(), systemContext)
+		if err != nil {
+			if i+1 == numCreds {
+				glog.Errorf("SimpleSigning verification: ImagePullSecret with username %s for image %s failed, no more secrets in scope (secret %d/%d). Failing. Error %v", credential.Username, imageToVerify, i+1, numCreds, err)
+				return nil, nil, err
+			}
+			glog.Warningf("SimpleSigning verification: ImagePullSecret with username %s for image %s failed, trying the next secret in scope (secret %d/%d). Error %v", credential.Username, imageToVerify, i+1, numCreds, err)
+			continue
+		}
+		defer imageSource.Close()
+		glog.Infof("SimpleSigning verification: ImagePullSecret with username %s for image %s was valid (secret %d/%d), continuing to next stage", credential.Username, imageToVerify, i+1, numCreds)
+		return verifyAttempt(imageSource, policyContext)
 	}
 
 	return nil, nil, fmt.Errorf("Deny %q, no valid ImagePullSecret, %d tried", imageToVerify, len(credentials))
 }
 
-func verifyAttempt(imageReference types.ImageReference, systemContext *types.SystemContext, policyContext *signature.PolicyContext) (*bytes.Buffer, error, error) {
-	imageSource, err := imageReference.NewImageSource(context.Background(), systemContext)
-	if err != nil {
-		return nil, nil, err
-	}
-
+func verifyAttempt(imageSource types.ImageSource, policyContext *signature.PolicyContext) (*bytes.Buffer, error, error) {
 	unparsedImage := image.UnparsedInstance(imageSource, nil)
 	_, deny := policyContext.IsRunningImageAllowed(context.Background(), unparsedImage)
 	if deny != nil {

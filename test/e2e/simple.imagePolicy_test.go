@@ -22,7 +22,7 @@ import (
 
 func TestSimple_ImagePolicyRepositories_AllowAllDenyAll(t *testing.T) {
 	utils.CheckIfTesting(t, testSimpleImagePolicy)
-	if defaultClusterPolicy := utils.DeleteThenReturnClusterImagePolicy(t, framework, "ibmcloud-default-cluster-image-policy"); defaultClusterPolicy != nil {
+	if defaultClusterPolicy := utils.DeleteThenReturnClusterImagePolicy(t, framework, "default"); defaultClusterPolicy != nil {
 		defer framework.CreateClusterImagePolicy(defaultClusterPolicy)
 	}
 
@@ -73,6 +73,13 @@ func TestSimple_ImagePolicyRepositories_Basic(t *testing.T) {
 		utils.CreateSecret(t, framework, "./testdata/secret/simple1pubkey.yaml", namespace.Name)
 		utils.CreateSecret(t, framework, "./testdata/secret/simple2pubkey.yaml", namespace.Name)
 		utils.TestDeploymentNotRunnable(t, framework, "./testdata/deployment/global-nginx-another.yaml", namespace.Name)
+		utils.CleanUpImagePolicyTest(t, framework, namespace.Name)
+	})
+	t.Run("Allow images matched with remapIdentity policy", func(t *testing.T) {
+		t.Parallel()
+		namespace := utils.CreateImagePolicyInstalledNamespace(t, framework, "./testdata/imagepolicy/simple-remap.yaml")
+		utils.CreateSecret(t, framework, "./testdata/secret/simple1pubkey.yaml", namespace.Name)
+		utils.TestDeploymentRunnable(t, framework, "./testdata/deployment/global-nginx-remapped.yaml", namespace.Name)
 		utils.CleanUpImagePolicyTest(t, framework, namespace.Name)
 	})
 }

@@ -3,28 +3,34 @@
 # Declare variables to be passed into your templates.
 
 replicaCount: 3
-namespace: portieris
 
 image:
-  host:
+  host: icr.io/portieris
   pullSecret:
   image: portieris
-  tag: 0.7.0
+  tag: v0.9.5
   pullPolicy: Always
 
 service:
   type: ClusterIP
   port: 443
   targetPort: 8000
+  metricsPort: 8080
 
 securityContext:
   runAsUser: 1000060001
+
+webHooks:
+  failurePolicy: Fail
 
 # If not running on IBM Cloud Container Service set to false
 IBMContainerService: true
 
 # If managing portieris-certs secret externally
 SkipSecretCreation: false
+
+# If using cert-manager to handle secrets
+UseCertManager: false
 
 # Resoures defined to assist scheduling
 # request is typical x10, limit is typical x100
@@ -65,7 +71,16 @@ affinity:
         topologyKey: "failure-domain.beta.kubernetes.io/zone"
       weight: 50
 
-# Not recommended for user to configure this. Hyperkube image to use when creating custom resources
-hyperkube:
-  repository: quay.io/coreos/hyperkube
-  tag: v1.7.6_coreos.0
+# Allow an annotation to be used to skip the webhook. This is required for Portieris to be able to
+# self heal when it has no running pods, which could otherwise deadlock your cluster after an
+# outage.
+# However, if this is enabled, anyone with access to annotate namespaces could bypass Portieris by
+# setting the annotation on their namespaces. Therefore, be careful with your RBAC policies if you
+# enable this option!
+AllowAdmissionSkip: false
+
+clusterPolicy:
+  allowedRepositories:
+    # This permissive policy allows all images in namespaces which do not have an ImagePolicy.
+    # IMPORTANT: Review this policy and replace it with one that meets your requirements.
+    - name: "*"

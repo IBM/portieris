@@ -4,7 +4,7 @@ metadata:
   name: global-nginx-simple
   labels:
     app: global-nginx-simple
-    test: true
+    test: "true"
 spec:
   replicas: 1
   selector:

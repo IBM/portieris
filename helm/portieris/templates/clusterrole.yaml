@@ -8,8 +8,10 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
   annotations:
+    {{- if .Capabilities.APIVersions.Has "clusterversions.config.openshift.io" }}
     helm.sh/hook: pre-install
     helm.sh/hook-weight: "-10"
+    {{- end }}
 rules:
 - apiGroups: ["securityenforcement.admission.cloud.ibm.com"]
   resources: ["imagepolicies", "clusterimagepolicies"]

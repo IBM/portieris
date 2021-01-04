@@ -22,7 +22,7 @@ import (
 
 func TestNotary_ImagePolicyRepositories_AllowAllDenyAll(t *testing.T) {
 	utils.CheckIfTesting(t, testTrustImagePolicy)
-	if defaultClusterPolicy := utils.DeleteThenReturnClusterImagePolicy(t, framework, "ibmcloud-default-cluster-image-policy"); defaultClusterPolicy != nil {
+	if defaultClusterPolicy := utils.DeleteThenReturnClusterImagePolicy(t, framework, "default"); defaultClusterPolicy != nil {
 		defer framework.CreateClusterImagePolicy(defaultClusterPolicy)
 	}
 
