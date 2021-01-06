@@ -8,7 +8,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 # v0.9.6
 ## TBD
-* support verifying image which dont require pull secrets ([#123](https://github.com/IBM/portieris/issues/123))
+* support verifying images which dont require pull secrets ([#123](https://github.com/IBM/portieris/issues/123))
  
 
 # v0.9.5
