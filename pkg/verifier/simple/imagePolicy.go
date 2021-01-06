@@ -1,4 +1,4 @@
-// Copyright 2020 Portieris Authors.
+// Copyright 2020-2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -49,7 +49,14 @@ func (v verifier) VerifyByPolicy(imageToVerify string, credentials credential.Cr
 		RegistriesDirPath:            registriesConfigDir,
 	}
 
-	// support no-auth ?
+	imageSource, err := imageReference.NewImageSource(context.Background(), systemContext)
+	if err == nil {
+		defer imageSource.Close()
+		glog.Infof("SimpleSigning verification: anonymous access allowed for image %s, continuing with anonymous verify", imageToVerify)
+		return verifyAttempt(imageSource, policyContext)
+	}
+	glog.Errorf("SimpleSigning verification: anonymous access denied for image %s, continuing with ImagePullSecrets... Error %v", imageToVerify, err)
+
 	numCreds := len(credentials)
 	for i, credential := range credentials {
 		dockerAuthConfig := &types.DockerAuthConfig{
@@ -59,26 +66,33 @@ func (v verifier) VerifyByPolicy(imageToVerify string, credentials credential.Cr
 		systemContext.DockerAuthConfig = dockerAuthConfig
 		imageSource, err := imageReference.NewImageSource(context.Background(), systemContext)
 		if err != nil {
-			if i == numCreds-1 {
+			if i+1 == numCreds {
 				glog.Errorf("SimpleSigning verification: ImagePullSecret with username %s for image %s failed, no more secrets in scope (secret %d/%d). Failing. Error %v", credential.Username, imageToVerify, i+1, numCreds, err)
 				return nil, nil, err
 			}
 			glog.Warningf("SimpleSigning verification: ImagePullSecret with username %s for image %s failed, trying the next secret in scope (secret %d/%d). Error %v", credential.Username, imageToVerify, i+1, numCreds, err)
 			continue
 		}
+		defer imageSource.Close()
 		glog.Infof("SimpleSigning verification: ImagePullSecret with username %s for image %s was valid (secret %d/%d), continuing to next stage", credential.Username, imageToVerify, i+1, numCreds)
-		unparsedImage := image.UnparsedInstance(imageSource, nil)
-		_, deny := policyContext.IsRunningImageAllowed(context.Background(), unparsedImage)
-		if deny != nil {
-			return nil, deny, nil
-		}
-		// get the digest
-		m, _, _ := unparsedImage.Manifest(context.Background())
-		digest, err := manifest.Digest(m)
-		if err != nil {
-			return nil, nil, err
-		}
-		return bytes.NewBufferString(strings.TrimPrefix(digest.String(), "sha256:")), nil, nil
+		return verifyAttempt(imageSource, policyContext)
 	}
-	return nil, nil, fmt.Errorf("Deny %q, no valid ImagePullSecret defined for %s", imageToVerify, imageToVerify)
+
+	return nil, nil, fmt.Errorf("Deny %q, no valid ImagePullSecret, %d tried", imageToVerify, len(credentials))
+}
+
+func verifyAttempt(imageSource types.ImageSource, policyContext *signature.PolicyContext) (*bytes.Buffer, error, error) {
+	unparsedImage := image.UnparsedInstance(imageSource, nil)
+	_, deny := policyContext.IsRunningImageAllowed(context.Background(), unparsedImage)
+	if deny != nil {
+		return nil, deny, nil
+	}
+
+	// get the digest
+	m, _, err := unparsedImage.Manifest(context.Background())
+	digest, err := manifest.Digest(m)
+	if err != nil {
+		return nil, nil, err
+	}
+	return bytes.NewBufferString(strings.TrimPrefix(digest.String(), "sha256:")), nil, nil
 }

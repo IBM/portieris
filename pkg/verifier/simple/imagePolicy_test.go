@@ -1,4 +1,4 @@
-// Copyright 2020 Portieris Authors.
+// Copyright 2020-2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -47,12 +47,18 @@ func TestVerifyByPolicy(t *testing.T) {
 			errMsg:      "name must be lowercase",
 		},
 		{
-			name:        "no creds", // fails, future enhancement to cover no-auth registries
+			name:        "no creds",
 			image:       "docker.io/library/busybox",
 			credentials: credential.Credentials{},
 			policies:    &policyRequirementInsecure,
-			wantErr:     true,
-			errMsg:      "no valid ImagePullSecret",
+			wantErr:     false,
+		},
+		{
+			name:        "extra creds",
+			image:       "docker.io/library/busybox",
+			credentials: credential.Credentials{{Username: "user", Password: "password"}},
+			policies:    &policyRequirementInsecure,
+			wantErr:     false,
 		},
 		{
 			name:        "bad registry",
