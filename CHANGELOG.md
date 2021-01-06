@@ -6,6 +6,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 # v-next
 ##
 
+# v0.9.6
+## TBD
+* support verifying image which dont require pull secrets ([#123](https://github.com/IBM/portieris/issues/123))
+ 
+
 # v0.9.5
 ## 2020-12-15
 * Support remapIdentity simple signature identity type ([#92](https://github.com/IBM/portieris/issues/92)) 
