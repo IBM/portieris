@@ -21,7 +21,7 @@ package versioned
 import (
 	"fmt"
 
-	securityenforcementv1beta1 "github.com/IBM/portieris/pkg/apis/securityenforcement/client/clientset/versioned/typed/securityenforcement/v1beta1"
+	portierisv1 "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/client/clientset/versioned/typed/portieris.cloud.ibm.com/v1"
 	discovery "k8s.io/client-go/discovery"
 	rest "k8s.io/client-go/rest"
 	flowcontrol "k8s.io/client-go/util/flowcontrol"
@@ -29,19 +29,19 @@ import (
 
 type Interface interface {
 	Discovery() discovery.DiscoveryInterface
-	SecurityenforcementV1beta1() securityenforcementv1beta1.SecurityenforcementV1beta1Interface
+	PortierisV1() portierisv1.PortierisV1Interface
 }
 
 // Clientset contains the clients for groups. Each group has exactly one
 // version included in a Clientset.
 type Clientset struct {
 	*discovery.DiscoveryClient
-	securityenforcementV1beta1 *securityenforcementv1beta1.SecurityenforcementV1beta1Client
+	portierisV1 *portierisv1.PortierisV1Client
 }
 
-// SecurityenforcementV1beta1 retrieves the SecurityenforcementV1beta1Client
-func (c *Clientset) SecurityenforcementV1beta1() securityenforcementv1beta1.SecurityenforcementV1beta1Interface {
-	return c.securityenforcementV1beta1
+// PortierisV1 retrieves the PortierisV1Client
+func (c *Clientset) PortierisV1() portierisv1.PortierisV1Interface {
+	return c.portierisV1
 }
 
 // Discovery retrieves the DiscoveryClient
@@ -65,7 +65,7 @@ func NewForConfig(c *rest.Config) (*Clientset, error) {
 	}
 	var cs Clientset
 	var err error
-	cs.securityenforcementV1beta1, err = securityenforcementv1beta1.NewForConfig(&configShallowCopy)
+	cs.portierisV1, err = portierisv1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +81,7 @@ func NewForConfig(c *rest.Config) (*Clientset, error) {
 // panics if there is an error in the config.
 func NewForConfigOrDie(c *rest.Config) *Clientset {
 	var cs Clientset
-	cs.securityenforcementV1beta1 = securityenforcementv1beta1.NewForConfigOrDie(c)
+	cs.portierisV1 = portierisv1.NewForConfigOrDie(c)
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClientForConfigOrDie(c)
 	return &cs
@@ -90,7 +90,7 @@ func NewForConfigOrDie(c *rest.Config) *Clientset {
 // New creates a new Clientset for the given RESTClient.
 func New(c rest.Interface) *Clientset {
 	var cs Clientset
-	cs.securityenforcementV1beta1 = securityenforcementv1beta1.New(c)
+	cs.portierisV1 = portierisv1.New(c)
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClient(c)
 	return &cs

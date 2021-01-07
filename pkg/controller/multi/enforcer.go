@@ -20,7 +20,7 @@ import (
 
 	"github.com/IBM/portieris/helpers/credential"
 	"github.com/IBM/portieris/helpers/image"
-	securityenforcementv1beta1 "github.com/IBM/portieris/pkg/apis/securityenforcement/v1beta1"
+	portieriscloudibmcomv1 "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/v1"
 	"github.com/IBM/portieris/pkg/kubernetes"
 	"github.com/IBM/portieris/pkg/verifier/simple"
 	notaryverifier "github.com/IBM/portieris/pkg/verifier/trust"
@@ -30,8 +30,8 @@ import (
 
 // Enforcer is an interface that enforces pod admission based on a configured policy
 type Enforcer interface {
-	DigestByPolicy(string, *image.Reference, credential.Credentials, *securityenforcementv1beta1.Policy) (*bytes.Buffer, error, error)
-	VulnerabilityPolicy(*image.Reference, credential.Credentials, *securityenforcementv1beta1.Policy) vulnerability.ScanResponse
+	DigestByPolicy(string, *image.Reference, credential.Credentials, *portieriscloudibmcomv1.Policy) (*bytes.Buffer, error, error)
+	VulnerabilityPolicy(*image.Reference, credential.Credentials, *portieriscloudibmcomv1.Policy) vulnerability.ScanResponse
 }
 
 type enforcer struct {

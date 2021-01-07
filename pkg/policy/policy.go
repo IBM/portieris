@@ -17,8 +17,8 @@ package policy
 import (
 	"fmt"
 
-	securityenforcementclientset "github.com/IBM/portieris/pkg/apis/securityenforcement/client/clientset/versioned"
-	securityenforcementv1beta1 "github.com/IBM/portieris/pkg/apis/securityenforcement/v1beta1"
+	securityenforcementclientset "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/client/clientset/versioned"
+	securityenforcementv1beta1 "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 

@@ -21,6 +21,7 @@ import (
 
 	"github.com/IBM/portieris/helpers/credential"
 	"github.com/IBM/portieris/helpers/image"
+	v1 "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/v1"
 	"github.com/IBM/portieris/pkg/apis/securityenforcement/v1beta1"
 	"github.com/IBM/portieris/pkg/metrics"
 	"github.com/IBM/portieris/pkg/verifier/simple"
@@ -39,9 +40,9 @@ type mockPolicyClient struct {
 	mock.Mock
 }
 
-func (mpc *mockPolicyClient) GetPolicyToEnforce(namespace, image string) (*v1beta1.Policy, error) {
+func (mpc *mockPolicyClient) GetPolicyToEnforce(namespace, image string) (*v1.Policy, error) {
 	args := mpc.Called(namespace, image)
-	return args.Get(0).(*v1beta1.Policy), args.Error(1)
+	return args.Get(0).(*v1.Policy), args.Error(1)
 }
 
 type mockKubeWrapper struct {
@@ -73,12 +74,12 @@ type mockEnforcer struct {
 	mock.Mock
 }
 
-func (me *mockEnforcer) DigestByPolicy(namespace string, img *image.Reference, credentials credential.Credentials, policy *v1beta1.Policy) (*bytes.Buffer, error, error) {
+func (me *mockEnforcer) DigestByPolicy(namespace string, img *image.Reference, credentials credential.Credentials, policy *v1.Policy) (*bytes.Buffer, error, error) {
 	args := me.Called(namespace, img, credentials, policy)
 	return args.Get(0).(*bytes.Buffer), args.Error(1), args.Error(2)
 }
 
-func (me *mockEnforcer) VulnerabilityPolicy(img *image.Reference, credentials credential.Credentials, policy *v1beta1.Policy) vulnerability.ScanResponse {
+func (me *mockEnforcer) VulnerabilityPolicy(img *image.Reference, credentials credential.Credentials, policy.v1.Policy) vulnerability.ScanResponse {
 	args := me.Called(img, credentials, policy)
 	return args.Get(0).(vulnerability.ScanResponse)
 }

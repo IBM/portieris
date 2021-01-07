@@ -18,9 +18,9 @@ import (
 	"errors"
 	"testing"
 
-	securityenforcementclientset "github.com/IBM/portieris/pkg/apis/securityenforcement/client/clientset/versioned"
-	"github.com/IBM/portieris/pkg/apis/securityenforcement/client/clientset/versioned/fake"
-	securityenforcementv1beta1 "github.com/IBM/portieris/pkg/apis/securityenforcement/v1beta1"
+	securityenforcementclientset "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/client/clientset/versioned"
+	"github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/client/clientset/versioned/fake"
+	securityenforcementv1beta1 "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/v1"
 	"github.com/stretchr/testify/assert"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -29,17 +29,17 @@ import (
 var (
 	trueBool       = true
 	falseBool      = false
-	imagePolicyOne = &securityenforcementv1beta1.ImagePolicy{
+	imagePolicyOne = &portieriscloudibmcomv1.ImagePolicy{
 		ObjectMeta: metav1.ObjectMeta{Namespace: "default", Name: "policy-one"},
 		TypeMeta:   metav1.TypeMeta{Kind: "ImagePolicy"},
-		Spec: securityenforcementv1beta1.PolicySpec{
+		Spec: securityenforcementv1beta1.ImagePolicySpec{
 			Repositories: []securityenforcementv1beta1.Repository{{Name: "repo-one"}},
 		},
 	}
 	imagePolicyTwo = &securityenforcementv1beta1.ImagePolicy{
 		ObjectMeta: metav1.ObjectMeta{Namespace: "default", Name: "policy-two"},
 		TypeMeta:   metav1.TypeMeta{Kind: "ImagePolicy"},
-		Spec: securityenforcementv1beta1.PolicySpec{
+		Spec: securityenforcementv1beta1.ImagePolicySpec{
 			Repositories: []securityenforcementv1beta1.Repository{{Name: "repo-two"}},
 		},
 	}
@@ -47,14 +47,14 @@ var (
 	clusterImagePolicyOne = &securityenforcementv1beta1.ClusterImagePolicy{
 		ObjectMeta: metav1.ObjectMeta{Namespace: "default", Name: "policy-one"},
 		TypeMeta:   metav1.TypeMeta{Kind: "ClusterImagePolicy"},
-		Spec: securityenforcementv1beta1.PolicySpec{
+		Spec: securityenforcementv1beta1.ImagePolicySpec{
 			Repositories: []securityenforcementv1beta1.Repository{{Name: "repo-one"}},
 		},
 	}
 	clusterImagePolicyTwo = &securityenforcementv1beta1.ClusterImagePolicy{
 		ObjectMeta: metav1.ObjectMeta{Namespace: "default", Name: "policy-two"},
 		TypeMeta:   metav1.TypeMeta{Kind: "ClusterImagePolicy"},
-		Spec: securityenforcementv1beta1.PolicySpec{
+		Spec: securityenforcementv1beta1.ImagePolicySpec{
 			Repositories: []securityenforcementv1beta1.Repository{{Name: "repo-two"}},
 		},
 	}
