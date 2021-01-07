@@ -22,5 +22,6 @@ jobs:
         export PATH=$PATH:/usr/local/go/bin/
         export GOPATH=$HOME/go
         export PATH=$PATH:$HOME/go/bin/
+        export TERM=ansi
         make alltests
         mv /root/go/src/github.com/IBM/portieris/ /tmp/github-runner-your-repo/portieris/
