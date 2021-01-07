@@ -35,7 +35,6 @@ func boolPointer(boolean bool) *bool {
 
 // +genclient
 // +genclient:noStatus
-// +genclient:onlyVerbs=get,list
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // ImagePolicy is a specification for a ImagePolicy resource
@@ -59,7 +58,6 @@ type ImagePolicyList struct {
 // +genclient
 // +genclient:nonNamespaced
 // +genclient:noStatus
-// +genclient:onlyVerbs=get,list
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // ClusterImagePolicy is a specification for a ClusterImagePolicy resource

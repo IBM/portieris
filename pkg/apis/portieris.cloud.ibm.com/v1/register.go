@@ -15,14 +15,14 @@
 package v1
 
 import (
-	"github.com/IBM/portieris/pkg/apis/securityenforcement"
+	policy "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
 // SchemeGroupVersion is group version used to register these objects
-var SchemeGroupVersion = schema.GroupVersion{Group: securityenforcement.GroupName, Version: "v1"}
+var SchemeGroupVersion = schema.GroupVersion{Group: policy.GroupName, Version: "v1"}
 
 // Kind takes an unqualified kind and returns back a Group qualified GroupKind
 func Kind(kind string) schema.GroupKind {

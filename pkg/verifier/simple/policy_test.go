@@ -1,4 +1,4 @@
-// Copyright 2020 Portieris Authors.
+// Copyright 2020, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/IBM/portieris/pkg/apis/securityenforcement/v1beta1"
+	policyv1 "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/v1"
 	"github.com/IBM/portieris/pkg/kubernetes"
 	"github.com/golang/glog"
 	"github.com/stretchr/testify/assert"
@@ -111,13 +111,13 @@ func TestTransformPolicy(t *testing.T) {
 	tests := []struct {
 		name           string
 		image          string
-		simplePolicies []v1beta1.SimpleRequirement
+		simplePolicies []policyv1.SimpleRequirement
 		wantErr        bool
 		errMsg         string
 	}{
 		{
 			name: "invalid simple type",
-			simplePolicies: []v1beta1.SimpleRequirement{{
+			simplePolicies: []policyv1.SimpleRequirement{{
 				Type: "invalid",
 			}},
 			wantErr: true,
@@ -125,21 +125,21 @@ func TestTransformPolicy(t *testing.T) {
 		},
 		{
 			name: "reject type",
-			simplePolicies: []v1beta1.SimpleRequirement{{
+			simplePolicies: []policyv1.SimpleRequirement{{
 				Type: "reject",
 			}},
 			wantErr: false,
 		},
 		{
 			name: "accept type",
-			simplePolicies: []v1beta1.SimpleRequirement{{
+			simplePolicies: []policyv1.SimpleRequirement{{
 				Type: "insecureAcceptAnything",
 			}},
 			wantErr: false,
 		},
 		{
 			name: "signedByInvalidKey",
-			simplePolicies: []v1beta1.SimpleRequirement{{
+			simplePolicies: []policyv1.SimpleRequirement{{
 				Type:      "signedBy",
 				KeySecret: "badKeySecret",
 			}},
@@ -148,7 +148,7 @@ func TestTransformPolicy(t *testing.T) {
 		},
 		{
 			name: "signedByValidKey",
-			simplePolicies: []v1beta1.SimpleRequirement{{
+			simplePolicies: []policyv1.SimpleRequirement{{
 				Type:      "signedBy",
 				KeySecret: "validKeySecret",
 			}},
@@ -156,7 +156,7 @@ func TestTransformPolicy(t *testing.T) {
 		},
 		{
 			name: "signedByMissingKey",
-			simplePolicies: []v1beta1.SimpleRequirement{{
+			simplePolicies: []policyv1.SimpleRequirement{{
 				Type:      "signedBy",
 				KeySecret: "missingSecret",
 			}},
@@ -165,7 +165,7 @@ func TestTransformPolicy(t *testing.T) {
 		},
 		{
 			name: "signedByNoKey",
-			simplePolicies: []v1beta1.SimpleRequirement{{
+			simplePolicies: []policyv1.SimpleRequirement{{
 				Type: "signedBy",
 			}},
 			wantErr: true,
@@ -173,7 +173,7 @@ func TestTransformPolicy(t *testing.T) {
 		},
 		{
 			name: "signedBy emptyKey",
-			simplePolicies: []v1beta1.SimpleRequirement{{
+			simplePolicies: []policyv1.SimpleRequirement{{
 				Type:      "signedBy",
 				KeySecret: "emptyKeySecret",
 			}},
@@ -182,10 +182,10 @@ func TestTransformPolicy(t *testing.T) {
 		},
 		{
 			name: "invalid SignedIdentity Type",
-			simplePolicies: []v1beta1.SimpleRequirement{{
+			simplePolicies: []policyv1.SimpleRequirement{{
 				Type:      "signedBy",
 				KeySecret: "validKeySecret",
-				SignedIdentity: v1beta1.IdentityRequirement{
+				SignedIdentity: policyv1.IdentityRequirement{
 					Type: "invalid",
 				},
 			}},
@@ -194,10 +194,10 @@ func TestTransformPolicy(t *testing.T) {
 		},
 		{
 			name: "SignedIdentity matchExact",
-			simplePolicies: []v1beta1.SimpleRequirement{{
+			simplePolicies: []policyv1.SimpleRequirement{{
 				Type:      "signedBy",
 				KeySecret: "validKeySecret",
-				SignedIdentity: v1beta1.IdentityRequirement{
+				SignedIdentity: policyv1.IdentityRequirement{
 					Type: "matchExact",
 				},
 			}},
@@ -205,10 +205,10 @@ func TestTransformPolicy(t *testing.T) {
 		},
 		{
 			name: "SignedIdentity matchRepository",
-			simplePolicies: []v1beta1.SimpleRequirement{{
+			simplePolicies: []policyv1.SimpleRequirement{{
 				Type:      "signedBy",
 				KeySecret: "validKeySecret",
-				SignedIdentity: v1beta1.IdentityRequirement{
+				SignedIdentity: policyv1.IdentityRequirement{
 					Type: "matchRepository",
 				},
 			}},
@@ -216,10 +216,10 @@ func TestTransformPolicy(t *testing.T) {
 		},
 		{
 			name: "SignedIdentity matchExactRepository",
-			simplePolicies: []v1beta1.SimpleRequirement{{
+			simplePolicies: []policyv1.SimpleRequirement{{
 				Type:      "signedBy",
 				KeySecret: "validKeySecret",
-				SignedIdentity: v1beta1.IdentityRequirement{
+				SignedIdentity: policyv1.IdentityRequirement{
 					Type:             "matchExactRepository",
 					DockerRepository: "repository",
 				},
@@ -228,10 +228,10 @@ func TestTransformPolicy(t *testing.T) {
 		},
 		{
 			name: "SignedIdentity matchExactReference",
-			simplePolicies: []v1beta1.SimpleRequirement{{
+			simplePolicies: []policyv1.SimpleRequirement{{
 				Type:      "signedBy",
 				KeySecret: "validKeySecret",
-				SignedIdentity: v1beta1.IdentityRequirement{
+				SignedIdentity: policyv1.IdentityRequirement{
 					Type:            "matchExactReference",
 					DockerReference: "reg.io/image:tag",
 				},
@@ -240,10 +240,10 @@ func TestTransformPolicy(t *testing.T) {
 		},
 		{
 			name: "SignedIdentity remapIdentity",
-			simplePolicies: []v1beta1.SimpleRequirement{{
+			simplePolicies: []policyv1.SimpleRequirement{{
 				Type:      "signedBy",
 				KeySecret: "validKeySecret",
-				SignedIdentity: v1beta1.IdentityRequirement{
+				SignedIdentity: policyv1.IdentityRequirement{
 					Type:         "remapIdentity",
 					Prefix:       "reg.io/another/repo",
 					SignedPrefix: "reg.io/orig",
@@ -253,10 +253,10 @@ func TestTransformPolicy(t *testing.T) {
 		},
 		{
 			name: "SignedIdentity remapIdentity error",
-			simplePolicies: []v1beta1.SimpleRequirement{{
+			simplePolicies: []policyv1.SimpleRequirement{{
 				Type:      "signedBy",
 				KeySecret: "validKeySecret",
-				SignedIdentity: v1beta1.IdentityRequirement{
+				SignedIdentity: policyv1.IdentityRequirement{
 					Type:         "remapIdentity",
 					Prefix:       "invalid+prefix",
 					SignedPrefix: "reg.io/orig",

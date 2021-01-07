@@ -1,4 +1,4 @@
-// Copyright 2018, 2020 Portieris Authors.
+// Copyright 2018, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import (
 
 	"github.com/IBM/portieris/helpers/credential"
 	"github.com/IBM/portieris/helpers/image"
-	securityenforcementv1beta1 "github.com/IBM/portieris/pkg/apis/securityenforcement/v1beta1"
+	policyv1 "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/v1"
 	"github.com/IBM/portieris/pkg/kubernetes"
 	"github.com/IBM/portieris/pkg/notary"
 	registryclient "github.com/IBM/portieris/pkg/registry"
@@ -35,7 +35,7 @@ var codec = serializer.NewCodecFactory(runtime.NewScheme())
 
 // Interface is for verifying notary signatures
 type Interface interface {
-	VerifyByPolicy(string, *image.Reference, credential.Credentials, *securityenforcementv1beta1.Policy) (*bytes.Buffer, error, error)
+	VerifyByPolicy(string, *image.Reference, credential.Credentials, *policyv1.Policy) (*bytes.Buffer, error, error)
 }
 
 // Verifier is the notary controller
@@ -58,7 +58,7 @@ func NewVerifier(kubeWrapper kubernetes.WrapperInterface, trust notary.Interface
 }
 
 // VerifyByPolicy ...
-func (v *Verifier) VerifyByPolicy(namespace string, img *image.Reference, credentials credential.Credentials, policy *securityenforcementv1beta1.Policy) (*bytes.Buffer, error, error) {
+func (v *Verifier) VerifyByPolicy(namespace string, img *image.Reference, credentials credential.Credentials, policy *policyv1.Policy) (*bytes.Buffer, error, error) {
 	notaryURL := policy.Trust.TrustServer
 	var err error
 	if notaryURL == "" {

@@ -23,6 +23,8 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
+	types "k8s.io/apimachinery/pkg/types"
+	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
 )
 
@@ -64,4 +66,55 @@ func (c *FakeClusterImagePolicies) List(opts v1.ListOptions) (result *portierisc
 		}
 	}
 	return list, err
+}
+
+// Watch returns a watch.Interface that watches the requested clusterImagePolicies.
+func (c *FakeClusterImagePolicies) Watch(opts v1.ListOptions) (watch.Interface, error) {
+	return c.Fake.
+		InvokesWatch(testing.NewRootWatchAction(clusterimagepoliciesResource, opts))
+}
+
+// Create takes the representation of a clusterImagePolicy and creates it.  Returns the server's representation of the clusterImagePolicy, and an error, if there is any.
+func (c *FakeClusterImagePolicies) Create(clusterImagePolicy *portieriscloudibmcomv1.ClusterImagePolicy) (result *portieriscloudibmcomv1.ClusterImagePolicy, err error) {
+	obj, err := c.Fake.
+		Invokes(testing.NewRootCreateAction(clusterimagepoliciesResource, clusterImagePolicy), &portieriscloudibmcomv1.ClusterImagePolicy{})
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*portieriscloudibmcomv1.ClusterImagePolicy), err
+}
+
+// Update takes the representation of a clusterImagePolicy and updates it. Returns the server's representation of the clusterImagePolicy, and an error, if there is any.
+func (c *FakeClusterImagePolicies) Update(clusterImagePolicy *portieriscloudibmcomv1.ClusterImagePolicy) (result *portieriscloudibmcomv1.ClusterImagePolicy, err error) {
+	obj, err := c.Fake.
+		Invokes(testing.NewRootUpdateAction(clusterimagepoliciesResource, clusterImagePolicy), &portieriscloudibmcomv1.ClusterImagePolicy{})
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*portieriscloudibmcomv1.ClusterImagePolicy), err
+}
+
+// Delete takes name of the clusterImagePolicy and deletes it. Returns an error if one occurs.
+func (c *FakeClusterImagePolicies) Delete(name string, options *v1.DeleteOptions) error {
+	_, err := c.Fake.
+		Invokes(testing.NewRootDeleteAction(clusterimagepoliciesResource, name), &portieriscloudibmcomv1.ClusterImagePolicy{})
+	return err
+}
+
+// DeleteCollection deletes a collection of objects.
+func (c *FakeClusterImagePolicies) DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error {
+	action := testing.NewRootDeleteCollectionAction(clusterimagepoliciesResource, listOptions)
+
+	_, err := c.Fake.Invokes(action, &portieriscloudibmcomv1.ClusterImagePolicyList{})
+	return err
+}
+
+// Patch applies the patch and returns the patched clusterImagePolicy.
+func (c *FakeClusterImagePolicies) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *portieriscloudibmcomv1.ClusterImagePolicy, err error) {
+	obj, err := c.Fake.
+		Invokes(testing.NewRootPatchSubresourceAction(clusterimagepoliciesResource, name, pt, data, subresources...), &portieriscloudibmcomv1.ClusterImagePolicy{})
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*portieriscloudibmcomv1.ClusterImagePolicy), err
 }

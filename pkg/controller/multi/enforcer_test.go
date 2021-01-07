@@ -20,7 +20,7 @@ import (
 
 	"github.com/IBM/portieris/helpers/credential"
 	"github.com/IBM/portieris/helpers/image"
-	"github.com/IBM/portieris/pkg/apis/securityenforcement/v1beta1"
+	policyv1 "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/v1"
 	"github.com/IBM/portieris/pkg/kubernetes"
 	"github.com/IBM/portieris/pkg/verifier/vulnerability"
 	"github.com/containers/image/v5/signature"
@@ -33,7 +33,7 @@ type mockScannerFactory struct {
 	mock.Mock
 }
 
-func (msf *mockScannerFactory) GetScanners(img image.Reference, credentials credential.Credentials, policy v1beta1.Policy) (scanners []vulnerability.Scanner) {
+func (msf *mockScannerFactory) GetScanners(img image.Reference, credentials credential.Credentials, policy policyv1.Policy) (scanners []vulnerability.Scanner) {
 	args := msf.Called(img, credentials, policy)
 	return args.Get(0).([]vulnerability.Scanner)
 }
@@ -51,7 +51,7 @@ type mockNotaryVerifier struct {
 	mock.Mock
 }
 
-func (mnv *mockNotaryVerifier) VerifyByPolicy(namespace string, img *image.Reference, credentials credential.Credentials, policy *v1beta1.Policy) (*bytes.Buffer, error, error) {
+func (mnv *mockNotaryVerifier) VerifyByPolicy(namespace string, img *image.Reference, credentials credential.Credentials, policy *policyv1.Policy) (*bytes.Buffer, error, error) {
 	args := mnv.Called(namespace, img, credentials, policy)
 	return args.Get(0).(*bytes.Buffer), args.Error(1), args.Error(2)
 }
@@ -60,7 +60,7 @@ type mockSimpleVerifier struct {
 	mock.Mock
 }
 
-func (msv *mockSimpleVerifier) TransformPolicies(kWrapper kubernetes.WrapperInterface, namespace string, inPolicies []v1beta1.SimpleRequirement) (*signature.Policy, error) {
+func (msv *mockSimpleVerifier) TransformPolicies(kWrapper kubernetes.WrapperInterface, namespace string, inPolicies []policyv1.SimpleRequirement) (*signature.Policy, error) {
 	args := msv.Called(kWrapper, namespace, inPolicies)
 	return args.Get(0).(*signature.Policy), args.Error(1)
 }
@@ -107,7 +107,7 @@ func Test_enforcer_DigestByPolicy(t *testing.T) {
 		namespace            string
 		imageName            string
 		credentials          credential.Credentials
-		policy               *v1beta1.Policy
+		policy               *policyv1.Policy
 		transformPolicies    *transformPoliciesMock
 		getBasicCredentials  *getBasicCredentialsMock
 		createRegistryDir    *createRegistryDirMock
@@ -130,9 +130,9 @@ func Test_enforcer_DigestByPolicy(t *testing.T) {
 			name:      "If TransformPolicies errors, return error",
 			namespace: "wibble",
 			imageName: "icr.io/wibble/some:tag",
-			policy: &v1beta1.Policy{
-				Simple: v1beta1.Simple{
-					Requirements: []v1beta1.SimpleRequirement{
+			policy: &policyv1.Policy{
+				Simple: policyv1.Simple{
+					Requirements: []policyv1.SimpleRequirement{
 						{
 							Type:      "test",
 							KeySecret: "noOneCares",
@@ -153,9 +153,9 @@ func Test_enforcer_DigestByPolicy(t *testing.T) {
 			name:      "If GetBasicCredentials errors, return error",
 			namespace: "wibble",
 			imageName: "icr.io/wibble/some:tag",
-			policy: &v1beta1.Policy{
-				Simple: v1beta1.Simple{
-					Requirements: []v1beta1.SimpleRequirement{
+			policy: &policyv1.Policy{
+				Simple: policyv1.Simple{
+					Requirements: []policyv1.SimpleRequirement{
 						{
 							Type:      "test",
 							KeySecret: "noOneCares",
@@ -177,9 +177,9 @@ func Test_enforcer_DigestByPolicy(t *testing.T) {
 			name:      "If CreateRegistryDir errors, return error",
 			namespace: "wibble",
 			imageName: "icr.io/wibble/some:tag",
-			policy: &v1beta1.Policy{
-				Simple: v1beta1.Simple{
-					Requirements: []v1beta1.SimpleRequirement{
+			policy: &policyv1.Policy{
+				Simple: policyv1.Simple{
+					Requirements: []policyv1.SimpleRequirement{
 						{
 							Type:      "test",
 							KeySecret: "noOneCares",
@@ -205,9 +205,9 @@ func Test_enforcer_DigestByPolicy(t *testing.T) {
 			name:      "If simple signing VerifyByPolicy errors, return error",
 			namespace: "wibble",
 			imageName: "icr.io/wibble/some:tag",
-			policy: &v1beta1.Policy{
-				Simple: v1beta1.Simple{
-					Requirements: []v1beta1.SimpleRequirement{
+			policy: &policyv1.Policy{
+				Simple: policyv1.Simple{
+					Requirements: []policyv1.SimpleRequirement{
 						{
 							Type:      "test",
 							KeySecret: "noOneCares",
@@ -236,9 +236,9 @@ func Test_enforcer_DigestByPolicy(t *testing.T) {
 			name:      "If simple signing VerifyByPolicy says deny, deny",
 			namespace: "wibble",
 			imageName: "icr.io/wibble/some:tag",
-			policy: &v1beta1.Policy{
-				Simple: v1beta1.Simple{
-					Requirements: []v1beta1.SimpleRequirement{
+			policy: &policyv1.Policy{
+				Simple: policyv1.Simple{
+					Requirements: []policyv1.SimpleRequirement{
 						{
 							Type:      "test",
 							KeySecret: "noOneCares",
@@ -268,9 +268,9 @@ func Test_enforcer_DigestByPolicy(t *testing.T) {
 			name:      "Allow access if simple signing is allowed, and no trust policy",
 			namespace: "wibble",
 			imageName: "icr.io/wibble/some:tag",
-			policy: &v1beta1.Policy{
-				Simple: v1beta1.Simple{
-					Requirements: []v1beta1.SimpleRequirement{
+			policy: &policyv1.Policy{
+				Simple: policyv1.Simple{
+					Requirements: []policyv1.SimpleRequirement{
 						{
 							Type:      "test",
 							KeySecret: "noOneCares",
@@ -300,9 +300,9 @@ func Test_enforcer_DigestByPolicy(t *testing.T) {
 			name:      "If RemoveRegistryDir errors, log it and carry on as normal",
 			namespace: "wibble",
 			imageName: "icr.io/wibble/some:tag",
-			policy: &v1beta1.Policy{
-				Simple: v1beta1.Simple{
-					Requirements: []v1beta1.SimpleRequirement{
+			policy: &policyv1.Policy{
+				Simple: policyv1.Simple{
+					Requirements: []policyv1.SimpleRequirement{
 						{
 							Type:      "test",
 							KeySecret: "noOneCares",
@@ -417,7 +417,7 @@ func Test_enforcer_VulnerabilityPolicy(t *testing.T) {
 		name         string
 		imageName    string
 		credentials  credential.Credentials
-		policy       *v1beta1.Policy
+		policy       *policyv1.Policy
 		scanners     []canImageDeployBasedOnVulnerabilitiesMock
 		wantResponse vulnerability.ScanResponse
 	}{
@@ -430,14 +430,14 @@ func Test_enforcer_VulnerabilityPolicy(t *testing.T) {
 		{
 			name:         "If there are no scanners for the policy, allow deploy",
 			imageName:    "icr.io/nspc/some:thing",
-			policy:       &v1beta1.Policy{},
+			policy:       &policyv1.Policy{},
 			scanners:     []canImageDeployBasedOnVulnerabilitiesMock{},
 			wantResponse: vulnerability.ScanResponse{CanDeploy: true},
 		},
 		{
 			name:      "If CanImageDeployBasedOnVulnerabilities errors, deny access",
 			imageName: "icr.io/nspc/some:thing",
-			policy:    &v1beta1.Policy{},
+			policy:    &policyv1.Policy{},
 			scanners: []canImageDeployBasedOnVulnerabilitiesMock{
 				{
 					err: fmt.Errorf("something's broken something's broken"),
@@ -451,7 +451,7 @@ func Test_enforcer_VulnerabilityPolicy(t *testing.T) {
 		{
 			name:      "If CanImageDeployBasedOnVulnerabilities says denied, deny access",
 			imageName: "icr.io/nspc/some:thing",
-			policy:    &v1beta1.Policy{},
+			policy:    &policyv1.Policy{},
 			scanners: []canImageDeployBasedOnVulnerabilitiesMock{
 				{
 					response: vulnerability.ScanResponse{
@@ -468,7 +468,7 @@ func Test_enforcer_VulnerabilityPolicy(t *testing.T) {
 		{
 			name:      "First scanner says yes, but second says no",
 			imageName: "icr.io/nspc/some:thing",
-			policy:    &v1beta1.Policy{},
+			policy:    &policyv1.Policy{},
 			scanners: []canImageDeployBasedOnVulnerabilitiesMock{
 				{
 					response: vulnerability.ScanResponse{

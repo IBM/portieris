@@ -22,8 +22,10 @@ import (
 	"time"
 
 	scheme "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/client/clientset/versioned/scheme"
-	portieriscloudibmcomv1 "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/v1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	v1 "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	types "k8s.io/apimachinery/pkg/types"
+	watch "k8s.io/apimachinery/pkg/watch"
 	rest "k8s.io/client-go/rest"
 )
 
@@ -35,8 +37,14 @@ type ClusterImagePoliciesGetter interface {
 
 // ClusterImagePolicyInterface has methods to work with ClusterImagePolicy resources.
 type ClusterImagePolicyInterface interface {
-	Get(name string, options v1.GetOptions) (*portieriscloudibmcomv1.ClusterImagePolicy, error)
-	List(opts v1.ListOptions) (*portieriscloudibmcomv1.ClusterImagePolicyList, error)
+	Create(*v1.ClusterImagePolicy) (*v1.ClusterImagePolicy, error)
+	Update(*v1.ClusterImagePolicy) (*v1.ClusterImagePolicy, error)
+	Delete(name string, options *metav1.DeleteOptions) error
+	DeleteCollection(options *metav1.DeleteOptions, listOptions metav1.ListOptions) error
+	Get(name string, options metav1.GetOptions) (*v1.ClusterImagePolicy, error)
+	List(opts metav1.ListOptions) (*v1.ClusterImagePolicyList, error)
+	Watch(opts metav1.ListOptions) (watch.Interface, error)
+	Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1.ClusterImagePolicy, err error)
 	ClusterImagePolicyExpansion
 }
 
@@ -53,8 +61,8 @@ func newClusterImagePolicies(c *PortierisV1Client) *clusterImagePolicies {
 }
 
 // Get takes name of the clusterImagePolicy, and returns the corresponding clusterImagePolicy object, and an error if there is any.
-func (c *clusterImagePolicies) Get(name string, options v1.GetOptions) (result *portieriscloudibmcomv1.ClusterImagePolicy, err error) {
-	result = &portieriscloudibmcomv1.ClusterImagePolicy{}
+func (c *clusterImagePolicies) Get(name string, options metav1.GetOptions) (result *v1.ClusterImagePolicy, err error) {
+	result = &v1.ClusterImagePolicy{}
 	err = c.client.Get().
 		Resource("clusterimagepolicies").
 		Name(name).
@@ -65,16 +73,91 @@ func (c *clusterImagePolicies) Get(name string, options v1.GetOptions) (result *
 }
 
 // List takes label and field selectors, and returns the list of ClusterImagePolicies that match those selectors.
-func (c *clusterImagePolicies) List(opts v1.ListOptions) (result *portieriscloudibmcomv1.ClusterImagePolicyList, err error) {
+func (c *clusterImagePolicies) List(opts metav1.ListOptions) (result *v1.ClusterImagePolicyList, err error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {
 		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
 	}
-	result = &portieriscloudibmcomv1.ClusterImagePolicyList{}
+	result = &v1.ClusterImagePolicyList{}
 	err = c.client.Get().
 		Resource("clusterimagepolicies").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
+		Do().
+		Into(result)
+	return
+}
+
+// Watch returns a watch.Interface that watches the requested clusterImagePolicies.
+func (c *clusterImagePolicies) Watch(opts metav1.ListOptions) (watch.Interface, error) {
+	var timeout time.Duration
+	if opts.TimeoutSeconds != nil {
+		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
+	}
+	opts.Watch = true
+	return c.client.Get().
+		Resource("clusterimagepolicies").
+		VersionedParams(&opts, scheme.ParameterCodec).
+		Timeout(timeout).
+		Watch()
+}
+
+// Create takes the representation of a clusterImagePolicy and creates it.  Returns the server's representation of the clusterImagePolicy, and an error, if there is any.
+func (c *clusterImagePolicies) Create(clusterImagePolicy *v1.ClusterImagePolicy) (result *v1.ClusterImagePolicy, err error) {
+	result = &v1.ClusterImagePolicy{}
+	err = c.client.Post().
+		Resource("clusterimagepolicies").
+		Body(clusterImagePolicy).
+		Do().
+		Into(result)
+	return
+}
+
+// Update takes the representation of a clusterImagePolicy and updates it. Returns the server's representation of the clusterImagePolicy, and an error, if there is any.
+func (c *clusterImagePolicies) Update(clusterImagePolicy *v1.ClusterImagePolicy) (result *v1.ClusterImagePolicy, err error) {
+	result = &v1.ClusterImagePolicy{}
+	err = c.client.Put().
+		Resource("clusterimagepolicies").
+		Name(clusterImagePolicy.Name).
+		Body(clusterImagePolicy).
+		Do().
+		Into(result)
+	return
+}
+
+// Delete takes name of the clusterImagePolicy and deletes it. Returns an error if one occurs.
+func (c *clusterImagePolicies) Delete(name string, options *metav1.DeleteOptions) error {
+	return c.client.Delete().
+		Resource("clusterimagepolicies").
+		Name(name).
+		Body(options).
+		Do().
+		Error()
+}
+
+// DeleteCollection deletes a collection of objects.
+func (c *clusterImagePolicies) DeleteCollection(options *metav1.DeleteOptions, listOptions metav1.ListOptions) error {
+	var timeout time.Duration
+	if listOptions.TimeoutSeconds != nil {
+		timeout = time.Duration(*listOptions.TimeoutSeconds) * time.Second
+	}
+	return c.client.Delete().
+		Resource("clusterimagepolicies").
+		VersionedParams(&listOptions, scheme.ParameterCodec).
+		Timeout(timeout).
+		Body(options).
+		Do().
+		Error()
+}
+
+// Patch applies the patch and returns the patched clusterImagePolicy.
+func (c *clusterImagePolicies) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1.ClusterImagePolicy, err error) {
+	result = &v1.ClusterImagePolicy{}
+	err = c.client.Patch(pt).
+		Resource("clusterimagepolicies").
+		SubResource(subresources...).
+		Name(name).
+		Body(data).
 		Do().
 		Into(result)
 	return

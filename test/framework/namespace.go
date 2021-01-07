@@ -1,4 +1,4 @@
-// Copyright 2018, 2020 Portieris Authors.
+// Copyright 2018, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ func generateNamespace(name string) *corev1.Namespace {
 	return ns
 }
 
-// IBMCloudSecretName secret provided to enable access to test images
+// IBMCloudSecretNames secret provided to enable access to test images
 // https://github.com/IBM/portieris/issues/34 to remove the need for this
 var IBMCloudSecretNames = []string{"all-icr-io", "default-icr-io"}
 

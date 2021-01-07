@@ -23,9 +23,9 @@ import (
 	sync "sync"
 	time "time"
 
-	versioned "github.com/IBM/portieris/pkg/apis/securityenforcement/client/clientset/versioned"
-	internalinterfaces "github.com/IBM/portieris/pkg/apis/securityenforcement/client/informers/externalversions/internalinterfaces"
-	securityenforcement "github.com/IBM/portieris/pkg/apis/securityenforcement/client/informers/externalversions/securityenforcement"
+	versioned "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/client/clientset/versioned"
+	internalinterfaces "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/client/informers/externalversions/internalinterfaces"
+	portieriscloudibmcom "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/client/informers/externalversions/portieris.cloud.ibm.com"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
@@ -172,9 +172,9 @@ type SharedInformerFactory interface {
 	ForResource(resource schema.GroupVersionResource) (GenericInformer, error)
 	WaitForCacheSync(stopCh <-chan struct{}) map[reflect.Type]bool
 
-	Securityenforcement() securityenforcement.Interface
+	Portieris() portieriscloudibmcom.Interface
 }
 
-func (f *sharedInformerFactory) Securityenforcement() securityenforcement.Interface {
-	return securityenforcement.New(f, f.namespace, f.tweakListOptions)
+func (f *sharedInformerFactory) Portieris() portieriscloudibmcom.Interface {
+	return portieriscloudibmcom.New(f, f.namespace, f.tweakListOptions)
 }
