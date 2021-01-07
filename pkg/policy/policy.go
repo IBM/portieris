@@ -29,7 +29,7 @@ type Interface interface {
 
 // Client is responsible for working out which policy should be enforced
 type Client struct {
-	// policyClientSet is a securityenforcementclientset for the policy CRDs
+	// policyClientSet is a clientset for the policy CRDs
 	policyClientSet policyClientSet.Interface
 }
 

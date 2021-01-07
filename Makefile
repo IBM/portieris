@@ -101,6 +101,5 @@ code-generator:
 
 regenerate:
 	$(GOPATH)/src/k8s.io/code-generator/generate-groups.sh all github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/client github.com/IBM/portieris/pkg/apis portieris.cloud.ibm.com:v1
-	$(GOPATH)/src/k8s.io/code-generator/generate-groups.sh all github.com/IBM/portieris/pkg/apis/securityenforcement/client github.com/IBM/portieris/pkg/apis securityenforcement:v1beta1
 
 

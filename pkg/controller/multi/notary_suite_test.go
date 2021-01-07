@@ -20,7 +20,7 @@ import (
 	"net/http"
 	"os"
 
-	securityenforcementfake "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/client/clientset/versioned/fake"
+	policyclientsetfake "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/client/clientset/versioned/fake"
 	policyV1 "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/v1"
 	"github.com/IBM/portieris/pkg/kubernetes"
 	"github.com/IBM/portieris/pkg/metrics"
@@ -58,7 +58,7 @@ var (
 	ctrl                *Controller
 	kubeClientset       *k8sfake.Clientset
 	kubeWrapper         kubernetes.WrapperInterface
-	secClientset        *securityenforcementfake.Clientset
+	secClientset        *policyclientsetfake.Clientset
 	policyClient        *policy.Client
 	kubeObjects         []runtime.Object
 	imageObjects        []runtime.Object
@@ -75,7 +75,7 @@ func resetAllFakes() {
 	kubeClientset = k8sfake.NewSimpleClientset(kubeObjects...)
 	kubeWrapper = kubernetes.NewKubeClientsetWrapper(kubeClientset)
 	imageObjects = []runtime.Object{}
-	secClientset = securityenforcementfake.NewSimpleClientset(imageObjects...)
+	secClientset = policyclientsetfake.NewSimpleClientset(imageObjects...)
 	policyClient = policy.NewClient(secClientset)
 	if pm != nil {
 		pm.UnregisterAll()

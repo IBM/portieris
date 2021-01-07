@@ -41,7 +41,7 @@ func (f *Framework) LoadClusterImagePolicyManifest(pathToManifest string) (*poli
 
 // CreateClusterImagePolicy creates the ClusterImagePolicy
 func (f *Framework) CreateClusterImagePolicy(clusterImagePolicy *policyv1.ClusterImagePolicy) error {
-	if _, err := f.ClusterImagePolicyClient.SecurityenforcementV1beta1().ClusterImagePolicies().Create(clusterImagePolicy); err != nil {
+	if _, err := f.ClusterImagePolicyClient.PortierisV1().ClusterImagePolicies().Create(clusterImagePolicy); err != nil {
 		return fmt.Errorf("Error creating ClusterImagePolicy %q: %v", clusterImagePolicy.Name, err)
 	}
 	return f.WaitForClusterImagePolicy(clusterImagePolicy.Name, time.Minute)
@@ -49,12 +49,12 @@ func (f *Framework) CreateClusterImagePolicy(clusterImagePolicy *policyv1.Cluste
 
 // GetClusterImagePolicy retrieves the ClusterImagePolicy
 func (f *Framework) GetClusterImagePolicy(name string) (*policyv1.ClusterImagePolicy, error) {
-	return f.ClusterImagePolicyClient.SecurityenforcementV1beta1().ClusterImagePolicies().Get(name, metav1.GetOptions{})
+	return f.ClusterImagePolicyClient.PortierisV1().ClusterImagePolicies().Get(name, metav1.GetOptions{})
 }
 
 // ListClusterImagePolicies creates the ClusterImagePolicy
 func (f *Framework) ListClusterImagePolicies() (*policyv1.ClusterImagePolicyList, error) {
-	return f.ClusterImagePolicyClient.SecurityenforcementV1beta1().ClusterImagePolicies().List(metav1.ListOptions{})
+	return f.ClusterImagePolicyClient.PortierisV1().ClusterImagePolicies().List(metav1.ListOptions{})
 }
 
 // WaitForClusterImagePolicy waits until the ClusterImagePolicy is created or the timeout is reached
@@ -85,5 +85,5 @@ func (f *Framework) GetClusterImagePolicyDefinition() (*apiextensions.CustomReso
 
 // DeleteClusterImagePolicy deletes the specified ClusterImagePolicy
 func (f *Framework) DeleteClusterImagePolicy(name string) error {
-	return f.ClusterImagePolicyClient.SecurityenforcementV1beta1().ClusterImagePolicies().Delete(name, &metav1.DeleteOptions{})
+	return f.ClusterImagePolicyClient.PortierisV1().ClusterImagePolicies().Delete(name, &metav1.DeleteOptions{})
 }
