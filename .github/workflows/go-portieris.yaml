@@ -16,11 +16,13 @@ jobs:
 
     - name: alltests
       run: |
+        rm -rf /root/go/src/github.com/IBM
         mkdir -p /root/go/src/github.com/IBM/
         mv /tmp/github-runner-your-repo/portieris/portieris /root/go/src/github.com/IBM/
         cd /root/go/src/github.com/IBM/portieris/
         export PATH=$PATH:/usr/local/go/bin/
         export GOPATH=$HOME/go
         export PATH=$PATH:$HOME/go/bin/
+        export TERM=ansi
         make alltests
         mv /root/go/src/github.com/IBM/portieris/ /tmp/github-runner-your-repo/portieris/

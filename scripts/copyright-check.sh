@@ -52,3 +52,4 @@ else
     fail "Failed to get branch information for origin/master, cannot perform copyright check. Make sure that you have a remote called origin in your git project."
     CRC=$(($CRC + 1))
 fi
+exit $CRC
