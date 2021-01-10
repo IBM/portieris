@@ -6,9 +6,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 # v-next
 ##
 
-# v0.9.6
+# v0.10.0
 ## TBD
 * support verifying images which dont require pull secrets ([#123](https://github.com/IBM/portieris/issues/123))
+* redifine policy crds using v1 with validation, breaking change ([]())
  
 
 # v0.9.5

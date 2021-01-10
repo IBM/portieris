@@ -183,7 +183,6 @@ spec:
                                           type: string
                                         dockerRepository:
                                           type: string
-
   names:
     kind: ClusterImagePolicy
     listKind: ClusterImagePolicyList

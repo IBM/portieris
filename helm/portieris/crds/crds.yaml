@@ -1,31 +1,180 @@
-apiVersion: apiextensions.k8s.io/v1beta1
+apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  name: imagepolicies.securityenforcement.admission.cloud.ibm.com
+  name: imagepolicies.portieris.cloud.ibm.com
   labels:
     app: portieris
 spec:
-  group: securityenforcement.admission.cloud.ibm.com
+  group: portieris.cloud.ibm.com
+  versions:
+    - name: v1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                repositories:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      policy:
+                        type: object
+                        nullable: true
+                        properties:
+                          vulnerability:
+                            type: object
+                            properties:
+                              ICCRVA:
+                                type: object
+                                properties:
+                                  enabled:
+                                    type: boolean
+                                  account:
+                                    type: string
+                          trust:
+                            type: object
+                            properties:
+                              enabled:
+                                type: boolean
+                              trustServer:
+                                type: string
+                              signerSecrets:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    name:
+                                      type: string
+                          simple:
+                            type: object
+                            properties:
+                              requirements:
+                                nullable: true
+                                type: array
+                                items:
+                                  type: object
+                                  required: [ "type" ]
+                                  properties:
+                                    type:
+                                      type: string
+                                    keySecret:
+                                      type: string
+                                    signedIdentity:
+                                      type: object
+                                      required: [ "type" ]
+                                      properties:
+                                        type:
+                                          type: string
+                                        prefix:
+                                          type: string
+                                        signedPrefix: 
+                                          type: string
+                                        dockerReference:
+                                          type: string
+                                        dockerRepository:
+                                          type: string
   names:
     kind: ImagePolicy
     listKind: ImagePolicyList
     plural: imagepolicies
     singular: imagepolicy
   scope: Namespaced
-  version: v1beta1
 ---
-apiVersion: apiextensions.k8s.io/v1beta1
+apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  name: clusterimagepolicies.securityenforcement.admission.cloud.ibm.com
+  name: clusterimagepolicies.portieris.cloud.ibm.com
   labels:
     app: portieris
 spec:
-  group: securityenforcement.admission.cloud.ibm.com
+  group: portieris.cloud.ibm.com
+  versions:
+    - name: v1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                repositories:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      policy:
+                        type: object
+                        properties:
+                          vulnerability:
+                            type: object
+                            properties:
+                              ICCRVA:
+                                type: object
+                                properties:
+                                  enabled:
+                                    type: boolean
+                                  account:
+                                    type: string
+                          trust:
+                            type: object
+                            properties:
+                              enabled:
+                                type: boolean
+                              trustServer:
+                                type: string
+                              signerSecrets:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    name:
+                                      type: string
+                          simple:
+                            type: object
+                            properties:
+                              storeURL:
+                                type: string
+                              storeSecret:
+                                type: string
+                              requirements:
+                                type: array
+                                nullable: true
+                                items:
+                                  type: object
+                                  required: [ "type" ]
+                                  properties:
+                                    type:
+                                      type: string
+                                    keySecret:
+                                      type: string
+                                    signedIdentity:
+                                      type: object
+                                      required: [ "type" ]
+                                      properties:
+                                        type:
+                                          type: string
+                                        prefix:
+                                          type: string
+                                        signedPrefix: 
+                                          type: string
+                                        dockerReference:
+                                          type: string
+                                        dockerRepository:
+                                          type: string
   names:
     kind: ClusterImagePolicy
     listKind: ClusterImagePolicyList
     plural: clusterimagepolicies
     singular: clusterimagepolicy
   scope: Cluster
-  version: v1beta1
