@@ -7,7 +7,7 @@ Portieris defines two custom resource types for policy:
 * ImagePolicies can be configured in a Kubernetes namespace, and define Portieris' behavior in that namespace. If ImagePolicies exists in a namespace, the policies from those ImagePolicy resources are used exclusively, if there is no match for the workload image in ImagePolicies ClusterImagePolicies are not examined. Images in deployed workloads are wildcard matched against the set of policies defined, if there is no policy matching the workload image then deployment is denied.
   - this example allows any image from the "icr.io" registry with no further checks (the policy is empty):
 ```yaml
-apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
+apiVersion: portieris.cloud.ibm.com/v1
 kind: ImagePolicy
 metadata:
   name: allow-all-icrio
@@ -21,7 +21,7 @@ spec:
   - this example allows all images from all registries with no checks:
 
 ```yaml
-apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
+apiVersion: portieris.cloud.ibm.com/v1
 kind: ClusterImagePolicy
 metadata:
   name: portieris-default-cluster-image-policy
@@ -55,7 +55,7 @@ Portieris supports sourcing trust data from the following registries without add
 To use a different trust server for a repository, you can specify the `trustServer` parameter in your policy:
 *Example*
 ```yaml
-apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
+apiVersion: portieris.cloud.ibm.com/v1
 kind: ImagePolicy
 metadata:
   name: allow-custom
@@ -85,7 +85,7 @@ In creating the secret, ensure you are creating the key with a value of `key`, a
 
 This example requires that images from `icr.io` are signed by the identity with public key in `my-pubkey`:
 ```yaml
-apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
+apiVersion: portieris.cloud.ibm.com/v1
 kind: ImagePolicy
 metadata:
   name: signedby-me
@@ -101,7 +101,7 @@ spec:
 
 This example requires that a given image is signed but it allows the registry location to have changed, in this pattern a policy per image is required to exactly define the new location (but see the next example):
 ```yaml
-apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
+apiVersion: portieris.cloud.ibm.com/v1
 kind: ImagePolicy
 metadata:
   name: db2mirror
@@ -120,7 +120,7 @@ spec:
 
 This example allows many images with a common origin which have been moved with their original signature, for example by mirroring, in this case from `icr.io/db2` to `registry.myco.com:5000/mymirror/ibmdb2`:
 ```yaml
-apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
+apiVersion: portieris.cloud.ibm.com/v1
 kind: ImagePolicy
 metadata:
   name: remapDB2Example
@@ -141,7 +141,7 @@ spec:
 
 It is also possible to specify the location of signature storage for registries which do not support the registry extension:
 ```yaml
-apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
+apiVersion: portieris.cloud.ibm.com/v1
 kind: ImagePolicy
 metadata:
   name: db2mirror
@@ -166,7 +166,7 @@ Vulnerability policies enable you to admit or deny pod admission based on the se
 
 Example policy:
 ```yaml
-apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
+apiVersion: portieris.cloud.ibm.com/v1
 kind: ImagePolicy
 metadata:
   name: block-vulnerable-images

@@ -55,15 +55,20 @@ spec:
                           simple:
                             type: object
                             properties:
+                              storeURL:
+                                type: string
+                              storeSecret:
+                                type: string
                               requirements:
-                                nullable: true
                                 type: array
+                                nullable: true
                                 items:
                                   type: object
                                   required: [ "type" ]
                                   properties:
                                     type:
                                       type: string
+                                      enum: [ "insecureAcceptAnything", "reject", "signedBy" ]
                                     keySecret:
                                       type: string
                                     signedIdentity:
@@ -72,13 +77,14 @@ spec:
                                       properties:
                                         type:
                                           type: string
-                                        prefix:
-                                          type: string
-                                        signedPrefix: 
+                                          enum: [ "matchExact", "matchRepository", "matchExactRepository", "matchExactReference", "remapIdentityy" ]
+                                        dockerRepository:
                                           type: string
                                         dockerReference:
                                           type: string
-                                        dockerRepository:
+                                        prefix:
+                                          type: string
+                                        signedPrefix: 
                                           type: string
   names:
     kind: ImagePolicy
@@ -156,11 +162,13 @@ spec:
                                   properties:
                                     type:
                                       type: string
+                                      enum: [ "insecureAcceptAnything", "reject", "signedBy" ]
                                     keySecret:
                                       type: string
                                     signedIdentity:
                                       type: object
                                       required: [ "type" ]
+                                      enum: [ "matchExact", "matchRepository", "matchExactReference", "matchExactRepository", "remapIdentity" ]
                                       properties:
                                         type:
                                           type: string
