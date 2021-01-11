@@ -188,3 +188,7 @@ The optional `account` parameter specifies the IBM Cloud account where exemption
 If the report returns an overall status of `OK`, `WARN` or `UNSUPPORTED` the pod is allowed. In the event of any other status, or any error condition the pod is denied.
 
 Please note that images that were recently pushed to the registry and have not yet completed scanning will be denied admission.
+
+### Notes:
+#### apiVersion change
+Prior to Portieris v0.10.0 policies had `apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1`. Policies developed before this version must be updated to `apiVersion: portieris.cloud.ibm.com/v1` otherwise they will not be enforced. This breaking change is due to some pre-existing incompatible policies in some environments.
