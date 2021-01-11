@@ -77,7 +77,7 @@ spec:
                                       properties:
                                         type:
                                           type: string
-                                          enum: [ "matchExact", "matchRepository", "matchExactRepository", "matchExactReference", "remapIdentityy" ]
+                                          enum: [ "","matchExact", "matchRepository", "matchExactRepository", "matchExactReference", "remapIdentity" ]
                                         dockerRepository:
                                           type: string
                                         dockerReference:
@@ -168,10 +168,10 @@ spec:
                                     signedIdentity:
                                       type: object
                                       required: [ "type" ]
-                                      enum: [ "matchExact", "matchRepository", "matchExactReference", "matchExactRepository", "remapIdentity" ]
                                       properties:
                                         type:
                                           type: string
+                                          enum: [ "", "matchExact", "matchRepository", "matchExactReference", "matchExactRepository", "remapIdentity" ]
                                         prefix:
                                           type: string
                                         signedPrefix: 
