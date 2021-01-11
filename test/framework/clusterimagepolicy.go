@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/IBM/portieris/pkg/apis/securityenforcement/v1beta1"
+	policyv1 "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/v1"
 	"k8s.io/apiextensions-apiserver/pkg/apis/apiextensions"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -27,12 +27,12 @@ import (
 )
 
 // LoadClusterImagePolicyManifest takes a manifest and decodes it into a ImagePolicy object
-func (f *Framework) LoadClusterImagePolicyManifest(pathToManifest string) (*v1beta1.ClusterImagePolicy, error) {
+func (f *Framework) LoadClusterImagePolicyManifest(pathToManifest string) (*policyv1.ClusterImagePolicy, error) {
 	manifest, err := openFile(pathToManifest)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to open file %q: %v", pathToManifest, err)
 	}
-	ip := v1beta1.ClusterImagePolicy{}
+	ip := policyv1.ClusterImagePolicy{}
 	if err := yaml.NewYAMLOrJSONDecoder(manifest, 100).Decode(&ip); err != nil {
 		return nil, fmt.Errorf("Unable to decode file %q: %v", pathToManifest, err)
 	}
@@ -40,21 +40,21 @@ func (f *Framework) LoadClusterImagePolicyManifest(pathToManifest string) (*v1be
 }
 
 // CreateClusterImagePolicy creates the ClusterImagePolicy
-func (f *Framework) CreateClusterImagePolicy(clusterImagePolicy *v1beta1.ClusterImagePolicy) error {
-	if _, err := f.ClusterImagePolicyClient.SecurityenforcementV1beta1().ClusterImagePolicies().Create(clusterImagePolicy); err != nil {
+func (f *Framework) CreateClusterImagePolicy(clusterImagePolicy *policyv1.ClusterImagePolicy) error {
+	if _, err := f.ClusterImagePolicyClient.PortierisV1().ClusterImagePolicies().Create(clusterImagePolicy); err != nil {
 		return fmt.Errorf("Error creating ClusterImagePolicy %q: %v", clusterImagePolicy.Name, err)
 	}
 	return f.WaitForClusterImagePolicy(clusterImagePolicy.Name, time.Minute)
 }
 
 // GetClusterImagePolicy retrieves the ClusterImagePolicy
-func (f *Framework) GetClusterImagePolicy(name string) (*v1beta1.ClusterImagePolicy, error) {
-	return f.ClusterImagePolicyClient.SecurityenforcementV1beta1().ClusterImagePolicies().Get(name, metav1.GetOptions{})
+func (f *Framework) GetClusterImagePolicy(name string) (*policyv1.ClusterImagePolicy, error) {
+	return f.ClusterImagePolicyClient.PortierisV1().ClusterImagePolicies().Get(name, metav1.GetOptions{})
 }
 
 // ListClusterImagePolicies creates the ClusterImagePolicy
-func (f *Framework) ListClusterImagePolicies() (*v1beta1.ClusterImagePolicyList, error) {
-	return f.ClusterImagePolicyClient.SecurityenforcementV1beta1().ClusterImagePolicies().List(metav1.ListOptions{})
+func (f *Framework) ListClusterImagePolicies() (*policyv1.ClusterImagePolicyList, error) {
+	return f.ClusterImagePolicyClient.PortierisV1().ClusterImagePolicies().List(metav1.ListOptions{})
 }
 
 // WaitForClusterImagePolicy waits until the ClusterImagePolicy is created or the timeout is reached
@@ -85,5 +85,5 @@ func (f *Framework) GetClusterImagePolicyDefinition() (*apiextensions.CustomReso
 
 // DeleteClusterImagePolicy deletes the specified ClusterImagePolicy
 func (f *Framework) DeleteClusterImagePolicy(name string) error {
-	return f.ClusterImagePolicyClient.SecurityenforcementV1beta1().ClusterImagePolicies().Delete(name, &metav1.DeleteOptions{})
+	return f.ClusterImagePolicyClient.PortierisV1().ClusterImagePolicies().Delete(name, &metav1.DeleteOptions{})
 }

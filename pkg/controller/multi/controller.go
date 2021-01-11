@@ -1,4 +1,4 @@
-// Copyright 2018, 2020 Portieris Authors.
+// Copyright 2018, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ var codec = serializer.NewCodecFactory(runtime.NewScheme())
 type Controller struct {
 	// kubeClientsetWrapper is a standard kubernetes clientset with a wrapper for retrieving podSpec from a given object
 	kubeClientsetWrapper kubernetes.WrapperInterface
-	// policyClient is a securityenforcementclientset with a wrapper for retrieving the relevant policy spec
+	// policyClient is a clientset with a wrapper for retrieving the relevant policy spec
 	policyClient policy.Interface
 	// Enforcer is used to check that containers satisfy constraints set by a policy
 	Enforcer

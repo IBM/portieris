@@ -1,4 +1,4 @@
-// Copyright 2020 Portieris Authors.
+// Copyright 2020, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,13 +19,13 @@ package simple
 import (
 	"fmt"
 
-	"github.com/IBM/portieris/pkg/apis/securityenforcement/v1beta1"
+	policyv1 "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/v1"
 	"github.com/IBM/portieris/pkg/kubernetes"
 	"github.com/containers/image/v5/signature"
 )
 
 // TransformPolicies from Portieris to container/image lib policies
-func (v verifier) TransformPolicies(kWrapper kubernetes.WrapperInterface, namespace string, inPolicies []v1beta1.SimpleRequirement) (*signature.Policy, error) {
+func (v verifier) TransformPolicies(kWrapper kubernetes.WrapperInterface, namespace string, inPolicies []policyv1.SimpleRequirement) (*signature.Policy, error) {
 	var policyRequirements []signature.PolicyRequirement
 
 	for _, inPolicy := range inPolicies {
@@ -79,7 +79,7 @@ func (v verifier) TransformPolicies(kWrapper kubernetes.WrapperInterface, namesp
 	}, nil
 }
 
-func policySignedIdentity(inPolicy *v1beta1.SimpleRequirement) (signature.PolicyReferenceMatch, error) {
+func policySignedIdentity(inPolicy *policyv1.SimpleRequirement) (signature.PolicyReferenceMatch, error) {
 	switch inPolicy.SignedIdentity.Type {
 	case "":
 		return signature.NewPRMMatchRepoDigestOrExact(), nil

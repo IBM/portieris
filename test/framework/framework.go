@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 
-	securityenforcementclientset "github.com/IBM/portieris/pkg/apis/securityenforcement/client/clientset/versioned"
+	policyclientset "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/client/clientset/versioned"
 	customResourceDefinitionClientSet "github.com/kubernetes/apiextensions-apiserver/pkg/client/clientset/internalclientset/typed/apiextensions/internalversion"
 
 	// Needed for testing using oidc (Armada)
@@ -38,16 +38,16 @@ const (
 	helmReleaseName = "portieris"
 	helmChartName   = "portieris"
 
-	imagePolicyCRDName        = "imagepolicies.securityenforcement.admission.cloud.ibm.com"
-	clusterImagePolicyCRDName = "clusterimagepolicies.securityenforcement.admission.cloud.ibm.com"
+	imagePolicyCRDName        = "imagepolicies.portieris.cloud.ibm.com"
+	clusterImagePolicyCRDName = "clusterimagepolicies.portieris.cloud.ibm.com"
 )
 
 // Framework is an e2e test framework esponsible for installing and deleting of the helm chart
 // It also providers helper functions for talking to Kube clusters
 type Framework struct {
 	KubeClient                     kubernetes.Interface
-	ImagePolicyClient              securityenforcementclientset.Interface
-	ClusterImagePolicyClient       securityenforcementclientset.Interface
+	ImagePolicyClient              policyclientset.Interface
+	ClusterImagePolicyClient       policyclientset.Interface
 	CustomResourceDefinitionClient customResourceDefinitionClientSet.CustomResourceDefinitionInterface
 	HTTPClient                     *http.Client
 	Namespace                      string
@@ -69,11 +69,11 @@ func New(kubeconfig, helmChart string, noInstall bool) (*Framework, error) {
 	if httpClient == nil {
 		return nil, fmt.Errorf("unable to create Kube client")
 	}
-	imagePolicyClient, err := securityenforcementclientset.NewForConfig(config)
+	imagePolicyClient, err := policyclientset.NewForConfig(config)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create ImagePolicy client: %v", err)
 	}
-	clusterImagePolicyClient, err := securityenforcementclientset.NewForConfig(config)
+	clusterImagePolicyClient, err := policyclientset.NewForConfig(config)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create ClusterImagePolicy client: %v", err)
 	}

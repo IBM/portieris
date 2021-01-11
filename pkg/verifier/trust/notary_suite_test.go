@@ -1,4 +1,4 @@
-// Copyright 2018, 2020 Portieris Authors.
+// Copyright 2018, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@ import (
 	"net/http"
 	"os"
 
-	securityenforcementfake "github.com/IBM/portieris/pkg/apis/securityenforcement/client/clientset/versioned/fake"
-	securityenforcementv1beta1 "github.com/IBM/portieris/pkg/apis/securityenforcement/v1beta1"
+	policyclientsetfake "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/client/clientset/versioned/fake"
+	policyv1 "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/v1"
 	"github.com/IBM/portieris/pkg/kubernetes"
 	"github.com/IBM/portieris/pkg/notary/fakenotary"
 	"github.com/IBM/portieris/pkg/policy"
@@ -56,7 +56,7 @@ var (
 	ctrl                *Verifier
 	kubeClientset       *k8sfake.Clientset
 	kubeWrapper         kubernetes.WrapperInterface
-	secClientset        *securityenforcementfake.Clientset
+	secClientset        *policyclientsetfake.Clientset
 	policyClient        *policy.Client
 	kubeObjects         []runtime.Object
 	imageObjects        []runtime.Object
@@ -72,7 +72,7 @@ func resetAllFakes() {
 	kubeClientset = k8sfake.NewSimpleClientset(kubeObjects...)
 	kubeWrapper = kubernetes.NewKubeClientsetWrapper(kubeClientset)
 	imageObjects = []runtime.Object{}
-	secClientset = securityenforcementfake.NewSimpleClientset(imageObjects...)
+	secClientset = policyclientsetfake.NewSimpleClientset(imageObjects...)
 	policyClient = policy.NewClient(secClientset)
 	trust = &fakenotary.FakeNotary{}
 	cr = &fakeregistry.FakeRegistry{}
@@ -81,9 +81,9 @@ func resetAllFakes() {
 }
 
 // newImagePolicyFromYAMLOrJSON .
-func newImagePolicyFromYAMLOrJSON(payload *bytes.Buffer, namespace string) *securityenforcementv1beta1.ImagePolicy {
+func newImagePolicyFromYAMLOrJSON(payload *bytes.Buffer, namespace string) *policyv1.ImagePolicy {
 	decoder := yaml.NewYAMLOrJSONDecoder(payload, 50)
-	policy := &securityenforcementv1beta1.ImagePolicy{
+	policy := &policyv1.ImagePolicy{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: namespace,
 		},
@@ -93,24 +93,24 @@ func newImagePolicyFromYAMLOrJSON(payload *bytes.Buffer, namespace string) *secu
 }
 
 // createNewImagePolicy creates a new ImagePolicy in the given namespace
-func createNewImagePolicy(repo, namespace string) *securityenforcementv1beta1.ImagePolicy {
-	return &securityenforcementv1beta1.ImagePolicy{
+func createNewImagePolicy(repo, namespace string) *policyv1.ImagePolicy {
+	return &policyv1.ImagePolicy{
 		TypeMeta: metav1.TypeMeta{
-			APIVersion: securityenforcementv1beta1.SchemeGroupVersion.String(),
+			APIVersion: policyv1.SchemeGroupVersion.String(),
 			Kind:       "ImagePolicy",
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      fmt.Sprintf("%s-test", namespace),
 			Namespace: namespace,
 		},
-		Spec: securityenforcementv1beta1.PolicySpec{
-			Repositories: []securityenforcementv1beta1.Repository{
+		Spec: policyv1.ImagePolicySpec{
+			Repositories: []policyv1.Repository{
 				{
 					Name: repo,
-					Policy: securityenforcementv1beta1.Policy{
-						Trust: securityenforcementv1beta1.Trust{
-							Enabled:       securityenforcementv1beta1.FalsePointer,
-							SignerSecrets: []securityenforcementv1beta1.Signer{},
+					Policy: policyv1.Policy{
+						Trust: policyv1.Trust{
+							Enabled:       policyv1.FalsePointer,
+							SignerSecrets: []policyv1.TrustSigner{},
 						},
 					},
 				},
@@ -120,9 +120,9 @@ func createNewImagePolicy(repo, namespace string) *securityenforcementv1beta1.Im
 }
 
 // newClusterImagePolicyFromYAMLOrJSON .
-func newClusterImagePolicyFromYAMLOrJSON(payload *bytes.Buffer, namespace string) *securityenforcementv1beta1.ClusterImagePolicy {
+func newClusterImagePolicyFromYAMLOrJSON(payload *bytes.Buffer, namespace string) *policyv1.ClusterImagePolicy {
 	decoder := yaml.NewYAMLOrJSONDecoder(payload, 50)
-	policy := &securityenforcementv1beta1.ClusterImagePolicy{
+	policy := &policyv1.ClusterImagePolicy{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: namespace,
 		},
@@ -133,24 +133,24 @@ func newClusterImagePolicyFromYAMLOrJSON(payload *bytes.Buffer, namespace string
 }
 
 // createClusterImagePolicy creates a new ClusterImagePolicy in the given namespace
-func createClusterImagePolicy(repo, namespace string) *securityenforcementv1beta1.ClusterImagePolicy {
-	return &securityenforcementv1beta1.ClusterImagePolicy{
+func createClusterImagePolicy(repo, namespace string) *policyv1.ClusterImagePolicy {
+	return &policyv1.ClusterImagePolicy{
 		TypeMeta: metav1.TypeMeta{
-			APIVersion: securityenforcementv1beta1.SchemeGroupVersion.String(),
+			APIVersion: policyv1.SchemeGroupVersion.String(),
 			Kind:       "ClusterImagePolicy",
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      fmt.Sprintf("%s-test", namespace),
 			Namespace: namespace,
 		},
-		Spec: securityenforcementv1beta1.PolicySpec{
-			Repositories: []securityenforcementv1beta1.Repository{
+		Spec: policyv1.ImagePolicySpec{
+			Repositories: []policyv1.Repository{
 				{
 					Name: repo,
-					Policy: securityenforcementv1beta1.Policy{
-						Trust: securityenforcementv1beta1.Trust{
-							Enabled:       securityenforcementv1beta1.FalsePointer,
-							SignerSecrets: []securityenforcementv1beta1.Signer{},
+					Policy: policyv1.Policy{
+						Trust: policyv1.Trust{
+							Enabled:       policyv1.FalsePointer,
+							SignerSecrets: []policyv1.TrustSigner{},
 						},
 					},
 				},

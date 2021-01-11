@@ -1,4 +1,4 @@
-// Copyright 2020 Portieris Authors.
+// Copyright 2020, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import (
 
 	"github.com/IBM/portieris/helpers/credential"
 	"github.com/IBM/portieris/helpers/image"
-	securityenforcementv1beta1 "github.com/IBM/portieris/pkg/apis/securityenforcement/v1beta1"
+	policyv1 "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/v1"
 	"github.com/IBM/portieris/pkg/kubernetes"
 	"github.com/IBM/portieris/pkg/verifier/simple"
 	notaryverifier "github.com/IBM/portieris/pkg/verifier/trust"
@@ -30,8 +30,8 @@ import (
 
 // Enforcer is an interface that enforces pod admission based on a configured policy
 type Enforcer interface {
-	DigestByPolicy(string, *image.Reference, credential.Credentials, *securityenforcementv1beta1.Policy) (*bytes.Buffer, error, error)
-	VulnerabilityPolicy(*image.Reference, credential.Credentials, *securityenforcementv1beta1.Policy) vulnerability.ScanResponse
+	DigestByPolicy(string, *image.Reference, credential.Credentials, *policyv1.Policy) (*bytes.Buffer, error, error)
+	VulnerabilityPolicy(*image.Reference, credential.Credentials, *policyv1.Policy) vulnerability.ScanResponse
 }
 
 type enforcer struct {
@@ -56,7 +56,7 @@ func NewEnforcer(kubeClientsetWrapper kubernetes.WrapperInterface, nv *notaryver
 	}
 }
 
-func (e enforcer) DigestByPolicy(namespace string, img *image.Reference, credentials credential.Credentials, policy *securityenforcementv1beta1.Policy) (*bytes.Buffer, error, error) {
+func (e enforcer) DigestByPolicy(namespace string, img *image.Reference, credentials credential.Credentials, policy *policyv1.Policy) (*bytes.Buffer, error, error) {
 	// no policy indicates admission should be allowed, without mutation
 	if policy == nil {
 		return nil, nil, nil
@@ -113,7 +113,7 @@ func (e enforcer) DigestByPolicy(namespace string, img *image.Reference, credent
 	return digest, nil, nil
 }
 
-func (e *enforcer) VulnerabilityPolicy(img *image.Reference, credentials credential.Credentials, policy *securityenforcementv1beta1.Policy) vulnerability.ScanResponse {
+func (e *enforcer) VulnerabilityPolicy(img *image.Reference, credentials credential.Credentials, policy *policyv1.Policy) vulnerability.ScanResponse {
 	if policy == nil {
 		glog.Warningf("vulnerability: No policy for image %q so allow", img.String())
 		return vulnerability.ScanResponse{CanDeploy: true}

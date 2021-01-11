@@ -1,4 +1,4 @@
-// Copyright 2018, 2020 Portieris Authors.
+// Copyright 2018, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/runtime"
 
-	securityenforcementfake "github.com/IBM/portieris/pkg/apis/securityenforcement/client/clientset/versioned/fake"
+	policyclientsetfake "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/client/clientset/versioned/fake"
 	"github.com/IBM/portieris/pkg/kubernetes"
 	"github.com/IBM/portieris/pkg/notary/fakenotary"
 	"github.com/IBM/portieris/pkg/policy"
@@ -146,7 +146,7 @@ var _ = Describe("Main", func() {
 				clusterImagePolicy := newClusterImagePolicyFromYAMLOrJSON(clusterImagePolicyPayload, namespace)
 				policies = append(policies, clusterImagePolicy)
 			}
-			secClientset = securityenforcementfake.NewSimpleClientset(policies...)
+			secClientset = policyclientsetfake.NewSimpleClientset(policies...)
 			policyClient = policy.NewClient(secClientset)
 
 			// Fake content trust token

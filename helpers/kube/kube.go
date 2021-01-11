@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"os"
 
-	securityenforcementclientset "github.com/IBM/portieris/pkg/apis/securityenforcement/client/clientset/versioned"
+	portierisclientset "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/client/clientset/versioned"
 	"github.com/IBM/portieris/pkg/policy"
 	"github.com/golang/glog"
 	"k8s.io/client-go/kubernetes"
@@ -74,7 +74,7 @@ func GetKubeClient(config *rest.Config) *kubernetes.Clientset {
 
 // GetPolicyClient creates a policy clientset
 func GetPolicyClient(config *rest.Config) *policy.Client {
-	clientset, err := securityenforcementclientset.NewForConfig(config)
+	clientset, err := portierisclientset.NewForConfig(config)
 	if err != nil {
 		glog.Fatal(err)
 	}

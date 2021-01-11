@@ -1,4 +1,4 @@
-apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
+apiVersion: portieris.cloud.ibm.com/v1
 kind: ImagePolicy
 metadata:
   name: default
@@ -11,7 +11,7 @@ spec:
     # This policy prevents Portieris from denying its own updates. Do not remove this policy or portieris may not function correctly.
     - name: "{{ .Values.image.host | default "docker.io/ibmcom"  }}/{{ .Values.image.image }}"
 ---
-apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
+apiVersion: portieris.cloud.ibm.com/v1
 kind: ImagePolicy
 metadata:
   name: default
@@ -39,7 +39,7 @@ spec:
     {{ end }}
 ---
 {{ if .Values.IBMContainerService }}
-apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
+apiVersion: portieris.cloud.ibm.com/v1
 kind: ImagePolicy
 metadata:
   name: default
@@ -63,7 +63,7 @@ spec:
     - name: "icr.io/ext/istio/*"
 ---
 {{ end }}
-apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
+apiVersion: portieris.cloud.ibm.com/v1
 kind: ClusterImagePolicy
 metadata:
   name: default

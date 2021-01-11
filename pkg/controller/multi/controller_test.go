@@ -1,4 +1,4 @@
-// Copyright 2020 Portieris Authors.
+// Copyright 2020, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import (
 
 	"github.com/IBM/portieris/helpers/credential"
 	"github.com/IBM/portieris/helpers/image"
-	"github.com/IBM/portieris/pkg/apis/securityenforcement/v1beta1"
+	policyv1 "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/v1"
 	"github.com/IBM/portieris/pkg/metrics"
 	"github.com/IBM/portieris/pkg/verifier/simple"
 	notaryverifier "github.com/IBM/portieris/pkg/verifier/trust"
@@ -39,9 +39,9 @@ type mockPolicyClient struct {
 	mock.Mock
 }
 
-func (mpc *mockPolicyClient) GetPolicyToEnforce(namespace, image string) (*v1beta1.Policy, error) {
+func (mpc *mockPolicyClient) GetPolicyToEnforce(namespace, image string) (*policyv1.Policy, error) {
 	args := mpc.Called(namespace, image)
-	return args.Get(0).(*v1beta1.Policy), args.Error(1)
+	return args.Get(0).(*policyv1.Policy), args.Error(1)
 }
 
 type mockKubeWrapper struct {
@@ -73,12 +73,12 @@ type mockEnforcer struct {
 	mock.Mock
 }
 
-func (me *mockEnforcer) DigestByPolicy(namespace string, img *image.Reference, credentials credential.Credentials, policy *v1beta1.Policy) (*bytes.Buffer, error, error) {
+func (me *mockEnforcer) DigestByPolicy(namespace string, img *image.Reference, credentials credential.Credentials, policy *policyv1.Policy) (*bytes.Buffer, error, error) {
 	args := me.Called(namespace, img, credentials, policy)
 	return args.Get(0).(*bytes.Buffer), args.Error(1), args.Error(2)
 }
 
-func (me *mockEnforcer) VulnerabilityPolicy(img *image.Reference, credentials credential.Credentials, policy *v1beta1.Policy) vulnerability.ScanResponse {
+func (me *mockEnforcer) VulnerabilityPolicy(img *image.Reference, credentials credential.Credentials, policy *policyv1.Policy) vulnerability.ScanResponse {
 	args := me.Called(img, credentials, policy)
 	return args.Get(0).(vulnerability.ScanResponse)
 }
@@ -111,7 +111,7 @@ func TestNewController(t *testing.T) {
 
 func TestController_getPatchesForContainers(t *testing.T) {
 	type getPolicyToEnforceMock struct {
-		outPolicy *v1beta1.Policy
+		outPolicy *policyv1.Policy
 		outErr    error
 	}
 	type enforcerVulnerabilityPolicyMock struct {
@@ -236,7 +236,7 @@ func TestController_getPatchesForContainers(t *testing.T) {
 				{
 					inImage: "icr.io/some-namespace/image:tag",
 					getPolicyToEnforce: &getPolicyToEnforceMock{
-						outPolicy: &v1beta1.Policy{},
+						outPolicy: &policyv1.Policy{},
 					},
 					credentials: credential.Credentials{{
 						Username: "wibble",
@@ -271,7 +271,7 @@ func TestController_getPatchesForContainers(t *testing.T) {
 				{
 					inImage: "icr.io/some-namespace/image:tag",
 					getPolicyToEnforce: &getPolicyToEnforceMock{
-						outPolicy: &v1beta1.Policy{},
+						outPolicy: &policyv1.Policy{},
 					},
 					credentials: credential.Credentials{{
 						Username: "wibble",
@@ -308,7 +308,7 @@ func TestController_getPatchesForContainers(t *testing.T) {
 				{
 					inImage: "icr.io/some-namespace/image:tag",
 					getPolicyToEnforce: &getPolicyToEnforceMock{
-						outPolicy: &v1beta1.Policy{},
+						outPolicy: &policyv1.Policy{},
 					},
 					credentials: credential.Credentials{{
 						Username: "wibble",
@@ -345,7 +345,7 @@ func TestController_getPatchesForContainers(t *testing.T) {
 				{
 					inImage: "icr.io/some-namespace/image:tag",
 					getPolicyToEnforce: &getPolicyToEnforceMock{
-						outPolicy: &v1beta1.Policy{},
+						outPolicy: &policyv1.Policy{},
 					},
 					credentials: credential.Credentials{{
 						Username: "wibble",
@@ -382,7 +382,7 @@ func TestController_getPatchesForContainers(t *testing.T) {
 				{
 					inImage: "icr.io/some-namespace/image:tag",
 					getPolicyToEnforce: &getPolicyToEnforceMock{
-						outPolicy: &v1beta1.Policy{},
+						outPolicy: &policyv1.Policy{},
 					},
 					credentials: credential.Credentials{{
 						Username: "wibble",

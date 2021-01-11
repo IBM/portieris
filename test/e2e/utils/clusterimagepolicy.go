@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import (
 
 	uuid "github.com/satori/go.uuid"
 
-	"github.com/IBM/portieris/pkg/apis/securityenforcement/v1beta1"
+	policyv1 "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/v1"
 	"github.com/IBM/portieris/test/framework"
 	corev1 "k8s.io/api/core/v1"
 )
@@ -32,7 +32,7 @@ func CheckIfTesting(t *testing.T, boolToCheck bool) {
 
 // DeleteThenReturnClusterImagePolicy is used for temporary deletion of a cluster image policy for a given test
 // The returned ClusterImagePolicy should be used to recreate after the test is complete using a defer
-func DeleteThenReturnClusterImagePolicy(t *testing.T, fw *framework.Framework, clusterImagePolicy string) *v1beta1.ClusterImagePolicy {
+func DeleteThenReturnClusterImagePolicy(t *testing.T, fw *framework.Framework, clusterImagePolicy string) *policyv1.ClusterImagePolicy {
 	defaultClusterPolicy, err := fw.GetClusterImagePolicy(clusterImagePolicy)
 	if err != nil {
 		return nil
@@ -43,7 +43,7 @@ func DeleteThenReturnClusterImagePolicy(t *testing.T, fw *framework.Framework, c
 	return defaultClusterPolicy
 }
 
-func CreateClusterImagePolicyAndNamespace(t *testing.T, fw *framework.Framework, manifestPath string) (*v1beta1.ClusterImagePolicy, *corev1.Namespace) {
+func CreateClusterImagePolicyAndNamespace(t *testing.T, fw *framework.Framework, manifestPath string) (*policyv1.ClusterImagePolicy, *corev1.Namespace) {
 	ns := uuid.NewV4().String()
 	clusterImagePolicy, err := fw.LoadClusterImagePolicyManifest(manifestPath)
 	if err != nil {
