@@ -23,6 +23,7 @@ import (
 	"strings"
 
 	"github.com/IBM/portieris/helpers/credential"
+	"github.com/IBM/portieris/internal/info"
 	"github.com/containers/image/v5/docker"
 	"github.com/containers/image/v5/image"
 	"github.com/containers/image/v5/manifest"
@@ -44,8 +45,8 @@ func (v verifier) VerifyByPolicy(imageToVerify string, credentials credential.Cr
 	}
 	// if expensive, make instance
 	systemContext := &types.SystemContext{
-		RootForImplicitAbsolutePaths: "/nowhere",  // read nothing from files
-		DockerRegistryUserAgent:      "portieris", // add version?
+		RootForImplicitAbsolutePaths: "/nowhere", // read nothing from files
+		DockerRegistryUserAgent:      "portieris/" + info.Version,
 		RegistriesDirPath:            registriesConfigDir,
 	}
 
