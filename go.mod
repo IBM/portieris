@@ -12,6 +12,7 @@ require (
 	github.com/bugsnag/bugsnag-go v1.5.3 // indirect
 	github.com/bugsnag/panicwrap v1.2.0 // indirect
 	github.com/cloudflare/cfssl v1.5.0 // indirect
+	github.com/containers/common v0.33.1
 	github.com/containers/image/v5 v5.9.0
 	github.com/docker/distribution v2.7.1+incompatible
 	github.com/docker/go v1.5.1-1 // indirect
@@ -19,7 +20,7 @@ require (
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/googleapis/gnostic v0.4.0 // indirect
-	github.com/gorilla/mux v1.7.4
+	github.com/gorilla/mux v1.8.0
 	github.com/hailocab/go-hostpool v0.0.0-20160125115350-e80d13ce29ed // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/jinzhu/gorm v1.9.12 // indirect
@@ -27,7 +28,7 @@ require (
 	github.com/kubernetes/apiextensions-apiserver v0.0.0-20181121072900-e8a638592964
 	github.com/miekg/pkcs11 v0.0.0-20181023194645-95e2e42e3ece // indirect
 	github.com/onsi/ginkgo v1.14.2
-	github.com/onsi/gomega v1.10.3
+	github.com/onsi/gomega v1.10.4
 	github.com/prometheus/client_golang v1.8.0
 	github.com/satori/go.uuid v1.2.0
 	github.com/stretchr/testify v1.6.1
