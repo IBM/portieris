@@ -32,6 +32,18 @@ SkipSecretCreation: false
 # If using cert-manager to handle secrets
 UseCertManager: false
 
+# HostAliases
+hostAliases: {}
+#hostAliases:
+#- ip: "127.0.0.1"
+#  hostnames:
+#  - "foo.local"
+#  - "bar.local"
+#- ip: "10.1.2.3"
+#  hostnames:
+#  - "foo.remote"
+#  - "bar.remote"
+
 # Resoures defined to assist scheduling
 # request is typical x10, limit is typical x100
 resources:
