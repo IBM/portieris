@@ -38,7 +38,7 @@ for GOFILE in "${GOSRCFILES[@]}"; do
          fi
       elif [[ ${#YEARS[@]} == 2 ]]; then
         if [[ ${YEARS[1]} != ${THISYEAR} ]]; then
-            sed -i '' -e "s|Copyright ${YEARS[0]}, ${YEARS[1]} Portieris Authors.|Copyright ${YEARS[0]}, ${THISYEAR} Portieris Authors.|" $GOFILE
+            sed -i '' -e "s|Copyright ${YEARS[0]}-${YEARS[1]} Portieris Authors.|Copyright ${YEARS[0]}, ${THISYEAR} Portieris Authors.|" $GOFILE
         fi
       fi
   fi
