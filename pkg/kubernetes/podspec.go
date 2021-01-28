@@ -48,6 +48,17 @@ var ErrObjectHasParents = fmt.Errorf("This object has parents")
 // ErrObjectHasZeroReplicas is returned when the resource being created has zero replicas
 var ErrObjectHasZeroReplicas = fmt.Errorf("This object has zero replicas")
 
+var supportedKinds = map[string]struct{}{
+	"Deployment":            struct{}{},
+	"Pod":                   struct{}{},
+	"DaemonSet":             struct{}{},
+	"ReplicaSet":            struct{}{},
+	"ReplicationController": struct{}{},
+	"StatefulSet":           struct{}{},
+	"CronJob":               struct{}{},
+	"Job":                   struct{}{},
+}
+
 // GetPodSpec retrieves the podspec from the admission request passed in
 func (w *Wrapper) GetPodSpec(ar *v1beta1.AdmissionRequest) (string, *corev1.PodSpec, error) {
 	ps := corev1.PodSpec{}
@@ -243,8 +254,13 @@ func (w *Wrapper) decodeObject(raw []byte, object object) error {
 	if _, _, err := deserializer.Decode(raw, nil, object); err != nil {
 		return err
 	}
-	if len(object.GetOwnerReferences()) != 0 {
-		return ErrObjectHasParents
+	ownerRefs := object.GetOwnerReferences()
+	for _, owner := range ownerRefs {
+		if _, ok := supportedKinds[owner.Kind]; ok {
+			return ErrObjectHasParents
+		} else {
+			glog.Warningf("Resource has an owner with a kind that is not supported: %s, treating this resource as top level", owner.Kind)
+		}
 	}
 	return nil
 }
