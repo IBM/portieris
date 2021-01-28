@@ -848,7 +848,7 @@ func TestWrapper_decodeObject(t *testing.T) {
 			wantErrEqual: ErrObjectHasParents.Error(),
 		},
 		{
-			name:   "decodes a pod spec when it's owner of kind that we do not support",
+			name:   "decodes a pod spec when it's owner of a kind that we do not support",
 			raw:    []byte(`{"metadata":{"name":"nginx","namespace":"default","ownerReferences":[{"apiVersion":"customcontroller.v1","kind":"CustomController","name":"customercontroller-55d687c698","uid":"e0577bcf-30dd-11e8-83d1-baaf52c27f02","controller":true,"blockOwnerDeletion":true}]},"spec":{"containers":[{"name":"nginx","image":"docker.io/nginx"}]}}`),
 			object: &corev1.Pod{},
 			want: &corev1.Pod{
@@ -856,7 +856,7 @@ func TestWrapper_decodeObject(t *testing.T) {
 					Name:      "nginx",
 					Namespace: "default",
 					OwnerReferences: []metav1.OwnerReference{
-						metav1.OwnerReference{
+						{
 							APIVersion:         "customcontroller.v1",
 							Kind:               "CustomController",
 							Name:               "customercontroller-55d687c698",

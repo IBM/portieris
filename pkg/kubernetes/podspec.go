@@ -49,14 +49,14 @@ var ErrObjectHasParents = fmt.Errorf("This object has parents")
 var ErrObjectHasZeroReplicas = fmt.Errorf("This object has zero replicas")
 
 var supportedKinds = map[string]struct{}{
-	"Deployment":            struct{}{},
-	"Pod":                   struct{}{},
-	"DaemonSet":             struct{}{},
-	"ReplicaSet":            struct{}{},
-	"ReplicationController": struct{}{},
-	"StatefulSet":           struct{}{},
-	"CronJob":               struct{}{},
-	"Job":                   struct{}{},
+	"Deployment":            {},
+	"Pod":                   {},
+	"DaemonSet":             {},
+	"ReplicaSet":            {},
+	"ReplicationController": {},
+	"StatefulSet":           {},
+	"CronJob":               {},
+	"Job":                   {},
 }
 
 // GetPodSpec retrieves the podspec from the admission request passed in
