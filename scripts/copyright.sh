@@ -34,7 +34,7 @@ for GOFILE in "${GOSRCFILES[@]}"; do
       YEARS=($(echo $YEAR_LINE | grep -oE '\d{4}'))
       if [[ ${#YEARS[@]} == 1 ]]; then
          if [[ ${YEARS[0]} != ${THISYEAR} ]]; then
-            sed -i '' -e "s|Copyright ${YEARS[0]} Portieris Authors.|Copyright ${THISYEAR} Portieris Authors.|" $GOFILE
+            sed -i '' -e "s|Copyright ${YEARS[0]} Portieris Authors.|Copyright ${YEARS[0]}, ${THISYEAR} Portieris Authors.|" $GOFILE
          fi
       elif [[ ${#YEARS[@]} == 2 ]]; then
         if [[ ${YEARS[1]} != ${THISYEAR} ]]; then
