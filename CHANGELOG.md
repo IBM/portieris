@@ -7,7 +7,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ##
 
 # v0.10.0
-## TBD
+## 2021-01-11
 * support verifying images which dont require pull secrets ([#123](https://github.com/IBM/portieris/issues/123))
 * redifine policy crds using v1 with validation, breaking change ([#121](https://github.com/IBM/portieris/issues/121))
  
@@ -45,12 +45,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 # v0.8.2
 ## 2020-10-12
-
 * Provide option to run out of cluster ([#180](https://github.com/IBM/portieris/issues/180))
 
 # v0.8.1
 ## 2020-09-18
-
 * PR checker fixed to fail when tests fail ([#167](https://github.com/IBM/portieris/issues/167))
 * Drop support for Helm 2. You must now use Helm 3 to install Portieris ([#141](https://github.com/IBM/portieris/issues/141)) ([#41](https://github.com/IBM/portieris/issues/41)) ([#89](https://github.com/IBM/portieris/issues/89))
 * Ability to use a namespace selector for admission webhook ([#112](https://github.com/IBM/portieris/issues/112))
@@ -59,7 +57,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 # 0.8.0
 ## 2020-09-02
-
 * Fix the port name in service template ([PR#149](https://github.com/IBM/portieris/pull/149))
 * Change the default namespace to portieris ([#117](https://github.com/IBM/portieris/issues/117))
 * Support Helm3 and Openshift 4 ([PR#130](https://github.com/IBM/portieris/pull/130))
@@ -69,10 +66,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 # 0.7.0
 ## 2020-06-09
-
 * Support for reading simple signatures from lookaside storage, ([#93](https://github.com/IBM/portieris/issues/93))
 
 # 0.6.0
 ## 2020-03-26
-
 * Support for the verification of simple signatures using [containers/image](https://github.com/containers/image). ([#70](https://github.com/IBM/portieris/issues/70))
