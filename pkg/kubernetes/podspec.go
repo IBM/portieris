@@ -258,9 +258,8 @@ func (w *Wrapper) decodeObject(raw []byte, object object) error {
 	for _, owner := range ownerRefs {
 		if _, ok := supportedKinds[owner.Kind]; ok {
 			return ErrObjectHasParents
-		} else {
-			glog.Warningf("Resource has an owner with a kind that is not supported: %s, treating this resource as top level", owner.Kind)
 		}
+		glog.Warningf("Resource has an owner with a kind that is not supported: %s, treating this resource as top level", owner.Kind)
 	}
 	return nil
 }
