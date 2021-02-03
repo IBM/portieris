@@ -24,7 +24,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var policyRequirementInsecure = signature.NewPRInsecureAcceptAnything()
+var (
+	policyRequirementInsecure = signature.NewPRInsecureAcceptAnything()
+	policyDeny                = signature.NewPRReject()
+)
 
 // Cover error paths - good path is covered in e2e tests
 func TestVerifyByPolicy(t *testing.T) {
@@ -68,6 +71,14 @@ func TestVerifyByPolicy(t *testing.T) {
 			wantErr:     true,
 			errMsg:      "pinging docker registry ",
 		},
+		{
+			name:        "policy verification denied",
+			image:       "docker.io/library/busybox",
+			credentials: credential.Credentials{{Username: "user", Password: "password"}},
+			policies:    &policyDeny,
+			wantErr:     false,
+			wantDeny:    true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -81,16 +92,18 @@ func TestVerifyByPolicy(t *testing.T) {
 			}
 			digest, deny, err := verifier{}.VerifyByPolicy(tt.image, tt.credentials, "", policy)
 			if tt.wantErr {
-				assert.Error(t, err)
-				assert.Contains(t, err.Error(), tt.errMsg, "unexpected error")
+				if assert.Error(t, err) {
+					assert.Contains(t, err.Error(), tt.errMsg, "unexpected error")
+				}
 			} else {
 				assert.NoError(t, err)
 			}
 			if tt.wantDeny {
-				assert.Error(t, deny)
-				assert.Contains(t, deny.Error(), tt.denyMsg, "unexpected deny")
+				if assert.Error(t, deny, "Expected deny but got nil") {
+					assert.Contains(t, deny.Error(), tt.denyMsg, "unexpected deny")
+				}
 			} else {
-				assert.NoError(t, deny)
+				assert.NoError(t, deny, "expected nil but got deny: %s", deny)
 			}
 			if !tt.wantErr && !tt.wantDeny {
 				assert.NotEmpty(t, digest, "should have a digest")

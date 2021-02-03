@@ -23,6 +23,7 @@ import (
 	"strings"
 
 	"github.com/IBM/portieris/helpers/credential"
+	"github.com/containers/common/pkg/retry"
 	"github.com/containers/image/v5/docker"
 	"github.com/containers/image/v5/image"
 	"github.com/containers/image/v5/manifest"
@@ -30,6 +31,12 @@ import (
 	"github.com/containers/image/v5/types"
 	"github.com/golang/glog"
 )
+
+var retryOpts = &retry.RetryOptions{
+	MaxRetry: 2,
+	// No Delay because the containers/image library internally retries 429
+	// errors, all other retryable errors are suitable for immediate retry.
+}
 
 // VerifyByPolicy verifies the image according to the supplied policy and returns the verified digest, verify error or processing error
 func (v verifier) VerifyByPolicy(imageToVerify string, credentials credential.Credentials, registriesConfigDir string, simplePolicy *signature.Policy) (*bytes.Buffer, error, error) {
@@ -49,11 +56,11 @@ func (v verifier) VerifyByPolicy(imageToVerify string, credentials credential.Cr
 		RegistriesDirPath:            registriesConfigDir,
 	}
 
-	imageSource, err := imageReference.NewImageSource(context.Background(), systemContext)
+	imageSource, err := newImageSourceWithRetry(context.Background(), systemContext, imageReference)
 	if err == nil {
 		defer imageSource.Close()
 		glog.Infof("SimpleSigning verification: anonymous access allowed for image %s, continuing with anonymous verify", imageToVerify)
-		return verifyAttempt(imageSource, policyContext)
+		return verifyWithRetry(context.Background(), imageSource, policyContext)
 	}
 	glog.Errorf("SimpleSigning verification: anonymous access denied for image %s, continuing with ImagePullSecrets... Error %v", imageToVerify, err)
 
@@ -64,7 +71,7 @@ func (v verifier) VerifyByPolicy(imageToVerify string, credentials credential.Cr
 			Password: credential.Password,
 		}
 		systemContext.DockerAuthConfig = dockerAuthConfig
-		imageSource, err := imageReference.NewImageSource(context.Background(), systemContext)
+		imageSource, err := newImageSourceWithRetry(context.Background(), systemContext, imageReference)
 		if err != nil {
 			if i+1 == numCreds {
 				glog.Errorf("SimpleSigning verification: ImagePullSecret with username %s for image %s failed, no more secrets in scope (secret %d/%d). Failing. Error %v", credential.Username, imageToVerify, i+1, numCreds, err)
@@ -75,24 +82,66 @@ func (v verifier) VerifyByPolicy(imageToVerify string, credentials credential.Cr
 		}
 		defer imageSource.Close()
 		glog.Infof("SimpleSigning verification: ImagePullSecret with username %s for image %s was valid (secret %d/%d), continuing to next stage", credential.Username, imageToVerify, i+1, numCreds)
-		return verifyAttempt(imageSource, policyContext)
+		return verifyWithRetry(context.Background(), imageSource, policyContext)
 	}
 
 	return nil, nil, fmt.Errorf("Deny %q, no valid ImagePullSecret, %d tried", imageToVerify, len(credentials))
 }
 
-func verifyAttempt(imageSource types.ImageSource, policyContext *signature.PolicyContext) (*bytes.Buffer, error, error) {
+func verifyWithRetry(ctx context.Context, imageSource types.ImageSource, policyContext *signature.PolicyContext) (*bytes.Buffer, error, error) {
+	var (
+		manifest *bytes.Buffer
+		deny     error
+		attempt  int
+	)
+	return manifest, deny, retry.RetryIfNecessary(ctx, func() error {
+		attempt++
+		glog.InfoDepth(6, fmt.Sprintf("Attempt %d to verify image", attempt))
+		var err error
+		manifest, deny, err = verifyAttempt(ctx, imageSource, policyContext)
+		if err != nil {
+			glog.ErrorDepth(5, fmt.Sprintf("Attempt %d to verify image failed: %s", attempt, err))
+		}
+		return err
+	}, retryOpts)
+}
+
+func verifyAttempt(ctx context.Context, imageSource types.ImageSource, policyContext *signature.PolicyContext) (*bytes.Buffer, error, error) {
 	unparsedImage := image.UnparsedInstance(imageSource, nil)
-	_, deny := policyContext.IsRunningImageAllowed(context.Background(), unparsedImage)
-	if deny != nil {
-		return nil, deny, nil
+	_, err := policyContext.IsRunningImageAllowed(ctx, unparsedImage)
+	switch err.(type) {
+	case nil:
+	case signature.PolicyRequirementError:
+		return nil, err, nil
+	default:
+		return nil, nil, err
 	}
 
 	// get the digest
-	m, _, err := unparsedImage.Manifest(context.Background())
+	m, _, err := unparsedImage.Manifest(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
 	digest, err := manifest.Digest(m)
 	if err != nil {
 		return nil, nil, err
 	}
 	return bytes.NewBufferString(strings.TrimPrefix(digest.String(), "sha256:")), nil, nil
+}
+
+func newImageSourceWithRetry(ctx context.Context, systemContext *types.SystemContext, imageReference types.ImageReference) (types.ImageSource, error) {
+	var (
+		imageSource types.ImageSource
+		attempt     int
+	)
+	return imageSource, retry.RetryIfNecessary(ctx, func() error {
+		attempt++
+		glog.InfoDepth(6, fmt.Sprintf("Attempt %d to get image source", attempt))
+		var err error
+		imageSource, err = imageReference.NewImageSource(context.Background(), systemContext)
+		if err != nil {
+			glog.ErrorDepth(5, fmt.Sprintf("Attempt %d to get image source for simple verification failed: %s", attempt, err))
+		}
+		return err
+	}, retryOpts)
 }
