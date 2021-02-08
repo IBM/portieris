@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -764,7 +764,9 @@ func TestWrapper_mutateWithSA(t *testing.T) {
 }
 
 func TestWrapper_decodeObject(t *testing.T) {
-
+	pointerToBool := func(in bool) *bool {
+		return &in
+	}
 	tests := []struct {
 		name         string
 		raw          []byte
@@ -844,6 +846,35 @@ func TestWrapper_decodeObject(t *testing.T) {
 			object:       &corev1.Pod{},
 			wantErr:      true,
 			wantErrEqual: ErrObjectHasParents.Error(),
+		},
+		{
+			name:   "decodes a pod spec when it's owner of a kind that we do not support",
+			raw:    []byte(`{"metadata":{"name":"nginx","namespace":"default","ownerReferences":[{"apiVersion":"customcontroller.v1","kind":"CustomController","name":"customercontroller-55d687c698","uid":"e0577bcf-30dd-11e8-83d1-baaf52c27f02","controller":true,"blockOwnerDeletion":true}]},"spec":{"containers":[{"name":"nginx","image":"docker.io/nginx"}]}}`),
+			object: &corev1.Pod{},
+			want: &corev1.Pod{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "nginx",
+					Namespace: "default",
+					OwnerReferences: []metav1.OwnerReference{
+						{
+							APIVersion:         "customcontroller.v1",
+							Kind:               "CustomController",
+							Name:               "customercontroller-55d687c698",
+							UID:                "e0577bcf-30dd-11e8-83d1-baaf52c27f02",
+							Controller:         pointerToBool(true),
+							BlockOwnerDeletion: pointerToBool(true),
+						},
+					},
+				},
+				Spec: corev1.PodSpec{
+					Containers: []corev1.Container{
+						{
+							Name:  "nginx",
+							Image: "docker.io/nginx",
+						},
+					},
+				},
+			},
 		},
 		{
 			name:    "returns error if the object is weird",

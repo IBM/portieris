@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -47,6 +47,17 @@ var ErrObjectHasParents = fmt.Errorf("This object has parents")
 
 // ErrObjectHasZeroReplicas is returned when the resource being created has zero replicas
 var ErrObjectHasZeroReplicas = fmt.Errorf("This object has zero replicas")
+
+var supportedKinds = map[string]struct{}{
+	"Deployment":            {},
+	"Pod":                   {},
+	"DaemonSet":             {},
+	"ReplicaSet":            {},
+	"ReplicationController": {},
+	"StatefulSet":           {},
+	"CronJob":               {},
+	"Job":                   {},
+}
 
 // GetPodSpec retrieves the podspec from the admission request passed in
 func (w *Wrapper) GetPodSpec(ar *v1beta1.AdmissionRequest) (string, *corev1.PodSpec, error) {
@@ -243,8 +254,12 @@ func (w *Wrapper) decodeObject(raw []byte, object object) error {
 	if _, _, err := deserializer.Decode(raw, nil, object); err != nil {
 		return err
 	}
-	if len(object.GetOwnerReferences()) != 0 {
-		return ErrObjectHasParents
+	ownerRefs := object.GetOwnerReferences()
+	for _, owner := range ownerRefs {
+		if _, ok := supportedKinds[owner.Kind]; ok {
+			return ErrObjectHasParents
+		}
+		glog.Warningf("Resource has an owner with a kind that is not supported: %s, treating this resource as top level", owner.Kind)
 	}
 	return nil
 }
