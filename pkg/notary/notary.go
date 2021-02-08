@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018,2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,11 +23,11 @@ import (
 	"os"
 	"time"
 
+	"github.com/IBM/portieris/internal/info"
 	"github.com/docker/distribution/registry/client/transport"
+	notaryclient "github.com/theupdateframework/notary/client"
 	"github.com/theupdateframework/notary/trustpinning"
 	"github.com/theupdateframework/notary/tuf/data"
-
-	notaryclient "github.com/theupdateframework/notary/client"
 )
 
 // Client .
@@ -90,14 +90,14 @@ func (c Client) makeHubTransport(notaryToken string) http.RoundTripper {
 
 	modifiers := []transport.RequestModifier{
 		transport.NewHeaderRequestModifier(http.Header{
-			"User-Agent": []string{"portieris-client"},
+			"User-Agent": []string{"portieris/" + info.Version},
 		}),
 	}
 
 	if notaryToken != "" {
 		modifiers = []transport.RequestModifier{
 			transport.NewHeaderRequestModifier(http.Header{
-				"User-Agent":    []string{"portieris-client"},
+				"User-Agent":    []string{"portieris/" + info.Version},
 				"Authorization": []string{fmt.Sprintf("Bearer %s", notaryToken)},
 			}),
 		}

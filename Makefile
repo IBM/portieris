@@ -8,7 +8,7 @@ GOTAGS='containers_image_openpgp'
 .PHONY: test
 
 image: 
-	docker build -t portieris:$(TAG) .
+	docker build --build-arg VERSION=$(VERSION) -t portieris:$(TAG) .
 
 push: image
 	docker tag portieris:$(TAG) $(HUB)/portieris:$(TAG)

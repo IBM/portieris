@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/IBM/portieris/internal/info"
 	portierisclientset "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/client/clientset/versioned"
 	"github.com/IBM/portieris/pkg/policy"
 	"github.com/golang/glog"
@@ -59,6 +60,8 @@ func GetKubeClientConfig(kubeconfigFileLoc *string) *rest.Config {
 	if err != nil {
 		glog.Fatal(err)
 	}
+
+	config.UserAgent = "portieris/" + info.Version
 
 	return config
 }

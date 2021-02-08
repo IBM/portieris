@@ -1,4 +1,4 @@
-// Copyright 2018,2020 Portieris Authors.
+// Copyright 2018,2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,18 +22,18 @@ import (
 	"os"
 	"strings"
 
-	"github.com/IBM/portieris/pkg/metrics"
-	notaryclient "github.com/IBM/portieris/pkg/notary"
-	"github.com/gorilla/mux"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-
 	kube "github.com/IBM/portieris/helpers/kube"
+	"github.com/IBM/portieris/internal/info"
 	"github.com/IBM/portieris/pkg/controller/multi"
 	"github.com/IBM/portieris/pkg/kubernetes"
+	"github.com/IBM/portieris/pkg/metrics"
+	notaryclient "github.com/IBM/portieris/pkg/notary"
 	registryclient "github.com/IBM/portieris/pkg/registry"
 	notaryverifier "github.com/IBM/portieris/pkg/verifier/trust"
 	"github.com/IBM/portieris/pkg/webhook"
 	"github.com/golang/glog"
+	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func main() {
@@ -62,6 +62,8 @@ func main() {
 		}
 		os.Exit(0)
 	}
+
+	glog.Info("Starting portieris ", info.Version)
 
 	kubeClientConfig := kube.GetKubeClientConfig(kubeconfig)
 	kubeClientset := kube.GetKubeClient(kubeClientConfig)

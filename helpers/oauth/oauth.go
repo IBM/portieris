@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018,2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/IBM/portieris/helpers/useragent"
 	"github.com/golang/glog"
 )
 
@@ -49,19 +50,21 @@ func GetHTTPClient(customFile string) *http.Client {
 
 	client := &http.Client{
 		Timeout: 10 * time.Minute,
-		Transport: &http.Transport{
-			Dial: (&net.Dialer{
-				Timeout:   5 * time.Second,
-				KeepAlive: 30 * time.Second,
-			}).Dial,
-			DisableKeepAlives:   false,
-			MaxIdleConnsPerHost: 10,
-			TLSHandshakeTimeout: 5 * time.Second,
-			TLSClientConfig: &tls.Config{
-				// Avoid fallback by default to SSL protocols < TLS1.2
-				MinVersion:               tls.VersionTLS12,
-				PreferServerCipherSuites: true,
-				RootCAs:                  rootCA,
+		Transport: &useragent.Set{
+			Transport: &http.Transport{
+				Dial: (&net.Dialer{
+					Timeout:   5 * time.Second,
+					KeepAlive: 30 * time.Second,
+				}).Dial,
+				DisableKeepAlives:   false,
+				MaxIdleConnsPerHost: 10,
+				TLSHandshakeTimeout: 5 * time.Second,
+				TLSClientConfig: &tls.Config{
+					// Avoid fallback by default to SSL protocols < TLS1.2
+					MinVersion:               tls.VersionTLS12,
+					PreferServerCipherSuites: true,
+					RootCAs:                  rootCA,
+				},
 			},
 		},
 	}
