@@ -237,7 +237,7 @@ func (c *Controller) getPatchesForContainers(containerType, namespace, specPath 
 					patches = append(patches, patch)
 				}
 			} else {
-				glog.Warning("No mutation of %s", img.String)
+				glog.Warningf("No mutation of %s", img.String())
 			}
 		}
 	}
