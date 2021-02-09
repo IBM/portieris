@@ -20,9 +20,15 @@ While it is possible to require both Notary trust and simple signing, the two me
 
 If any image in your workload does not satisfy the policy the entire workload is prevented from deploying.
 
-Portieris receives AdmissionRequests for creation of or edits to all types of workload. To prevent Portieris from impacting auto-recovery, it approves requests where a parent exists.
+Portieris receives AdmissionRequests for creation of or edits to all types of workload. To prevent Portieris from impacting auto-recovery, it approves requests where a known parent exists.
 
 Portieris' Admission Webhook is configured to fail closed. Three instances of Portieris make sure that it is able to approve its own upgrades and auto-recovery. If all instance of Portieris are unavailable, Kubernetes will not auto-recover it, and you must delete the MutatingAdmissionWebhook to allow Portieris to recover.
+
+## Image Mutation Option
+As described above the default behavior is to mutate the image reference on successful admission to make it reference an image immutably (using a digest and not a tag). This is so that there is little possibility that an image can be substituted after verification by making changes in the image registry. Without this safegaurd there is a time window between andmission and image pull and also between admission and any subsequent re-pull of the image due to rescheduling where an image under a tag can change. Switching the image to the digest form of the image means that the image content is gauranteed to be the one admitted. 
+We have found some closed loop deployment technologies verify that the image running is the expected one by looking at the image reference in the running container and seeing a mutated image reference as different, then attempt to correct the discrepancy, actually to no avail. In this case it is possible that an infinite reconciliation loop driving kubernetes api, portieris and registry traffic, can be be started. In order to avoid this it is possible in the policy to specify `mutateImage: false`, behavior setting which does not chnage the image admitted under this policy and prevents the undesirable consequences. The benefit is at the expense of re-introducing the window between admission and pull for other images to be substituted and run without verification.
+We strongly recommend that this option is used only where absolutely necessary and not used alongside `trust` requirements since notaryV1 tags are in not directly linked to registry tags and thus unexpected images can run with trust verifcation even in the steady state (without registry changes).  
+See: [POLICIES](POLICIES.md#image-mutation-option)
 
 ## Portieris Metrics
 Portieris exposes two metrics for monitoring the policy decisions made for workload images, these metrics

@@ -45,6 +45,25 @@ When an image is evaluated for admission, the set of policies set is wildcard ma
 ## Policy
 A policy consists of an array of objects defining requirements on the image using either `trust:` (Docker Content Trust / Notary V1), `simple:` (RedHat's Simple Signing) or `vulnerability:` objects.
 
+### Image Mutation Option
+Alongside the above objects containing policy requirements it is also possible to set a `mutateImage: bool` behavior preference for each policy, the default is `true` which is also the former behavior and means that on successful admission the container's image property is mutated to ensure that the immutable digest form of the image is used. If `false` the original image reference is retained with the consequences discussed in [README](README.md#image-mutation-option) 
+Example: 
+```yaml
+apiVersion: portieris.cloud.ibm.com/v1
+kind: ImagePolicy
+metadata:
+  name: signedby-me
+spec:
+   repositories:
+    - name: "icr.io/*"
+      policy:
+        mutateImage: false
+        simple:
+          requirements:
+          - type: "signedBy"
+            keySecret: my-pubkey
+```
+
 ### trust (Docker Content Trust/Notary)
 Portieris supports sourcing trust data from the following registries without additional configuration in the image policy:
 

@@ -28,6 +28,8 @@ spec:
                         type: object
                         nullable: true
                         properties:
+                          mutateImage:
+                            type: boolean
                           vulnerability:
                             type: object
                             properties:
@@ -122,6 +124,8 @@ spec:
                       policy:
                         type: object
                         properties:
+                          mutateImage:
+                            type: boolean
                           vulnerability:
                             type: object
                             properties:

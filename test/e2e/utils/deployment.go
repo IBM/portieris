@@ -16,12 +16,14 @@ package utils
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/IBM/portieris/test/framework"
 	"github.com/stretchr/testify/assert"
 	appsv1 "k8s.io/api/apps/v1"
+	v1 "k8s.io/api/core/v1"
 )
 
 func buildDeployment(t *testing.T, fw *framework.Framework, manifestLocation, namespace string, expectCreateFail bool) *appsv1.Deployment {
@@ -88,14 +90,78 @@ func replaceDeployment(t *testing.T, fw *framework.Framework, namespace, manifes
 	return deployment
 }
 
-// TestDeploymentRunnable tests whether a manifest is deployable to the specified namespace
-func TestDeploymentRunnable(t *testing.T, fw *framework.Framework, manifestLocation, namespace string) {
+// ShaCheck indicates whether the image should be checked for sha256 content
+type ShaCheck int
+
+const (
+	// NoCheck setting does not check image content
+	NoCheck = iota
+	// VerifySha setting does not check image content
+	VerifySha
+	// VerifyNoSha setting does not check image content
+	VerifyNoSha
+)
+
+// TestDeploymentRunnableCheck tests whether a manifest is deployable to the specified namespace
+func TestDeploymentRunnableCheck(t *testing.T, fw *framework.Framework, manifestLocation, namespace string, sCheck ShaCheck) {
 	deployment := buildDeployment(t, fw, manifestLocation, namespace, false)
 	defer fw.DeleteDeployment(deployment.Name, deployment.Namespace)
+
+	switch sCheck {
+	case NoCheck:
+		break
+	case VerifySha:
+		err := allImagesContain(deployment.Spec.Template, "@sha256:")
+		if !assert.NoError(t, err) {
+			DumpEvents(t, fw, namespace)
+			DumpPolicies(t, fw, namespace)
+		}
+		break
+	case VerifyNoSha:
+		err := noImagesContain(deployment.Spec.Template, "@sha256:")
+		if !assert.NoError(t, err) {
+			DumpEvents(t, fw, namespace)
+			DumpPolicies(t, fw, namespace)
+		}
+		break
+	}
 	if !assert.Equal(t, *deployment.Spec.Replicas, deployment.Status.AvailableReplicas, "Deployment failed: available replicas did not match expected replicas") {
 		DumpEvents(t, fw, namespace)
 		DumpPolicies(t, fw, namespace)
 	}
+}
+
+func allImagesContain(template v1.PodTemplateSpec, content string) error {
+	for _, c := range template.Spec.InitContainers {
+		if !strings.Contains(c.Image, content) {
+			return fmt.Errorf("container %s has image without %s", c.Name, content)
+		}
+	}
+	for _, c := range template.Spec.Containers {
+		if !strings.Contains(c.Image, content) {
+			return fmt.Errorf("container %s has image without %s", c.Name, content)
+		}
+	}
+	return nil
+}
+
+func noImagesContain(template v1.PodTemplateSpec, content string) error {
+	for _, c := range template.Spec.InitContainers {
+		if strings.Contains(c.Image, content) {
+			return fmt.Errorf("container %s has image with %s", c.Name, content)
+		}
+	}
+	for _, c := range template.Spec.Containers {
+		if strings.Contains(c.Image, content) {
+			return fmt.Errorf("container %s has image with %s", c.Name, content)
+		}
+	}
+	return nil
+}
+
+// TestDeploymentRunnable tests whether a manifest is deployable to the specified namespace
+func TestDeploymentRunnable(t *testing.T, fw *framework.Framework, manifestLocation, namespace string) {
+	TestDeploymentRunnableCheck(t, fw, manifestLocation, namespace, NoCheck)
 }
 
 // TestDeploymentNotRunnable tests whether a manifest is deployable to the specified namespace

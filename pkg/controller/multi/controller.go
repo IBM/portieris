@@ -227,7 +227,7 @@ func (c *Controller) getPatchesForContainers(containerType, namespace, specPath 
 				glog.Infof("Mutation #: %s %d  Image name: %s", containerType, containerIndex, img.String())
 				if strings.Contains(container.Image, img.String()) {
 					// ISSUE: https://github.com/IBM/portieris/issues/90
-					glog.Infof("Mutated to: %s@sha256:%s", img.NameWithoutTag(), digest.String())
+					glog.Warningf("Image %s mutated to: %s@sha256:%s", img.String(), img.NameWithoutTag(), digest.String())
 					patch := types.JSONPatch{
 						Op:    "replace",
 						Path:  fmt.Sprintf("%s/%s/%d/image", specPath, containerType, containerIndex),
@@ -236,6 +236,8 @@ func (c *Controller) getPatchesForContainers(containerType, namespace, specPath 
 					glog.Infof("Patch: %v", patch)
 					patches = append(patches, patch)
 				}
+			} else {
+				glog.Warning("No mutation of %s", img.String)
 			}
 		}
 	}
