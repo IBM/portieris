@@ -1,0 +1,15 @@
+apiVersion: portieris.cloud.ibm.com/v1
+kind: ImagePolicy
+metadata:
+  name: simple-signedby2-nomutate
+spec:
+   repositories:
+    - name: "icr.io/cise/*"
+      policy:
+         mutateImage: false
+         simple:
+           requirements:
+           - type: "signedBy"
+             keySecret: simple1pubkey
+           - type: "signedBy"
+             keySecret: simple2pubkey

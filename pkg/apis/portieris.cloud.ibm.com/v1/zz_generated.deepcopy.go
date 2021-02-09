@@ -210,6 +210,11 @@ func (in *Policy) DeepCopyInto(out *Policy) {
 	in.Trust.DeepCopyInto(&out.Trust)
 	in.Simple.DeepCopyInto(&out.Simple)
 	in.Vulnerability.DeepCopyInto(&out.Vulnerability)
+	if in.MutateImage != nil {
+		in, out := &in.MutateImage, &out.MutateImage
+		*out = new(bool)
+		**out = **in
+	}
 	return
 }
 

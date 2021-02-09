@@ -94,6 +94,7 @@ type Policy struct {
 	Trust         Trust         `json:"trust,omitempty"`
 	Simple        Simple        `json:"simple,omitempty"`
 	Vulnerability Vulnerability `json:"vulnerability,omitempty"`
+	MutateImage   *bool         `json:"mutateImage,omitempty"`
 }
 
 // Trust .

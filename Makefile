@@ -10,7 +10,7 @@ GOTAGS='containers_image_openpgp'
 image: 
 	docker build --build-arg VERSION=$(VERSION) -t portieris:$(TAG) .
 
-push: image
+push:
 	docker tag portieris:$(TAG) $(HUB)/portieris:$(TAG)
 	docker push $(HUB)/portieris:$(TAG)
 

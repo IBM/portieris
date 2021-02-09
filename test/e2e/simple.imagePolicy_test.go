@@ -1,4 +1,4 @@
-// Copyright 2020 Portieris Authors.
+// Copyright 2020, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -57,7 +57,23 @@ func TestSimple_ImagePolicyRepositories_Basic(t *testing.T) {
 		namespace := utils.CreateImagePolicyInstalledNamespace(t, framework, "./testdata/imagepolicy/simple-signedby2.yaml")
 		utils.CreateSecret(t, framework, "./testdata/secret/simple1pubkey.yaml", namespace.Name)
 		utils.CreateSecret(t, framework, "./testdata/secret/simple2pubkey.yaml", namespace.Name)
-		utils.TestDeploymentRunnable(t, framework, "./testdata/deployment/global-nginx-simple.yaml", namespace.Name)
+		utils.TestDeploymentRunnableCheck(t, framework, "./testdata/deployment/global-nginx-simple.yaml", namespace.Name, utils.VerifySha)
+		utils.CleanUpImagePolicyTest(t, framework, namespace.Name)
+	})
+	t.Run("Allow images signed the correct multiple simple signers with no mutation", func(t *testing.T) {
+		t.Parallel()
+		namespace := utils.CreateImagePolicyInstalledNamespace(t, framework, "./testdata/imagepolicy/simple-signedby2-nomutate.yaml")
+		utils.CreateSecret(t, framework, "./testdata/secret/simple1pubkey.yaml", namespace.Name)
+		utils.CreateSecret(t, framework, "./testdata/secret/simple2pubkey.yaml", namespace.Name)
+		utils.TestDeploymentRunnableCheck(t, framework, "./testdata/deployment/global-nginx-simple.yaml", namespace.Name, utils.VerifyNoSha)
+		utils.CleanUpImagePolicyTest(t, framework, namespace.Name)
+	})
+	t.Run("Allow images signed the correct multiple simple signers with explicit mutation", func(t *testing.T) {
+		t.Parallel()
+		namespace := utils.CreateImagePolicyInstalledNamespace(t, framework, "./testdata/imagepolicy/simple-signedby2-mutate.yaml")
+		utils.CreateSecret(t, framework, "./testdata/secret/simple1pubkey.yaml", namespace.Name)
+		utils.CreateSecret(t, framework, "./testdata/secret/simple2pubkey.yaml", namespace.Name)
+		utils.TestDeploymentRunnableCheck(t, framework, "./testdata/deployment/global-nginx-simple.yaml", namespace.Name, utils.VerifySha)
 		utils.CleanUpImagePolicyTest(t, framework, namespace.Name)
 	})
 	t.Run("Deny images signed by the wrong single simple signer", func(t *testing.T) {
