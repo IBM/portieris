@@ -6,6 +6,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 # v-next
 ##
 
+# v0.10.1
+* add mutateImage policy option ([244](https://github.com/IBM/portieris/issues/244))
+* when skipping checks because a parent resource exists ensure its a known type ([246](https://github.com/IBM/portieris/issues/246))
+* add version to user-agent consistently ([241](https://github.com/IBM/portieris/issues/241))
+
 # v0.10.0
 ## 2021-01-11
 * support verifying images which dont require pull secrets ([#123](https://github.com/IBM/portieris/issues/123))
