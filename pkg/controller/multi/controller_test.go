@@ -104,7 +104,7 @@ func TestNewController(t *testing.T) {
 		PMetrics:             wantMetrics,
 	}
 
-	gotController := NewController(wantKubeWrapper, wantPolicyClient, wantNV, wantMetrics)
+	gotController := NewController(wantKubeWrapper, wantPolicyClient, wantNV, wantMetrics, "")
 
 	assert.Equal(t, wantController, *gotController)
 }

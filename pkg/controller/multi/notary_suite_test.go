@@ -84,7 +84,7 @@ func resetAllFakes() {
 	trust = &fakenotary.FakeNotary{}
 	cr = &fakeregistry.FakeRegistry{}
 	nv := notaryverifier.NewVerifier(kubeWrapper, trust, cr)
-	ctrl = NewController(kubeWrapper, policyClient, nv, pm)
+	ctrl = NewController(kubeWrapper, policyClient, nv, pm, "")
 	wh = webhook.NewServer("notary", ctrl, []byte{}, []byte{})
 }
 

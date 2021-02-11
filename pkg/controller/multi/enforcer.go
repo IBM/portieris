@@ -43,16 +43,19 @@ type enforcer struct {
 	sv simple.Verifier
 	// scannerFactory creates new vulnerabilities scanners according to the policy
 	scannerFactory vulnerability.ScannerFactory
+	// imageSigningPublicKeySecretNamespace if populated, will override the namespace used during the image signing public key secret lookup
+	imageSigningPublicKeySecretNamespace string
 }
 
 // NewEnforcer returns an enforce that wraps the kubenetes interface and a notary verifier
-func NewEnforcer(kubeClientsetWrapper kubernetes.WrapperInterface, nv *notaryverifier.Verifier) Enforcer {
+func NewEnforcer(kubeClientsetWrapper kubernetes.WrapperInterface, nv *notaryverifier.Verifier, imageSigningPublicKeySecretNamespace string) Enforcer {
 	scannerFactory := vulnerability.NewScannerFactory()
 	return &enforcer{
-		kubeClientsetWrapper: kubeClientsetWrapper,
-		nv:                   nv,
-		sv:                   simple.NewVerifier(),
-		scannerFactory:       &scannerFactory,
+		kubeClientsetWrapper:                 kubeClientsetWrapper,
+		nv:                                   nv,
+		sv:                                   simple.NewVerifier(),
+		scannerFactory:                       &scannerFactory,
+		imageSigningPublicKeySecretNamespace: imageSigningPublicKeySecretNamespace,
 	}
 }
 
@@ -66,7 +69,12 @@ func (e enforcer) DigestByPolicy(namespace string, img *image.Reference, credent
 	var deny, err error
 	if len(policy.Simple.Requirements) > 0 {
 		glog.Infof("policy.Simple %v", policy.Simple)
-		simplePolicy, err := e.sv.TransformPolicies(e.kubeClientsetWrapper, namespace, policy.Simple.Requirements)
+		secretNamespace := namespace
+		if e.imageSigningPublicKeySecretNamespace != "" {
+			glog.Infof("Image signing public key namespace override defined: %s", e.imageSigningPublicKeySecretNamespace)
+			secretNamespace = e.imageSigningPublicKeySecretNamespace
+		}
+		simplePolicy, err := e.sv.TransformPolicies(e.kubeClientsetWrapper, secretNamespace, policy.Simple.Requirements)
 		if err != nil {
 			return nil, nil, err
 		}

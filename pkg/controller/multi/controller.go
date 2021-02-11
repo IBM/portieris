@@ -49,8 +49,8 @@ type Controller struct {
 }
 
 // NewController creates a new controller object from the various clients passed in
-func NewController(kubeWrapper kubernetes.WrapperInterface, policyClient policy.Interface, nv *notaryverifier.Verifier, pm *metrics.PortierisMetrics) *Controller {
-	enforcer := NewEnforcer(kubeWrapper, nv)
+func NewController(kubeWrapper kubernetes.WrapperInterface, policyClient policy.Interface, nv *notaryverifier.Verifier, pm *metrics.PortierisMetrics, imageSigningPublicKeySecretNamespace string) *Controller {
+	enforcer := NewEnforcer(kubeWrapper, nv, imageSigningPublicKeySecretNamespace)
 	return &Controller{
 		kubeClientsetWrapper: kubeWrapper,
 		policyClient:         policyClient,

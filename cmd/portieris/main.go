@@ -39,6 +39,7 @@ import (
 func main() {
 	mkdir := flag.String("mkdir", "", "create directories needed for Portieris to run")
 	kubeconfig := flag.String("kubeconfig", "", "location of kubeconfig file to use for an out-of-cluster kube client configuration")
+	imageSigningPublicKeySecretNamespace := flag.String("pubkey-secret-namespace-override", "", "specify a namespace that will override where to look for the image signing public key secret")
 
 	flag.Parse() // glog flags
 
@@ -95,7 +96,7 @@ func main() {
 	cr := registryclient.NewClient()
 	nv := notaryverifier.NewVerifier(kubeWrapper, trust, cr)
 	pmetrics := metrics.NewMetrics()
-	controller := multi.NewController(kubeWrapper, policyClient, nv, pmetrics)
+	controller := multi.NewController(kubeWrapper, policyClient, nv, pmetrics, *imageSigningPublicKeySecretNamespace)
 
 	// Setup http handler for metrics
 	go func() {
