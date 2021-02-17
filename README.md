@@ -2,7 +2,7 @@
 
 copyright:
   years: 2018, 2021
-lastupdated: "2021-02-15"
+lastupdated: "2021-02-17"
 
 ---
 
@@ -80,7 +80,7 @@ Portieris is installed by using a Helm chart. Before you begin, ensure that you 
      helm install portieris --create-namespace --namespace portieris ./portieris
      ``` 
 
-* To install Portieris in a different namespace, including an existing one, omit the `--create-namespace` option, since the namespace forms part of the webhook certificate common name, you must generate the certificate for the target namespace.
+* To install Portieris in a different namespace, including an existing one, omit the `--create-namespace` option. Because the namespace forms part of the webhook certificate common name, you must generate the certificate for the target namespace.
 
   1. Run:
      
