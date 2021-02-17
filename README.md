@@ -2,7 +2,7 @@
 
 copyright:
   years: 2018, 2021
-lastupdated: "2021-02-11"
+lastupdated: "2021-02-17"
 
 ---
 
@@ -36,9 +36,9 @@ Portieris' Admission Webhook is configured to fail closed. Three instances of Po
 
 The default behavior is to mutate the image reference on successful admission so that it references an image immutably by using a digest and not a tag. This behavior ensures that there is little possibility that an image can be substituted after verification by making changes in the image registry. Without this safeguard there is a time window between admission and image pull, and also between admission and any subsequent re-pull of the image due to rescheduling where an image under a tag can change. Switching the image to the digest form ensures that the image content is guaranteed to be the one admitted. 
 
-Some closed loop deployment technologies verify that the image that is running is the expected one by looking at the image reference in the running container and seeing a mutated image reference as different, then attempt to correct the discrepancy, with no effect. In this case, an infinite reconciliation loop driving the Kubernetes API, Portieris, and registry traffic can start. To avoid this scenario, you can specify `mutateImage: false` in the policy behavior setting, which does not change the image that is admitted under this policy and prevents the undesirable consequences. The benefit is at the expense of re-introducing the window between admission and pull for other images to be substituted and run without verification.
+Some closed loop deployment technologies verify that the image that is running is the expected one by looking at the image reference in the running container and seeing a mutated image reference as different, then attempt to correct the discrepancy, with no effect. In this case, an infinite reconciliation loop driving the Kubernetes API, Portieris, and registry traffic can start. To avoid this scenario, you can specify `mutateImage: false` in the policy behavior setting, which does not change the image that is admitted under this policy and prevents the undesirable consequences. The benefit is at the expense of reintroducing the window between admission and pull for other images to be substituted and run without verification.
 
-Use this option only where absolutely necessary and don't use it alongside `trust` requirements because notaryV1 tags are not directly linked to registry tags and  unexpected images can run with trust verification even in the steady state (without registry changes).  
+Use this option only where absolutely necessary and don't use it alongside `trust` requirements because `notaryV1` tags aren't directly linked to registry tags and  unexpected images can run with trust verification even in the steady state (without registry changes).  
 See, [Policies](POLICIES.md#image-mutation-option).
 
 ## Portieris metrics
@@ -60,21 +60,51 @@ Portieris is installed by using a Helm chart. Before you begin, ensure that you 
 
 * To install Portieris in the default namespace (`portieris`), complete the following steps:
 
-1. Find the release you want to run, see [releases](https://github.com/IBM/portieris/releases), and download the Helm chart package. 
-2. Unpack the charts, for example, run `tar xzvf portieris-0.9.4.tgz`
-3. Run `sh ./portieris/gencerts`. The `gencerts` script generates new SSL certificates and keys for Portieris. Portieris presents this certificate to the Kubernetes API server when the API server makes admission requests. If you don't generate new certificates, an attacker could imitate Portieris in your cluster.
-4. Run `helm install portieris --create-namespace --namespace portieris ./portieris`. 
+  1. Find the release you want to run, see [releases](https://github.com/IBM/portieris/releases), and download the Helm chart package. 
+  2. Unpack the charts, for example, run: 
+  
+     ```
+     tar xzvf portieris-0.9.4.tgz
+     ```
+     
+  3. Run:
+  
+     ```
+     sh ./portieris/gencerts
+     ```
+     
+     The `gencerts` script generates new SSL certificates and keys for Portieris. Portieris presents this certificate to the Kubernetes API server when the API server makes admission requests. If you don't generate new certificates, an attacker could imitate Portieris in your cluster.
+  4. Run:
+  
+     ```
+     helm install portieris --create-namespace --namespace portieris ./portieris
+     ``` 
 
-* To install Portieris in a different namespace, including an existing one, by omitting the `--create-namespace` option, but the namespace forms part of the webhook certificate common name, you must, therefore, generate the certificate for the target namespace.
+* To install Portieris in a different namespace, including an existing one, omit the `--create-namespace` option. Because the namespace forms part of the webhook certificate common name, you must generate the certificate for the target namespace.
 
-   1. Run `sh portieris/gencerts <namespace>`.
-   2. Run `helm install portieris --create-namespace --namespace <namespace> ./portieris`.
+  1. Run:
+     
+     ```
+     sh portieris/gencerts <namespace>
+     ```
+     
+  2. Run:
+  
+     ```
+     helm install portieris --create-namespace --namespace <namespace> ./portieris
+     ```
 
-To manage certificates through an installed [cert-manager](https://cert-manager.io/), you do not need to unpack the charts in this case:
+* To manage certificates through an installed [cert-manager](https://cert-manager.io/), you don't need to unpack the charts. 
 
-1. Run `helm install portieris --set UseCertManager=true portieris-0.9.4.tgz`.
+  1. Run:
 
-By default, Portieris' admission webhook runs in all namespaces including its own install namespace, so that Portieris is able to review all the pods in the cluster. However, this can prevent the cluster from self-healing in the event where Portieris becomes unavailable. Portieris also supports skipping namespaces with a certain label set. You can enable this by adding `--set AllowAdmissionSkip=true` to your install command, but make sure to control who can add labels to namespaces and who can access namespaces with this label so that a malicious party cannot use this label to bypass Portieris.
+     ```
+     helm install portieris --set UseCertManager=true portieris-0.9.4.tgz
+     ```
+
+By default, Portieris' admission webhook runs in all namespaces including its own install namespace, so that Portieris is able to review all the pods in the cluster. However, this can prevent the cluster from self-healing in the event that Portieris becomes unavailable. 
+
+Portieris also supports skipping namespaces with a certain label set. You can enable this by adding `--set AllowAdmissionSkip=true` to your installation command, but ensure that you control who can add labels to namespaces and who can access namespaces with this label so that a malicious party can't use this label to bypass Portieris.
 
 Another way to avoid update deadlock is to specify `--set webHooks.failurePolicy=Ignore`. 
 
@@ -82,11 +112,25 @@ Another way to avoid update deadlock is to specify `--set webHooks.failurePolicy
 
 **Note**: When you uninstall Portieris, all your image security policies are deleted.
 
-Uninstall Portieris by running: `helm delete portieris --namespace <namespace>`.
+To uninstall Portieris run: 
+
+```
+helm delete portieris --namespace <namespace>
+```
 
 **Note**:
-* If you no longer require the namespace, you must delete it manually by running: `kubectl delete namespace/<namespace>`.
-* If you have issues uninstalling Portieris by using Helm, try running the clean-up script: `helm/cleanup.sh portieris <namespace>`.
+
+* If you no longer require the namespace, you must delete it manually by running: 
+  
+  ```
+  kubectl delete namespace/<namespace>
+  ```
+  
+* If you have issues uninstalling Portieris by using Helm, try running the clean-up script: 
+  
+  ```
+  helm/cleanup.sh portieris <namespace>
+  ```
 
 ## Image security policies
 
