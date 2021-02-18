@@ -2,7 +2,7 @@
 
 copyright:
   years: 2020, 2021
-lastupdated: "2021-02-17"
+lastupdated: "2021-02-18"
 
 ---
 
@@ -57,7 +57,7 @@ When an image is evaluated for admission, the set of policies is wildcard matche
 
 A policy consists of an array of objects that define requirements on the image by using either `trust:` (Docker Content Trust and Notary v1), `simple:` (Red Hat Simple Signing), or `vulnerability:` objects.
 
-**Important** If your policy was developed before Portieris v0.10.0, the policy has the API version: `apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1`. To ensure that the polcy is enforced, you must update the API version to `apiVersion: portieris.cloud.ibm.com/v1`.
+**Important** If your policy was developed before Portieris v0.10.0, the policy has the API version: `apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1`. To ensure that the policy is enforced, you must update the API version to `apiVersion: portieris.cloud.ibm.com/v1`.
 
 ### Image mutation option
 
@@ -111,7 +111,7 @@ For more information, see the [IBM Cloud docs](https://cloud.ibm.com/docs/servic
 
 ### `simple` (Red Hat simple signing)
 
-The policy requirements are similar to those defined for the configuration files that are consulted when you're using the Red Hat tools [policy requirements](https://github.com/containers/image/blob/master/docs/containers-policy.json.5.md#policy-requirements). However, the main difference is that the public key in a `signedBy` requirement is defined in a `keySecret` attribute, the value is the name of an in-scope Kubernetes secret that contains a public key block. The value of `keyType`, `keyPath`, and `keyData`, see [policy requirements](https://github.com/containers/image/blob/master/docs/containers-policy.json.5.md#policy-requirements)), can't be provided. If multiple keys are present in the key ring, the requirement is satisfied if the signature is signed by any of them.
+The policy requirements are similar to those defined for the configuration files that are consulted when you're using the Red Hat tools [policy requirements](https://github.com/containers/image/blob/master/docs/containers-policy.json.5.md#policy-requirements). However, the main difference is that the public key in a `signedBy` requirement is defined in a `keySecret` attribute, the value is the name of an in-scope Kubernetes secret that contains a public key block. The value of `keyType`, `keyPath`, and `keyData`, see [policy requirements](https://github.com/containers/image/blob/master/docs/containers-policy.json.5.md#policy-requirements), can't be provided. If multiple keys are present in the key ring, the requirement is satisfied if the signature is signed by any of them.
 
 To export a single public key identified by `<finger-print>` from Gnu Privacy Guard (GPG) and create a KeySecret from it, you can use the following script.
 
@@ -184,7 +184,7 @@ spec:
                 signedPrefix: "icr.io/db2"
 ```
 
-You can also specify the location of signature storage for registries that don't support the registry extension.
+You can also specify the location of signature storage for registries that don't support the registry extension. Where `storeSecret` identifies an in-scope Kubernetes secret that contains `username` and `password` data items that are used to authenticate with the server referenced in `storeURL`.
 
 ```yaml
 apiVersion: portieris.cloud.ibm.com/v1
@@ -203,11 +203,9 @@ spec:
             keySecret: db2-pubkey
 ```
 
-Where `storeSecret` identifies an in-scope Kubernetes secret that contains `username` and `password` data items that are used to authenticate with the server referenced in `storeURL`.
-
 ### `vulnerability`
 
-Vulnerability policies enable you to admit or deny pod admission based on the security status of the container images within the pod. Vulnerability-based admission is available for [Vulnerability Advisor for IBM Cloud Container Registry](https://cloud.ibm.com/docs/Registry?topic=va-va_index). Vulnerability Advisor is available for any image in the [IBM Cloud Container Registry](https://www.ibm.com/uk-en/cloud/container-registry).
+Vulnerability policies enable you to admit or deny pod admission based on the security status of the container images within the pod. Vulnerability-based admission is available for [Vulnerability Advisor for IBM Cloud Container Registry](https://cloud.ibm.com/docs/Registry?topic=va-va_index). Vulnerability Advisor is available for any image in [IBM Cloud Container Registry](https://www.ibm.com/cloud/container-registry).
 
 Example policy:
 
@@ -230,7 +228,7 @@ spec:
 
 For each `container` in the pod that is being considered for admission, a [vulnerability status](https://cloud.ibm.com/apidocs/container-registry/va#imagestatusquerypath) report is retrieved for the `image` that is specified by the container.
 
-The optional `account` parameter specifies the IBM Cloud account where exemptions are fetched from for image matching the policy repository name.
+The optional `account` parameter specifies the IBM Cloud account from where exemptions are retreived for images that match the policy repository name.
 
 If the report returns an overall status of `OK`, `WARN`, or `UNSUPPORTED` the pod is allowed. In the event of any other status, or any error condition, the pod is denied.
 
