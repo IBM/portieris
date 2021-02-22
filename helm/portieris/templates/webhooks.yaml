@@ -1,5 +1,5 @@
 # an inoperative webhook, establishes the object in the helm manifest such that it is uninstalled on chart delete
-apiVersion: admissionregistration.k8s.io/v1beta1
+apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
 metadata:
   name: image-admission-config
@@ -23,10 +23,10 @@ webhooks:
       caBundle: {{ .Files.Get "certs/ca.crt" | b64enc }}
       {{ end }}
     rules: []
-    admissionReviewVersions: ["v1beta1"]
+    admissionReviewVersions: ["v1"]
 ---
 # webhook replaces the inoperative one, after the service is installed
-apiVersion: admissionregistration.k8s.io/v1beta1
+apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
 metadata:
   name: image-admission-config
@@ -57,7 +57,7 @@ webhooks:
         resources: ["pods", "deployments", "replicationcontrollers", "replicasets", "daemonsets", "statefulsets", "jobs", "cronjobs"]
     failurePolicy: {{ .Values.webHooks.failurePolicy }}
     sideEffects: None
-    admissionReviewVersions: ["v1beta1"]
+    admissionReviewVersions: ["v1"]
     {{ if .Values.AllowAdmissionSkip }}
     namespaceSelector:
       matchExpressions:
