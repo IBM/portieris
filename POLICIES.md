@@ -1,53 +1,70 @@
-# Portieris Policies
+---
 
-## Image Policy Resources
+copyright:
+  years: 2020, 2021
+lastupdated: "2021-02-18"
 
-Portieris defines two custom resource types for policy:
+---
 
-* ImagePolicies can be configured in a Kubernetes namespace, and define Portieris' behavior in that namespace. If ImagePolicies exists in a namespace, the policies from those ImagePolicy resources are used exclusively, if there is no match for the workload image in ImagePolicies ClusterImagePolicies are not examined. Images in deployed workloads are wildcard matched against the set of policies defined, if there is no policy matching the workload image then deployment is denied.
-  - this example allows any image from the "icr.io" registry with no further checks (the policy is empty):
-```yaml
-apiVersion: portieris.cloud.ibm.com/v1
-kind: ImagePolicy
-metadata:
-  name: allow-all-icrio
-spec:
-   repositories:
-    - name: "icr.io/*"
+# Portieris policies
+
+## Image policy resources
+
+Portieris defines two custom resource types for policy. Image policy resources and cluster image policy resources.
+
+For both types of resource, if multiple resources exist, they are merged together and can be protected by a role-based access control (RBAC) policy.
+
+* Image policy resources, `ImagePolicy`, are configured in a Kubernetes namespace and define Portieris' behavior in that namespace. If image policy resources exist in a namespace, the policies from those image policy resources are used exclusively. If no match exists for the workload image in `ImagePolicy`, cluster image policy resources, `ClusterImagePolicy`, are not examined. Images in deployed workloads are wildcard matched against the set of policies defined, if no policy matches the workload image, deployment is denied.
+
+  The following example allows any image from the `icr.io` registry with no further checks (the policy is empty).
+ 
+  ```yaml
+  apiVersion: portieris.cloud.ibm.com/v1
+  kind: ImagePolicy
+  metadata:
+    name: allow-all-icrio
+  spec:
+     repositories:
+      - name: "icr.io/*"
+        policy:
+  ```
+
+* Cluster image policy resources, `ClusterImagePolicy`, are configured at the cluster level, and take effect whenever no image policy resource, `ImagePolicy`, is defined in the namespace where the workload is deployed. These cluster image policy resources have the same structure as namespace image policy resources and, if no matching policy is found for an image, deployment is denied.
+
+  The following example allows all images from all registries with no checks.
+
+  ```yaml
+  apiVersion: portieris.cloud.ibm.com/v1
+  kind: ClusterImagePolicy
+  metadata:
+    name: portieris-default-cluster-image-policy
+  spec:
+    repositories:
+    - name: '*'
       policy:
-```
+  ```
 
-* ClusterImagePolicies are configured at the cluster level, and take effect whenever there is no ImagePolicy resource defined in the namespace where the workload is being deployed. These resources have the same structure as namespace ImagePolicies and if no matching policy is found for an image deployment is denied.
-  - this example allows all images from all registries with no checks:
-
-```yaml
-apiVersion: portieris.cloud.ibm.com/v1
-kind: ClusterImagePolicy
-metadata:
-  name: portieris-default-cluster-image-policy
-spec:
-  repositories:
-  - name: '*'
-    policy:
-```
-
-For both types of resource if there are multiple resources, they are merged together, and can be protected by RBAC policy.
-
-## Installation Default Policies
+## Installation default policies
 
 Default policies are installed when Portieris is installed. You must review and change these according to your requirements.
-The installation [default policies](helm/portieris/templates/default/policies.yaml) should be customised.
+You must customise the installation [default policies](helm/portieris/templates/default/policies.yaml).
 
-## Repository Matching
+## Repository matching
 
-When an image is evaluated for admission, the set of policies set is wildcard matched on the repository name. If there are multiple matches the most specific match is used.
+When an image is evaluated for admission, the set of policies is wildcard matched on the repository name. If multiple matches are found, the most specific match is used.
 
 ## Policy
-A policy consists of an array of objects defining requirements on the image using either `trust:` (Docker Content Trust / Notary V1), `simple:` (RedHat's Simple Signing) or `vulnerability:` objects.
 
-### Image Mutation Option
-Alongside the above objects containing policy requirements it is also possible to set a `mutateImage: bool` behavior preference for each policy, the default is `true` which is also the former behavior and means that on successful admission the container's image property is mutated to ensure that the immutable digest form of the image is used. If `false` the original image reference is retained with the consequences discussed in [README](README.md#image-mutation-option) 
-Example: 
+A policy consists of an array of objects that define requirements on the image by using either `trust:` (Docker Content Trust and Notary v1), `simple:` (Red Hat Simple Signing), or `vulnerability:` objects.
+
+**Important** If your policy was developed before Portieris v0.10.0, the policy has the API version: `apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1`. To ensure that the policy is enforced, you must update the API version to `apiVersion: portieris.cloud.ibm.com/v1`.
+
+### Image mutation option
+
+You can also set a mutate image, `mutateImage: bool`, behavior preference for each policy. The default value is `true`, which is also the original behavior and means that on successful admission the container's image property is mutated to ensure that the immutable digest form of the image is used. If the value is `false`, the original image reference is retained with the consequences described in [README](README.md#image-mutation-option).
+
+**Example**
+
 ```yaml
 apiVersion: portieris.cloud.ibm.com/v1
 kind: ImagePolicy
@@ -64,7 +81,8 @@ spec:
             keySecret: my-pubkey
 ```
 
-### trust (Docker Content Trust/Notary)
+### `trust` (Docker Content Trust and Notary)
+
 Portieris supports sourcing trust data from the following registries without additional configuration in the image policy:
 
 * IBM Cloud Container Registry
@@ -72,7 +90,9 @@ Portieris supports sourcing trust data from the following registries without add
 * Docker Hub
 
 To use a different trust server for a repository, you can specify the `trustServer` parameter in your policy:
-*Example*
+
+**Example**
+
 ```yaml
 apiVersion: portieris.cloud.ibm.com/v1
 kind: ImagePolicy
@@ -89,20 +109,25 @@ spec:
 
 For more information, see the [IBM Cloud docs](https://cloud.ibm.com/docs/services/Registry?topic=registry-security_enforce#customize_policies).
 
-### simple (RedHat simple signing)
-The policy requirements are similar to those defined for configuration files consulted when using the RedHat tools [policy requirements](https://github.com/containers/image/blob/master/docs/containers-policy.json.5.md#policy-requirements). However there are some differences, the main difference is that the public key in a`signedBy` requirement is defined in a `keySecret` attribute, the value is the name of an in-scope Kubernetes secret containing a public key block. The value of `keyType`, `keyPath` and `keyData` (seen in [policy requirements](https://github.com/containers/image/blob/master/docs/containers-policy.json.5.md#policy-requirements)) cannot be provided. If multiple keys are present in the keyring then the requirement is satisfied if the signature is signed by any of them.
+### `simple` (Red Hat simple signing)
 
-To export a single public key identified by `<finger-print>` from gpg and create a KeySecret from it you could use:
+The policy requirements are similar to those defined for the configuration files that are consulted when you're using the Red Hat tools [policy requirements](https://github.com/containers/image/blob/master/docs/containers-policy.json.5.md#policy-requirements). However, the main difference is that the public key in a `signedBy` requirement is defined in a `keySecret` attribute, the value is the name of an in-scope Kubernetes secret that contains a public key block. The value of `keyType`, `keyPath`, and `keyData`, see [policy requirements](https://github.com/containers/image/blob/master/docs/containers-policy.json.5.md#policy-requirements), can't be provided. If multiple keys are present in the key ring, the requirement is satisfied if the signature is signed by any of them.
+
+To export a single public key identified by `<finger-print>` from Gnu Privacy Guard (GPG) and create a KeySecret from it, you can use the following script.
+
 ```bash
 gpg --export --armour <finger-print> > my.pubkey
 kubectl create secret generic my-pubkey --from-file=key=my.pubkey
 ```
 
-In creating the secret, ensure you are creating the key with a value of `key`, as shown below:
+When you create the secret, ensure that you're creating the key with a value of `key`.
 
-`kubectl create secret generic my-pubkey --from-file=key=<your_pub_key>`
+```
+kubectl create secret generic my-pubkey --from-file=key=<your_pub_key>
+```
 
-This example requires that images from `icr.io` are signed by the identity with public key in `my-pubkey`:
+The following example requires that images from `icr.io` are signed by the identity with public key in `my-pubkey`.
+
 ```yaml
 apiVersion: portieris.cloud.ibm.com/v1
 kind: ImagePolicy
@@ -118,7 +143,8 @@ spec:
             keySecret: my-pubkey
 ```
 
-This example requires that a given image is signed but it allows the registry location to have changed, in this pattern a policy per image is required to exactly define the new location (but see the next example):
+The following example requires that a specific image is signed, but it allows the registry location to change. In this pattern, a policy for each image is required to exactly define the new location.
+
 ```yaml
 apiVersion: portieris.cloud.ibm.com/v1
 kind: ImagePolicy
@@ -137,7 +163,8 @@ spec:
                 dockerRepository: "icr.io/ibm/db2/db2manager"
 ```
 
-This example allows many images with a common origin which have been moved with their original signature, for example by mirroring, in this case from `icr.io/db2` to `registry.myco.com:5000/mymirror/ibmdb2`:
+The following example allows many images with a common origin that have moved with their original signature, for example, by mirroring, in this case from `icr.io/db2` to `registry.myco.com:5000/mymirror/ibmdb2`.
+
 ```yaml
 apiVersion: portieris.cloud.ibm.com/v1
 kind: ImagePolicy
@@ -157,8 +184,8 @@ spec:
                 signedPrefix: "icr.io/db2"
 ```
 
+You can also specify the location of signature storage for registries that don't support the registry extension. Where `storeSecret` identifies an in-scope Kubernetes secret that contains `username` and `password` data items that are used to authenticate with the server referenced in `storeURL`.
 
-It is also possible to specify the location of signature storage for registries which do not support the registry extension:
 ```yaml
 apiVersion: portieris.cloud.ibm.com/v1
 kind: ImagePolicy
@@ -175,15 +202,13 @@ spec:
           - type: "signedBy"
             keySecret: db2-pubkey
 ```
-where `storeSecret` identifies an in scope Kubernetes secret which contains `username` and `password` data items which are used to authenticate with the server referenced in `storeURL`.
 
-### vulnerability
+### `vulnerability`
 
-Vulnerability policies enable you to admit or deny pod admission based on the security status of the container images within the pod. Vulnerability-based admission is available for:
-* [Vulnerability Advisor for IBM Cloud Container Registry](https://cloud.ibm.com/docs/Registry?topic=va-va_index)
-    * This is available for any image in the [IBM Cloud Container Registry](https://www.ibm.com/uk-en/cloud/container-registry)
+Vulnerability policies enable you to admit or deny pod admission based on the security status of the container images within the pod. Vulnerability-based admission is available for [Vulnerability Advisor for IBM Cloud Container Registry](https://cloud.ibm.com/docs/Registry?topic=va-va_index). Vulnerability Advisor is available for any image in [IBM Cloud Container Registry](https://www.ibm.com/cloud/container-registry).
 
 Example policy:
+
 ```yaml
 apiVersion: portieris.cloud.ibm.com/v1
 kind: ImagePolicy
@@ -200,14 +225,11 @@ spec:
 ```
 
 #### Vulnerability Advisor for IBM Cloud Container Registry details
-For each `container` in the pod being considered for admission, a [vulnerability status](https://cloud.ibm.com/apidocs/container-registry/va#imagestatusquerypath) report is retrieved for the `image` specified by the container.
 
-The optional `account` parameter specifies the IBM Cloud account where exemptions should be fetched from for image matching the policy repository name.
+For each `container` in the pod that is being considered for admission, a [vulnerability status](https://cloud.ibm.com/apidocs/container-registry/va#imagestatusquerypath) report is retrieved for the `image` that is specified by the container.
 
-If the report returns an overall status of `OK`, `WARN` or `UNSUPPORTED` the pod is allowed. In the event of any other status, or any error condition the pod is denied.
+The optional `account` parameter specifies the IBM Cloud account from where exemptions are retreived for images that match the policy repository name.
 
-Please note that images that were recently pushed to the registry and have not yet completed scanning will be denied admission.
+If the report returns an overall status of `OK`, `WARN`, or `UNSUPPORTED` the pod is allowed. In the event of any other status, or any error condition, the pod is denied.
 
-### Notes:
-#### apiVersion change
-Prior to Portieris v0.10.0 policies had `apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1`. Policies developed before this version must be updated to `apiVersion: portieris.cloud.ibm.com/v1` otherwise they will not be enforced. This breaking change is due to some pre-existing incompatible policies in some environments.
+**Note** Recently pushed images to the registry that have not completed scanning are denied admission.
