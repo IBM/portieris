@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,19 +28,19 @@ func TestWildcards_ImagePolicyRepositories_Wildcards(t *testing.T) {
 
 	t.Run("Correctly apply policy when single trailing wildcard is used", func(t *testing.T) {
 		t.Parallel()
-		namespace := utils.CreateImagePolicyInstalledNamespace(t, framework, "./testdata/imagepolicy/allow-unsigned-trailing-wildcard.yaml")
+		namespace := utils.CreateImagePolicyInstalledNamespace(t, framework, "./testdata/imagepolicy/allow-unsigned-trailing-wildcard.yaml", "")
 		utils.TestDeploymentRunnable(t, framework, "./testdata/deployment/global-nginx-unsigned.yaml", namespace.Name)
 		utils.CleanUpImagePolicyTest(t, framework, namespace.Name)
 	})
 	t.Run("Correctly apply policy when single embedded wildcard is used", func(t *testing.T) {
 		t.Parallel()
-		namespace := utils.CreateImagePolicyInstalledNamespace(t, framework, "./testdata/imagepolicy/allow-unsigned-embedded-wildcard.yaml")
+		namespace := utils.CreateImagePolicyInstalledNamespace(t, framework, "./testdata/imagepolicy/allow-unsigned-embedded-wildcard.yaml", "")
 		utils.TestDeploymentRunnable(t, framework, "./testdata/deployment/global-nginx-unsigned.yaml", namespace.Name)
 		utils.CleanUpImagePolicyTest(t, framework, namespace.Name)
 	})
 	t.Run("Correctly apply policy when both embedded and trailing wildcard are used", func(t *testing.T) {
 		t.Parallel()
-		namespace := utils.CreateImagePolicyInstalledNamespace(t, framework, "./testdata/imagepolicy/allow-unsigned-embedded-trailing-wildcard.yaml")
+		namespace := utils.CreateImagePolicyInstalledNamespace(t, framework, "./testdata/imagepolicy/allow-unsigned-embedded-trailing-wildcard.yaml", "")
 		utils.TestDeploymentRunnable(t, framework, "./testdata/deployment/global-nginx-unsigned.yaml", namespace.Name)
 		utils.CleanUpImagePolicyTest(t, framework, namespace.Name)
 	})

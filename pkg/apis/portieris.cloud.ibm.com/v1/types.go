@@ -118,9 +118,10 @@ type Simple struct {
 
 // SimpleRequirement .
 type SimpleRequirement struct {
-	Type           string              `json:"type"`
-	KeySecret      string              `json:"keySecret,omitEmpty"`
-	SignedIdentity IdentityRequirement `json:"signedIdentity,omitEmpty"`
+	Type               string              `json:"type"`
+	KeySecret          string              `json:"keySecret,omitEmpty"`
+	KeySecretNamespace string              `json:"keySecretNamespace,omitEmpty"`
+	SignedIdentity     IdentityRequirement `json:"signedIdentity,omitEmpty"`
 }
 
 // IdentityRequirement .
