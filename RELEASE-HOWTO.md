@@ -24,6 +24,6 @@ Use the following format `vx.x.x`.
 4. Commit the changes.
 5. Run `make alltests`.
 6. Run `make e2e`, or both `make helm.install.local` and `make e2e.quick`.
-7. Publish the image to Docker Hub.
+7. Publish the image to IBM Cloud Container Registry at `icr.io/portieris`
 8. Create a **tag = VERSION** by running `git tag <VERSION>`.
 9. Create a release that has the chart as a release artifact. 
