@@ -24,6 +24,10 @@ spec:
         release: {{ .Release.Name }}
     spec:
       serviceAccountName: portieris
+      {{- if .Values.useHostNetwork }}
+      hostNetwork: true  
+      dnsPolicy: ClusterFirstWithHostNet
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.host | default "docker.io/ibmcom"  }}/{{ .Values.image.image }}:{{ .Values.image.tag }}"
