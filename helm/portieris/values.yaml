@@ -32,6 +32,9 @@ SkipSecretCreation: false
 # If using cert-manager to handle secrets
 UseCertManager: false
 
+# HostAliases
+hostAliases: {}
+
 # Resoures defined to assist scheduling
 # request is typical x10, limit is typical x100
 resources:

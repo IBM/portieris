@@ -55,6 +55,10 @@ spec:
           env:
           resources:
 {{ toYaml .Values.resources | indent 12 }}
+    {{- with .Values.hostAliases }}
+      hostAliases:
+{{ toYaml . | indent 8 }}
+    {{- end }}
     {{- with .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
