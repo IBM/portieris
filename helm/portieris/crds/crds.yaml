@@ -73,6 +73,8 @@ spec:
                                       enum: [ "insecureAcceptAnything", "reject", "signedBy" ]
                                     keySecret:
                                       type: string
+                                    keySecretNamespace:
+                                      type: string
                                     signedIdentity:
                                       type: object
                                       required: [ "type" ]
@@ -168,6 +170,8 @@ spec:
                                       type: string
                                       enum: [ "insecureAcceptAnything", "reject", "signedBy" ]
                                     keySecret:
+                                      type: string
+                                    keySecretNamespace:
                                       type: string
                                     signedIdentity:
                                       type: object
