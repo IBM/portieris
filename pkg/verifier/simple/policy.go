@@ -43,7 +43,12 @@ func (v verifier) TransformPolicies(kWrapper kubernetes.WrapperInterface, namesp
 				return nil, fmt.Errorf("KeySecret missing in signedBy requirement")
 			}
 
-			secretBytes, err := kWrapper.GetSecretKey(namespace, inPolicy.KeySecret)
+			secretNamespace := namespace
+			// Override the default namespace behavior if a namespace was provided in this policy
+			if inPolicy.KeySecretNamespace != "" {
+				secretNamespace = inPolicy.KeySecretNamespace
+			}
+			secretBytes, err := kWrapper.GetSecretKey(secretNamespace, inPolicy.KeySecret)
 			if err != nil {
 				return nil, err
 			}
