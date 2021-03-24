@@ -1,4 +1,4 @@
-// Copyright 2020 Portieris Authors.
+// Copyright 2020, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,8 +25,11 @@ import (
 )
 
 // CreateImagePolicyInstalledNamespaceOptionalSecrets ...
-func CreateImagePolicyInstalledNamespaceOptionalSecrets(t *testing.T, fw *framework.Framework, manifestPath string, ips bool) *corev1.Namespace {
+func CreateImagePolicyInstalledNamespaceOptionalSecrets(t *testing.T, fw *framework.Framework, manifestPath string, ips bool, namespaceParam string) *corev1.Namespace {
 	ns := uuid.NewV4().String()
+	if namespaceParam != "" {
+		ns = namespaceParam
+	}
 	imagePolicy, err := fw.LoadImagePolicyManifest(manifestPath)
 	if err != nil {
 		t.Fatalf("error loading %q ImagePolicy manifest: %v", manifestPath, err)
@@ -62,13 +65,13 @@ func CreateImagePolicyInstalledNamespaceOptionalSecrets(t *testing.T, fw *framew
 }
 
 // CreateImagePolicyInstalledNamespace ...
-func CreateImagePolicyInstalledNamespace(t *testing.T, fw *framework.Framework, manifestPath string) *corev1.Namespace {
-	return CreateImagePolicyInstalledNamespaceOptionalSecrets(t, fw, manifestPath, true)
+func CreateImagePolicyInstalledNamespace(t *testing.T, fw *framework.Framework, manifestPath string, ns string) *corev1.Namespace {
+	return CreateImagePolicyInstalledNamespaceOptionalSecrets(t, fw, manifestPath, true, ns)
 }
 
 // CreateImagePolicyInstalledNamespaceNoSecrets ...
 func CreateImagePolicyInstalledNamespaceNoSecrets(t *testing.T, fw *framework.Framework, manifestPath string) *corev1.Namespace {
-	return CreateImagePolicyInstalledNamespaceOptionalSecrets(t, fw, manifestPath, false)
+	return CreateImagePolicyInstalledNamespaceOptionalSecrets(t, fw, manifestPath, false, "")
 }
 
 // CleanUpImagePolicyTest ...
