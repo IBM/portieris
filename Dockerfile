@@ -1,4 +1,4 @@
-FROM golang:1.14.12 as golang
+FROM golang:1.15.10 as golang
 
 ARG VERSION=undefined
 WORKDIR /go/src/github.com/IBM/portieris

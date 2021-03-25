@@ -1,6 +1,6 @@
 module github.com/IBM/portieris
 
-go 1.14
+go 1.15
 
 require (
 	github.com/IBM/go-sdk-core/v4 v4.9.0
