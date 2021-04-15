@@ -1,4 +1,4 @@
-// Copyright 2018,2020 Portieris Authors.
+// Copyright 2018,2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -73,14 +73,14 @@ func TestMain(m *testing.M) {
 	}
 
 	if !noInstall {
-		// Check for deployment
+		// Check for deployment.
 		deploymentName := fmt.Sprintf("%v-%v", framework.HelmRelease, ChartName)
 		if err := framework.WaitForDeployment(deploymentName, framework.Namespace, time.Minute); err != nil {
 			log.Printf("error waiting for deployment %s in %s to appear: %v\n", deploymentName, framework.Namespace, err)
 			os.Exit(1)
 		}
 
-		// Check for CRDs
+		// Check for CRDs.
 		if err := framework.WaitForImagePolicyDefinition(time.Minute); err != nil {
 			log.Printf("error waiting for ImagePolicyDefinition to appear: %v\n", err)
 			os.Exit(1)
@@ -90,13 +90,13 @@ func TestMain(m *testing.M) {
 			os.Exit(1)
 		}
 
-		// Check for mutatingadmissionwebhook
+		// Check for mutatingadmissionwebhook.
 		if err := framework.WaitForMutatingAdmissionWebhook(MutatingWebhookName, time.Minute); err != nil {
 			log.Printf("error waiting for MutatingWebhookConfiguration to appear: %v\n", err)
 			os.Exit(1)
 		}
 
-		// check for validatingadmission webhook
+		// Check for validatingadmission webhook.
 		if err := framework.WaitForValidatingAdmissionWebhook(AdmissionWebhookName, time.Minute); err != nil {
 			log.Printf("error waiting for ValidatingWebhookConfiguration to appear: %v\n", err)
 			os.Exit(1)
