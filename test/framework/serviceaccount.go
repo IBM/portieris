@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ func generateServiceAccount(name string) *corev1.ServiceAccount {
 	return sa
 }
 
-// ListServiceAccounts retrieves all service accounts associated with the installed Helm release
+// ListServiceAccounts lists all service accounts that are associated with the installed Helm release.
 func (f *Framework) ListServiceAccounts() (*corev1.ServiceAccountList, error) {
 	opts := f.getHelmReleaseSelectorListOptions()
 	return f.KubeClient.CoreV1().ServiceAccounts(corev1.NamespaceAll).List(opts)
