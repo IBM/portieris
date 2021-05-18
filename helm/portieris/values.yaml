@@ -4,6 +4,10 @@
 
 replicaCount: 3
 
+# Annotations to add to the Portieris deployment's pod template. Optional.
+podAnnotations: {}
+  # sidecar.istio.io/inject: "false"
+
 image:
   host: icr.io/portieris
   pullSecret:
