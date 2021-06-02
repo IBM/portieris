@@ -30,8 +30,8 @@ func CheckIfTesting(t *testing.T, boolToCheck bool) {
 	}
 }
 
-// DeleteThenReturnClusterImagePolicy is used for temporary deletion of a cluster image policy for a given test
-// The returned ClusterImagePolicy should be used to recreate after the test is complete using a defer
+// DeleteThenReturnClusterImagePolicy is used for the temporary deletion of a cluster image policy for a given test.
+// The returned ClusterImagePolicy must be used to re-create the cluster image policy after the test is complete by using a defer.
 func DeleteThenReturnClusterImagePolicy(t *testing.T, fw *framework.Framework, clusterImagePolicy string) *policyv1.ClusterImagePolicy {
 	defaultClusterPolicy, err := fw.GetClusterImagePolicy(clusterImagePolicy)
 	if err != nil {
