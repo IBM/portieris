@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ func buildCronJob(t *testing.T, fw *framework.Framework, manifestLocation, names
 	return cronjob
 }
 
-// TestCronJobRunnable tests whether a manifest is deployable to the specified namespace
+// TestCronJobRunnable tests whether a manifest is deployable to the specified namespace.
 func TestCronJobRunnable(t *testing.T, fw *framework.Framework, manifestLocation, namespace string) {
 	cronjob := buildCronJob(t, fw, manifestLocation, namespace, false)
 	defer fw.DeleteCronJob(cronjob.Name, cronjob.Namespace)
@@ -58,7 +58,7 @@ func TestCronJobRunnable(t *testing.T, fw *framework.Framework, manifestLocation
 
 }
 
-// TestCronJobNotRunnable tests whether a manifest is deployable to the specified namespace
+// TestCronJobNotRunnable tests whether a manifest is deployable to the specified namespace.
 func TestCronJobNotRunnable(t *testing.T, fw *framework.Framework, manifestLocation, namespace string) {
 	cronjob := buildCronJob(t, fw, manifestLocation, namespace, true)
 	if cronjob != nil {

@@ -2,7 +2,7 @@
 
 copyright:
   years: 2018, 2021
-lastupdated: "2021-02-18"
+lastupdated: "2021-05-21"
 
 ---
 
@@ -39,7 +39,7 @@ Try to keep your PRs as small as possible. It's a lot easier to review many smal
 
 ## Changes to policy files
 
-If you add new elements to the Portieris policy files, (`pkg/apis/securityenforcement/v1beta1/*`), you have to run the code generator, see [Generator Readme](pkg/apis/securityenforcement/v1beta1/README.md).
+If you add new elements to the Portieris policy files, (`pkg/apis/*`), you have to run the code generator, see [Generator Readme](pkg/apis/README.md).
 
 ## Coding style
 
