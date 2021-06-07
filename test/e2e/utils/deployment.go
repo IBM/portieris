@@ -90,19 +90,19 @@ func replaceDeployment(t *testing.T, fw *framework.Framework, namespace, manifes
 	return deployment
 }
 
-// ShaCheck indicates whether the image should be checked for sha256 content
+// ShaCheck indicates whether to check the image for sha256 content.
 type ShaCheck int
 
 const (
-	// NoCheck setting does not check image content
+	// NoCheck The image content isn't checked.
 	NoCheck = iota
-	// VerifySha setting does not check image content
+	// VerifySha The image content isn't checked.
 	VerifySha
-	// VerifyNoSha setting does not check image content
+	// VerifyNoSha The image content isn't checked.
 	VerifyNoSha
 )
 
-// TestDeploymentRunnableCheck tests whether a manifest is deployable to the specified namespace
+// TestDeploymentRunnableCheck tests whether a manifest is deployable to the specified namespace.
 func TestDeploymentRunnableCheck(t *testing.T, fw *framework.Framework, manifestLocation, namespace string, sCheck ShaCheck) {
 	deployment := buildDeployment(t, fw, manifestLocation, namespace, false)
 	defer fw.DeleteDeployment(deployment.Name, deployment.Namespace)
@@ -159,12 +159,12 @@ func noImagesContain(template v1.PodTemplateSpec, content string) error {
 	return nil
 }
 
-// TestDeploymentRunnable tests whether a manifest is deployable to the specified namespace
+// TestDeploymentRunnable tests whether a manifest is deployable to the specified namespace.
 func TestDeploymentRunnable(t *testing.T, fw *framework.Framework, manifestLocation, namespace string) {
 	TestDeploymentRunnableCheck(t, fw, manifestLocation, namespace, NoCheck)
 }
 
-// TestDeploymentNotRunnable tests whether a manifest is deployable to the specified namespace
+// TestDeploymentNotRunnable tests whether a manifest is deployable to the specified namespace.
 func TestDeploymentNotRunnable(t *testing.T, fw *framework.Framework, manifestLocation, namespace string) {
 	deployment := buildDeployment(t, fw, manifestLocation, namespace, true)
 	if deployment != nil {
@@ -175,7 +175,7 @@ func TestDeploymentNotRunnable(t *testing.T, fw *framework.Framework, manifestLo
 	}
 }
 
-// TestCurrentDeployStatus checks the deployment currently has the expected number of replicas
+// TestCurrentDeployStatus checks that the deployment has the expected number of replicas.
 func TestCurrentDeployStatus(t *testing.T, fw *framework.Framework, namespace, deploymentName string) {
 	deployment, err := fw.GetDeployment(deploymentName, namespace)
 	if err != nil {
@@ -194,7 +194,7 @@ func TestCurrentDeployStatus(t *testing.T, fw *framework.Framework, namespace, d
 	}
 }
 
-// TestStartDeployNoDelete starts a deployment and only deletes on failure
+// TestStartDeployNoDelete starts a deployment and deletes only on failure.
 func TestStartDeployNoDelete(t *testing.T, fw *framework.Framework, manifestLocation, namespace string) (deploymentName string) {
 	deployment := buildDeployment(t, fw, manifestLocation, namespace, false)
 	if !assert.Equal(t, *deployment.Spec.Replicas, deployment.Status.AvailableReplicas, "Deployment failed: available replicas did not match expected replicas") {
@@ -205,7 +205,7 @@ func TestStartDeployNoDelete(t *testing.T, fw *framework.Framework, manifestLoca
 	return deployment.Name
 }
 
-// TestDeploymentNotRunnableOnPatch tests whether a deplomyent is not runnable after a patch
+// TestDeploymentNotRunnableOnPatch tests whether a deployment is runnable after a patch.
 func TestDeploymentNotRunnableOnPatch(t *testing.T, fw *framework.Framework, deploymentName, patchString, namespace string) {
 	deployment := patchDeployment(t, fw, deploymentName, namespace, patchString, true)
 	if deployment != nil {
@@ -217,7 +217,7 @@ func TestDeploymentNotRunnableOnPatch(t *testing.T, fw *framework.Framework, dep
 	}
 }
 
-// TestDeploymentNotRunnableOnReplace tests whether a deplomyent is not runnable after a replace
+// TestDeploymentNotRunnableOnReplace tests whether a deployment is runnable after a replace.
 func TestDeploymentNotRunnableOnReplace(t *testing.T, fw *framework.Framework, manifestLocation, namespace string) {
 	deployment := replaceDeployment(t, fw, namespace, manifestLocation, true)
 	if deployment != nil {

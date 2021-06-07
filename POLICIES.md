@@ -2,7 +2,7 @@
 
 copyright:
   years: 2020, 2021
-lastupdated: "2021-02-18"
+lastupdated: "2021-05-21"
 
 ---
 
@@ -47,7 +47,7 @@ For both types of resource, if multiple resources exist, they are merged togethe
 ## Installation default policies
 
 Default policies are installed when Portieris is installed. You must review and change these according to your requirements.
-You must customise the installation [default policies](helm/portieris/templates/default/policies.yaml).
+You must customise the installation [default policies](helm/portieris/templates/policies.yaml).
 
 ## Repository matching
 
