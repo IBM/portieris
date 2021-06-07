@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ func buildPod(t *testing.T, fw *framework.Framework, manifestLocation, namespace
 	return pod
 }
 
-// TestPodRunnable tests whether a manifest is deployable to the specified namespace
+// TestPodRunnable tests whether a manifest is deployable to the specified namespace.
 func TestPodRunnable(t *testing.T, fw *framework.Framework, manifestLocation, namespace string) {
 	pod := buildPod(t, fw, manifestLocation, namespace, false)
 	defer fw.DeletePod(pod.Name, pod.Namespace)
@@ -55,7 +55,7 @@ func TestPodRunnable(t *testing.T, fw *framework.Framework, manifestLocation, na
 	}
 }
 
-// TestPodNotRunnable tests whether a manifest is deployable to the specified namespace
+// TestPodNotRunnable tests whether a manifest is deployable to the specified namespace.
 func TestPodNotRunnable(t *testing.T, fw *framework.Framework, manifestLocation, namespace string) {
 	pod := buildPod(t, fw, manifestLocation, namespace, true)
 	if pod != nil {
@@ -67,7 +67,7 @@ func TestPodNotRunnable(t *testing.T, fw *framework.Framework, manifestLocation,
 	}
 }
 
-// KillPod kills first pod return in podlist in the given namespace
+// KillPod stops the first pod that is returned in the pod list in the specified namespace.
 func KillPod(t *testing.T, fw *framework.Framework, namespace string) {
 	if err := fw.DeleteRandomPod(namespace); err != nil {
 		DumpEvents(t, fw, namespace)
