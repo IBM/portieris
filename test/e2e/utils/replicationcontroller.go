@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ func buildReplicationController(t *testing.T, fw *framework.Framework, manifestL
 	return replicationcontroller
 }
 
-// TestReplicationControllerRunnable tests whether a manifest is deployable to the specified namespace
+// TestReplicationControllerRunnable tests whether a manifest is deployable to the specified namespace.
 func TestReplicationControllerRunnable(t *testing.T, fw *framework.Framework, manifestLocation, namespace string) {
 	replicationcontroller := buildReplicationController(t, fw, manifestLocation, namespace, false)
 	defer fw.DeleteReplicationController(replicationcontroller.Name, replicationcontroller.Namespace)
@@ -57,7 +57,7 @@ func TestReplicationControllerRunnable(t *testing.T, fw *framework.Framework, ma
 	}
 }
 
-// TestReplicationControllerNotRunnable tests whether a manifest is deployable to the specified namespace
+// TestReplicationControllerNotRunnable tests whether a manifest is deployable to the specified namespace.
 func TestReplicationControllerNotRunnable(t *testing.T, fw *framework.Framework, manifestLocation, namespace string) {
 	replicationcontroller := buildReplicationController(t, fw, manifestLocation, namespace, true)
 	if replicationcontroller != nil {
