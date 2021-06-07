@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ func buildDaemonSet(t *testing.T, fw *framework.Framework, manifestLocation, nam
 	return daemonset
 }
 
-// TestDaemonSetRunnable tests whether a manifest is deployable to the specified namespace
+// TestDaemonSetRunnable tests whether a manifest is deployable to the specified namespace.
 func TestDaemonSetRunnable(t *testing.T, fw *framework.Framework, manifestLocation, namespace string) {
 	daemonset := buildDaemonSet(t, fw, manifestLocation, namespace, false)
 	defer fw.DeleteDaemonSet(daemonset.Name, daemonset.Namespace)
@@ -56,7 +56,7 @@ func TestDaemonSetRunnable(t *testing.T, fw *framework.Framework, manifestLocati
 	}
 }
 
-// TestDaemonSetNotRunnable tests whether a manifest is deployable to the specified namespace
+// TestDaemonSetNotRunnable tests whether a manifest is deployable to the specified namespace.
 func TestDaemonSetNotRunnable(t *testing.T, fw *framework.Framework, manifestLocation, namespace string) {
 	daemonset := buildDaemonSet(t, fw, manifestLocation, namespace, true)
 	if daemonset != nil {
