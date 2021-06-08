@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ func buildStatefulSet(t *testing.T, fw *framework.Framework, manifestLocation, n
 	return statefulset
 }
 
-// TestStatefulSetRunnable tests whether a manifest is deployable to the specified namespace
+// TestStatefulSetRunnable tests whether a manifest is deployable to the specified namespace.
 func TestStatefulSetRunnable(t *testing.T, fw *framework.Framework, manifestLocation, namespace string) {
 	statefulset := buildStatefulSet(t, fw, manifestLocation, namespace, false)
 	defer fw.DeleteStatefulSet(statefulset.Name, statefulset.Namespace)
@@ -57,7 +57,7 @@ func TestStatefulSetRunnable(t *testing.T, fw *framework.Framework, manifestLoca
 	}
 }
 
-// TestStatefulSetNotRunnable tests whether a manifest is deployable to the specified namespace
+// TestStatefulSetNotRunnable tests whether a manifest is deployable to the specified namespace.
 func TestStatefulSetNotRunnable(t *testing.T, fw *framework.Framework, manifestLocation, namespace string) {
 	statefulset := buildStatefulSet(t, fw, manifestLocation, namespace, true)
 	if statefulset != nil {
