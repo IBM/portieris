@@ -34,7 +34,6 @@ func (f *Framework) WaitForMutatingAdmissionWebhook(name string, timeout time.Du
 	})
 }
 
-
 // ListMutatingAdmissionWebhooks lists the mutating admission webhooks that are associated with the installed Helm release.
 func (f *Framework) ListMutatingAdmissionWebhooks() (*v1.MutatingWebhookConfigurationList, error) {
 	opts := f.getHelmReleaseSelectorListOptions()
