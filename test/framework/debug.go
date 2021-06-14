@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// DumpEvents returns a reader that will have events for a given namespace written to
+// DumpEvents returns a reader that has events that are written to a specified namespace.
 func (f *Framework) DumpEvents(namespace string) io.Reader {
 	fmt.Printf("Dumping events for namespace: %v\n", namespace)
 	events, err := f.KubeClient.CoreV1().Events(namespace).List(metav1.ListOptions{})
@@ -69,7 +69,7 @@ func (e evs) Less(i, j int) bool {
 	return e[i].LastTimestamp.UnixNano() < e[j].LastTimestamp.UnixNano()
 }
 
-// DumpPolicies returns a reader that will have all cluster and image policies present in it
+// DumpPolicies returns a reader that has all cluster and image policies present in it.
 func (f *Framework) DumpPolicies(namespace string) io.Reader {
 	fmt.Printf("Dumping cluster policies and policies for namespace: %v\n", namespace)
 

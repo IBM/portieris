@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/yaml"
 )
 
-// LoadSecretManifest takes a manifest and decodes it into a deployment object
+// LoadSecretManifest takes a manifest and decodes it into a secret.
 func (f *Framework) LoadSecretManifest(pathToManifest string) (*corev1.Secret, error) {
 	manifest, err := openFile(pathToManifest)
 	if err != nil {
@@ -37,7 +37,7 @@ func (f *Framework) LoadSecretManifest(pathToManifest string) (*corev1.Secret, e
 	return &secret, nil
 }
 
-// CreateSecret creates a secret resource and then waits for it to appear
+// CreateSecret creates a secret and waits for it to show.
 func (f *Framework) CreateSecret(namespace string, secret *corev1.Secret) error {
 	if _, err := f.KubeClient.CoreV1().Secrets(namespace).Create(secret); err != nil {
 		return err
@@ -45,12 +45,12 @@ func (f *Framework) CreateSecret(namespace string, secret *corev1.Secret) error 
 	return f.WaitForSecret(secret.Name, namespace, time.Minute)
 }
 
-// GetSecret retrieves the specified secret
+// GetSecret retrieves the specified secret.
 func (f *Framework) GetSecret(name, namespace string) (*corev1.Secret, error) {
 	return f.KubeClient.CoreV1().Secrets(namespace).Get(name, metav1.GetOptions{})
 }
 
-// WaitForSecret waits until the specified deployment is created or the timeout is reached
+// WaitForSecret waits until the specified secret is created or the timeout is reached.
 func (f *Framework) WaitForSecret(name, namespace string, timeout time.Duration) error {
 	return wait.Poll(time.Second*5, timeout, func() (bool, error) {
 		if _, err := f.GetSecret(name, namespace); err != nil {

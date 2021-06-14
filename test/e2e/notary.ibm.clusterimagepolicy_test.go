@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -107,7 +107,7 @@ func TestNotary_ClusterImagePolicyRepositories_TrustPinningMultiContainers(t *te
 	})
 }
 
-// Temporary until we support other registries
+// Temporary check until other registries are supported.
 func TestNotary_ClusterImagePolicyRepositories_ThirdPartyTrust(t *testing.T) {
 	utils.CheckIfTesting(t, testTrustClusterImagePolicy)
 	t.Run("Third party trust is rejected", func(t *testing.T) {
