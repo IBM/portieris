@@ -33,14 +33,14 @@ func generateNamespace(name string) *corev1.Namespace {
 	return ns
 }
 
-// IBMCloudSecretNames secret provided to enable access to test images
+// IBMCloudSecretNames is the secret name that is provided to enable access to the test images.
 // https://github.com/IBM/portieris/issues/34 to remove the need for this
 var IBMCloudSecretNames = []string{"all-icr-io", "default-icr-io"}
 
-// IBMGlobalRegistry is the default location of the test images used in these e2e tests
+// IBMGlobalRegistry is the default location of the test images that are used in the end-to-end tests.
 var IBMGlobalRegistry = "icr.io"
 
-// CreateNamespace creates a namespace
+// CreateNamespace creates a namespace.
 func (f *Framework) CreateNamespace(name string) (*corev1.Namespace, error) {
 
 	if _, err := f.KubeClient.CoreV1().Namespaces().Create(generateNamespace(name)); err != nil {
@@ -54,12 +54,12 @@ func (f *Framework) CreateNamespace(name string) (*corev1.Namespace, error) {
 	return namespace, nil
 }
 
-// GetNamespace retrieves the specified namespace
+// GetNamespace retrieves the specified namespace.
 func (f *Framework) GetNamespace(name string) (*corev1.Namespace, error) {
 	return f.KubeClient.CoreV1().Namespaces().Get(name, metav1.GetOptions{})
 }
 
-// WaitForNamespace waits until the specified namespace is created or the timeout is reached
+// WaitForNamespace waits until the specified namespace is created or the timeout is reached.
 func (f *Framework) WaitForNamespace(name string, timeout time.Duration) error {
 	return wait.Poll(time.Second*5, timeout, func() (bool, error) {
 		if _, err := f.GetNamespace(name); err != nil {
@@ -69,8 +69,8 @@ func (f *Framework) WaitForNamespace(name string, timeout time.Duration) error {
 	})
 }
 
-// CreateNamespaceWithIPS creates a namespace, service account and IPS to pull from the IBM Cloud Container Registry Global region
-// It copies the `IBMCloudSecretName` imagePullSecret from the default namespace
+// CreateNamespaceWithIPS creates a namespace, service account, and IP addresses to pull from the Global region of IBM Cloud Container Registry.
+// It copies the IBM Cloud secret name, imagePullSecret, from the default namespace.
 func (f *Framework) CreateNamespaceWithIPS(name string) (*corev1.Namespace, error) {
 	namespace, err := f.CreateNamespace(name)
 	if err != nil {
@@ -92,7 +92,7 @@ func (f *Framework) CreateNamespaceWithIPS(name string) (*corev1.Namespace, erro
 		return nil, fmt.Errorf("error creating imagePullSecret: %v", err)
 	}
 
-	// Create a bad pull secret based off the good one (hard-code password to a bad value)
+	// Create an invalid pull secret that is based on the valid pull secret (hard-code the password to an invalid value).
 	badPullSecret := imagePullSecret.DeepCopy()
 	badPullSecret.Name = "bad-" + badPullSecret.GetName()
 	clientWrapper := pk.NewKubeClientsetWrapper(f.KubeClient)
@@ -115,7 +115,7 @@ func (f *Framework) CreateNamespaceWithIPS(name string) (*corev1.Namespace, erro
 	}
 
 	sa := generateServiceAccount("default")
-	// Ensure the bad imagePullSecret is before the good one in the ServiceAccount's list
+	// Ensure the invalid imagePullSecret is before the valid one in the ServiceAccount's list.
 	sa.ImagePullSecrets = []corev1.LocalObjectReference{
 		{Name: badPullSecret.GetName()},
 		{Name: imagePullSecret.GetName()},
@@ -126,7 +126,7 @@ func (f *Framework) CreateNamespaceWithIPS(name string) (*corev1.Namespace, erro
 	return namespace, nil
 }
 
-// DeleteNamespace deletes the specified namespace
+// DeleteNamespace deletes the specified namespace.
 func (f *Framework) DeleteNamespace(name string) error {
 	return f.KubeClient.CoreV1().Namespaces().Delete(name, &metav1.DeleteOptions{})
 }

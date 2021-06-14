@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/yaml"
 )
 
-// LoadReplicationControllerManifest takes a manifest and decodes it into a Replicaset object
+// LoadReplicationControllerManifest takes a manifest and decodes it into a replication controller.
 func (f *Framework) LoadReplicationControllerManifest(pathToManifest string) (*corev1.ReplicationController, error) {
 	manifest, err := openFile(pathToManifest)
 	if err != nil {
@@ -38,7 +38,7 @@ func (f *Framework) LoadReplicationControllerManifest(pathToManifest string) (*c
 	return &replicationcontroller, nil
 }
 
-// CreateReplicationController creates a Replicaset resource and then waits for it to appear
+// CreateReplicationController creates a replication controller and waits for it to show.
 func (f *Framework) CreateReplicationController(namespace string, replicationcontroller *corev1.ReplicationController) error {
 	if _, err := f.KubeClient.CoreV1().ReplicationControllers(namespace).Create(replicationcontroller); err != nil {
 		return err
@@ -50,22 +50,22 @@ func (f *Framework) CreateReplicationController(namespace string, replicationcon
 	return nil
 }
 
-// GetReplicationController retrieves the specified deployment
+// GetReplicationController retrieves the specified replication controller.
 func (f *Framework) GetReplicationController(name, namespace string) (*corev1.ReplicationController, error) {
 	return f.KubeClient.CoreV1().ReplicationControllers(namespace).Get(name, metav1.GetOptions{})
 }
 
-// // PatchDeployment patches the specified deployment
+// // PatchDeployment patches the specified deployment.
 // func (f *Framework) PatchDeployment(name, namespace, patch string) (*v1.Deployment, error) {
 // 	return f.KubeClient.CoreV1().Deployments(namespace).Patch(name, types.StrategicMergePatchType, []byte(patch))
 // }
 
-// DeleteReplicationController deletes the specified deployment
+// DeleteReplicationController deletes the specified replication controller.
 func (f *Framework) DeleteReplicationController(name, namespace string) error {
 	return f.KubeClient.CoreV1().ReplicationControllers(namespace).Delete(name, &metav1.DeleteOptions{})
 }
 
-// WaitForReplicationController waits until the specified Replicaset is created or the timeout is reached
+// WaitForReplicationController waits until the specified replication controller is created or the timeout is reached.
 func (f *Framework) WaitForReplicationController(name, namespace string, timeout time.Duration) error {
 	return wait.Poll(time.Second*5, timeout, func() (bool, error) {
 		if _, err := f.GetReplicationController(name, namespace); err != nil {
@@ -75,7 +75,7 @@ func (f *Framework) WaitForReplicationController(name, namespace string, timeout
 	})
 }
 
-// WaitForReplicationControllerPods waits until the specified deployment's pods are created or the timeout is reached
+// WaitForReplicationControllerPods waits until the specified replication controller's pods are created or the timeout is reached.
 func (f *Framework) WaitForReplicationControllerPods(name, namespace string, timeout time.Duration) error {
 	return wait.Poll(time.Second*5, timeout, func() (bool, error) {
 		replicationcontroller, err := f.GetReplicationController(name, namespace)
@@ -89,7 +89,7 @@ func (f *Framework) WaitForReplicationControllerPods(name, namespace string, tim
 	})
 }
 
-// ListReplicationController retrieves all Replicaset associated with the installed Helm release
+// ListReplicationController lists all replication controllers that are associated with the installed Helm release.
 func (f *Framework) ListReplicationController() (*corev1.ReplicationControllerList, error) {
 	opts := f.getHelmReleaseSelectorListOptions()
 	return f.KubeClient.CoreV1().ReplicationControllers(corev1.NamespaceAll).List(opts)
