@@ -18,7 +18,7 @@ import (
 	"log"
 	"time"
 
-	v1beta1 "k8s.io/api/admissionregistration/v1beta1"
+	v1 "k8s.io/api/admissionregistration/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 )
@@ -26,7 +26,7 @@ import (
 // WaitForValidatingAdmissionWebhook waits until the specified validating admission webhook is created or the timeout is reached.
 func (f *Framework) WaitForValidatingAdmissionWebhook(name string, timeout time.Duration) error {
 	return wait.Poll(time.Second*5, timeout, func() (bool, error) {
-		if _, err := f.KubeClient.AdmissionregistrationV1beta1().ValidatingWebhookConfigurations().Get(name, metav1.GetOptions{}); err != nil {
+		if _, err := f.KubeClient.AdmissionregistrationV1().ValidatingWebhookConfigurations().Get(name, metav1.GetOptions{}); err != nil {
 			return false, err
 		}
 		log.Printf("Found ValidatingWebhookConfiguration %q", name)
@@ -35,7 +35,7 @@ func (f *Framework) WaitForValidatingAdmissionWebhook(name string, timeout time.
 }
 
 // ListValidatingAdmissionWebhooks lists the validating admission webhooks that are associated with the installed Helm release.
-func (f *Framework) ListValidatingAdmissionWebhooks() (*v1beta1.ValidatingWebhookConfigurationList, error) {
+func (f *Framework) ListValidatingAdmissionWebhooks() (*v1.ValidatingWebhookConfigurationList, error) {
 	opts := f.getHelmReleaseSelectorListOptions()
-	return f.KubeClient.AdmissionregistrationV1beta1().ValidatingWebhookConfigurations().List(opts)
+	return f.KubeClient.AdmissionregistrationV1().ValidatingWebhookConfigurations().List(opts)
 }
