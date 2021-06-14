@@ -2,7 +2,7 @@
 
 copyright:
   years: 2018, 2021
-lastupdated: "2021-02-19"
+lastupdated: "2021-06-03"
 
 ---
 
@@ -48,7 +48,7 @@ If you're deploying onto a generic cluster, Portieris automatically creates a po
 helm install --create-namespace -n portieris . --set IBMContainerService=false --debug
 ```
 
-For installation instructions, see [Installing security enforcement in your cluster](https://cloud.ibm.com/docs/services/Registry?topic=registry-security_enforce#sec_enforcer_install).
+For installation instructions, see [Installing Portieris](https://github.com/IBM/portieris/blob/master/README.md#installing-portieris).
 
 ## Default security policies
 
