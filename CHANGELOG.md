@@ -14,6 +14,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 # v-next
 ##
 
+# v0.11.1
+## 2021-06-14
+* Further documentation improvements including godoc
+* Update webhook resources to v1 
+* update dependencies and glonag version to 1.16.5 
+
 # v0.10.2
 ## 2021-03-25
 * Documentation improvements 
