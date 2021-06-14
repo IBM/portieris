@@ -26,7 +26,7 @@ import (
 	policyv1 "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/v1"
 )
 
-// LoadImagePolicyManifest takes a manifest and decodes it into a ImagePolicy object
+// LoadImagePolicyManifest takes a manifest and decodes it into an image policy (ImagePolicy) object.
 func (f *Framework) LoadImagePolicyManifest(pathToManifest string) (*policyv1.ImagePolicy, error) {
 	manifest, err := openFile(pathToManifest)
 	if err != nil {
@@ -39,7 +39,7 @@ func (f *Framework) LoadImagePolicyManifest(pathToManifest string) (*policyv1.Im
 	return &ip, nil
 }
 
-// CreateImagePolicy creates the ImagePolicy
+// CreateImagePolicy creates an image policy (ImagePolicy).
 func (f *Framework) CreateImagePolicy(namespace string, imagePolicy *policyv1.ImagePolicy) error {
 	if _, err := f.ImagePolicyClient.PortierisV1().ImagePolicies(namespace).Create(imagePolicy); err != nil {
 		return fmt.Errorf("Error creating ImagePolicy %q: %v", imagePolicy.Name, err)
@@ -47,17 +47,17 @@ func (f *Framework) CreateImagePolicy(namespace string, imagePolicy *policyv1.Im
 	return f.WaitForImagePolicy(imagePolicy.Name, namespace, time.Minute)
 }
 
-// GetImagePolicy retrieves the ImagePolicy
+// GetImagePolicy retrieves the image policy (ImagePolicy).
 func (f *Framework) GetImagePolicy(name, namespace string) (*policyv1.ImagePolicy, error) {
 	return f.ImagePolicyClient.PortierisV1().ImagePolicies(namespace).Get(name, metav1.GetOptions{})
 }
 
-// ListImagePolicies lists all ImagePolicies in a given namespace
+// ListImagePolicies lists all the image polices in a specified namespace.
 func (f *Framework) ListImagePolicies(namespace string) (*policyv1.ImagePolicyList, error) {
 	return f.ImagePolicyClient.PortierisV1().ImagePolicies(namespace).List(metav1.ListOptions{})
 }
 
-// WaitForImagePolicy waits until the ImagePolicy is created or the timeout is reached
+// WaitForImagePolicy waits until the image policy is created or the timeout is reached.
 func (f *Framework) WaitForImagePolicy(name, namespace string, timeout time.Duration) error {
 	return wait.Poll(time.Second*5, timeout, func() (bool, error) {
 		if _, err := f.GetImagePolicy(name, namespace); err != nil {
@@ -67,7 +67,7 @@ func (f *Framework) WaitForImagePolicy(name, namespace string, timeout time.Dura
 	})
 }
 
-// DeleteImagePolicy deletes the ImagePolicy
+// DeleteImagePolicy deletes the image policy (ImagePolicy).
 func (f *Framework) DeleteImagePolicy(name, namespace string) error {
 	err := f.ImagePolicyClient.PortierisV1().ImagePolicies(namespace).Delete(name, &metav1.DeleteOptions{})
 	if err != nil {
@@ -76,7 +76,7 @@ func (f *Framework) DeleteImagePolicy(name, namespace string) error {
 	return nil
 }
 
-// WaitForImagePolicyDefinition waits until the ImagePolicy CRD is created or the timeout is reached
+// WaitForImagePolicyDefinition waits until the image policy (ImagePolicy) customer resource definition (CRD) is created or the timeout is reached.
 func (f *Framework) WaitForImagePolicyDefinition(timeout time.Duration) error {
 	return wait.Poll(time.Second*5, timeout, func() (bool, error) {
 		if _, err := f.GetImagePolicyDefinition(); err != nil {
@@ -86,12 +86,12 @@ func (f *Framework) WaitForImagePolicyDefinition(timeout time.Duration) error {
 	})
 }
 
-// GetImagePolicyDefinition retrieves the ImagePolicy CRD
+// GetImagePolicyDefinition retrieves the image policy (ImagePolicy) custom resource definition (CRD).
 func (f *Framework) GetImagePolicyDefinition() (*apiextensions.CustomResourceDefinition, error) {
 	return f.CustomResourceDefinitionClient.Get(imagePolicyCRDName, metav1.GetOptions{})
 }
 
-// UpdateImagePolicy creates the ImagePolicy
+// UpdateImagePolicy updates the image policy (ImagePolicy).
 func (f *Framework) UpdateImagePolicy(namespace string, imagePolicy *policyv1.ImagePolicy) error {
 	if _, err := f.ImagePolicyClient.PortierisV1().ImagePolicies(namespace).Update(imagePolicy); err != nil {
 		return fmt.Errorf("Error updating ImagePolicy %q: %v", imagePolicy.Name, err)
