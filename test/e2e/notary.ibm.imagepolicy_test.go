@@ -110,7 +110,7 @@ func TestNotary_ImagePolicyRepositories_TrustPinningMultiContainers(t *testing.T
 	})
 }
 
-// Temporary until we support other registries
+// Temporary check until other registries are supported.
 func TestNotary_ImagePolicyRepositories_ThirdPartyTrust(t *testing.T) {
 	utils.CheckIfTesting(t, testTrustImagePolicy)
 	t.Run("Third party trust is rejected", func(t *testing.T) {
