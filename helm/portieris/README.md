@@ -52,15 +52,15 @@ For installation instructions, see [Installing Portieris](https://github.com/IBM
 
 ## Default security policies
 
-This chart installs default security policies in your cluster. Modify the default policies or replace them with your own. For more information, see [Default policies](https://cloud.ibm.com/docs/services/Registry?topic=registry-security_enforce#default_policies).
+This chart installs default security policies in your cluster. You can modify the default policies or replace them with your own. The default policies are defined in the [chart policies templates](https://github.com/IBM/portieris/blob/unbreak-links/helm/portieris/templates/policies.yaml).
 
-Apply access control policies to limit who can modify Portieris policies in your cluster. See [Controlling who can customize policies](https://cloud.ibm.com/docs/services/Registry?topic=registry-security_enforce#assign_user_policy).
+Apply access control policies to limit who can modify Portieris policies in your cluster. See the [Kubernetes docs](https://kubernetes.io/docs/reference/access-authn-authz/rbac/) and [IBM Cloud docs](https://cloud.ibm.com/docs/containers?topic=containers-users#role-binding-assign) on this subject.
 
 ## Customizing security policies
 
 You can add your own security policies, scoped to a Kubernetes namespace or the entire cluster. Cluster policies are used when no namespace scoped policies exist in the Kubernetes namespace that you are deploying to.
 
-For more information about configuring security policies, and an explanation of the security policy resources, see [Customizing policies](https://cloud.ibm.com/docs/services/Registry?topic=registry-security_enforce#customize_policies).
+For more information about configuring security policies, and an explanation of the security policy resources, see [Portieris Policies](https://github.com/IBM/portieris/blob/master/POLICIES.md).
 
 ## Removing the chart
 
