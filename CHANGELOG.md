@@ -14,7 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 # v-next
 ##
 
-# v0.11.1
+# v0.11.0
 ## 2021-06-14
 * Further documentation improvements including godoc
 * Update webhook resources to v1 

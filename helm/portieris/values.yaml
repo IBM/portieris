@@ -8,7 +8,7 @@ image:
   host: icr.io/portieris
   pullSecret:
   image: portieris
-  tag: v0.11.1
+  tag: v0.11.0
   pullPolicy: Always
 
 service:
