@@ -42,8 +42,8 @@ const (
 	clusterImagePolicyCRDName = "clusterimagepolicies.portieris.cloud.ibm.com"
 )
 
-// Framework is an e2e test framework esponsible for installing and deleting of the helm chart
-// It also providers helper functions for talking to Kube clusters
+// Framework is an end-to-end test framework that is responsible for installing and deleting the Helm chart.
+// It also provides helper functions for talking to Kube clusters.
 type Framework struct {
 	KubeClient                     kubernetes.Interface
 	ImagePolicyClient              policyclientset.Interface
@@ -55,7 +55,7 @@ type Framework struct {
 	HelmChart                      string
 }
 
-// New installs the specific helm chart into the Kube cluster of the kubeconfig
+// New installs the specific Helm chart into the Kube cluster of the kubeconfig.
 func New(kubeconfig, helmChart string, noInstall bool) (*Framework, error) {
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
@@ -105,7 +105,7 @@ func New(kubeconfig, helmChart string, noInstall bool) (*Framework, error) {
 	return fw, nil
 }
 
-// Teardown deletes the chart and then verifies everything has been cleaned up
+// Teardown deletes the chart and then verifies that everything is cleaned up.
 func (f *Framework) Teardown() bool {
 	if err := f.deleteChart(); err != nil {
 		log.Printf("error deleting helm chart: %v", err)
@@ -116,7 +116,7 @@ func (f *Framework) Teardown() bool {
 func (f *Framework) verifyCleanedUp() bool {
 	ok := true
 
-	// Verify Webhooks have been cleaned up
+	// Verify that the webhooks are cleaned up.
 	if valWebhooks, err := f.ListValidatingAdmissionWebhooks(); err != nil {
 		ok = false
 		log.Printf("Error listing ValidatingAdmissionWebhook: %v", err)
@@ -138,7 +138,7 @@ func (f *Framework) verifyCleanedUp() bool {
 		}
 	}
 
-	// Verify CRDs have been cleaned up
+	// Verify that the custom resource definitions (CRDs) are cleaned up.
 	if imagePolicyDefinition, err := f.GetImagePolicyDefinition(); err != nil {
 		if statusErr, ok := err.(*errors.StatusError); ok {
 			if statusErr.Status().Code != http.StatusNotFound {
@@ -164,7 +164,7 @@ func (f *Framework) verifyCleanedUp() bool {
 		fmt.Printf("\t\t\t\t- %v\n", clusterImagePolicyDefinition.Name)
 	}
 
-	// Verify Deployments have been cleaned up
+	// Verify that the deployments are cleaned up.
 	if deployments, err := f.ListDeployments(); err != nil {
 		ok = false
 		log.Printf("Error listing Deployments: %v", err)
@@ -176,7 +176,7 @@ func (f *Framework) verifyCleanedUp() bool {
 		}
 	}
 
-	// Verify Services have been cleaned up
+	// Verify that the services are cleaned up.
 	if services, err := f.ListServices(); err != nil {
 		ok = false
 		log.Printf("Error listing Services: %v", err)
@@ -188,7 +188,7 @@ func (f *Framework) verifyCleanedUp() bool {
 		}
 	}
 
-	// Verify Jobs have been cleaned up
+	// Verify that the jobs are cleaned up.
 	if jobs, err := f.ListJobs(); err != nil {
 		ok = false
 		log.Printf("Error listing Jobs: %v", err)
@@ -200,7 +200,7 @@ func (f *Framework) verifyCleanedUp() bool {
 		}
 	}
 
-	// Verify ConfigMaps have been cleaned up
+	// Verify that the configuration maps (ConfigMaps) are cleaned up.
 	if cms, err := f.ListConfigMaps(); err != nil {
 		ok = false
 		log.Printf("Error listing ConfigMaps: %v", err)
@@ -212,7 +212,7 @@ func (f *Framework) verifyCleanedUp() bool {
 		}
 	}
 
-	// Verify ServiceAccounts have been cleaned up
+	// Verify that the service accounts (ServiceAccounts) are cleaned up.
 	if sas, err := f.ListServiceAccounts(); err != nil {
 		ok = false
 		log.Printf("Error listing ServiceAccounts : %v", err)
@@ -224,7 +224,7 @@ func (f *Framework) verifyCleanedUp() bool {
 		}
 	}
 
-	// Verify ClusterRoles have been cleaned up
+	// Verify that the cluster roles (ClusterRoles) are cleaned up.
 	if crs, err := f.ListClusterRoles(); err != nil {
 		ok = false
 		log.Printf("Error listing ClusterRoles: %v", err)
@@ -236,7 +236,7 @@ func (f *Framework) verifyCleanedUp() bool {
 		}
 	}
 
-	// Verify ClusterRoleBindings have been cleaned up
+	// Verify that the cluster role bindings (ClusterRoleBindings) are cleaned up.
 	if crbs, err := f.ListClusterRoleBindings(); err != nil {
 		ok = false
 		log.Printf("Error listing ClusterRoleBindings: %v", err)
