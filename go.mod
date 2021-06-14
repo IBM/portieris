@@ -1,14 +1,11 @@
 module github.com/IBM/portieris
 
-go 1.14
+go 1.16
 
 require (
 	github.com/IBM/go-sdk-core/v4 v4.9.0
 	github.com/Shopify/logrus-bugsnag v0.0.0-20171204204709-577dee27f20d // indirect
 	github.com/agl/ed25519 v0.0.0-20170116200512-5312a6153412 // indirect
-	github.com/bitly/go-hostpool v0.1.0 // indirect
-	github.com/bitly/go-simplejson v0.5.0 // indirect
-	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
 	github.com/bugsnag/bugsnag-go v1.5.3 // indirect
 	github.com/bugsnag/panicwrap v1.2.0 // indirect
 	github.com/cloudflare/cfssl v1.5.0 // indirect

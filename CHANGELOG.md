@@ -2,7 +2,7 @@
 
 copyright:
   years: 2020, 2021
-lastupdated: "2021-02-18"
+lastupdated: "2021-03-25"
 
 ---
 
@@ -13,6 +13,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 # v-next
 ##
+
+# v0.10.2
+## 2021-03-25
+* Documentation improvements 
+* Add keySecretNamespace policy option ([PR#258](https://github.com/IBM/portieris/pull/258))
+* update dependencies and golang to 1.15.10
 
 # v0.10.1
 ##

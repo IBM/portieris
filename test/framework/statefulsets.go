@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/yaml"
 )
 
-// LoadStatefulSetManifest takes a manifest and decodes it into a StatefulSet object
+// LoadStatefulSetManifest takes a manifest and decodes it into a StatefulSet object.
 func (f *Framework) LoadStatefulSetManifest(pathToManifest string) (*v1.StatefulSet, error) {
 	manifest, err := openFile(pathToManifest)
 	if err != nil {
@@ -39,7 +39,7 @@ func (f *Framework) LoadStatefulSetManifest(pathToManifest string) (*v1.Stateful
 	return &statefulset, nil
 }
 
-// CreateStatefulSet creates a StatefulSet resource and then waits for it to appear
+// CreateStatefulSet creates a StatefulSet and waits for it to show.
 func (f *Framework) CreateStatefulSet(namespace string, statefulset *v1.StatefulSet) error {
 	if _, err := f.KubeClient.AppsV1().StatefulSets(namespace).Create(statefulset); err != nil {
 		return err
@@ -51,17 +51,17 @@ func (f *Framework) CreateStatefulSet(namespace string, statefulset *v1.Stateful
 	return nil
 }
 
-// GetStatefulSet retrieves the specified deployment
+// GetStatefulSet retrieves the specified StatefulSet.
 func (f *Framework) GetStatefulSet(name, namespace string) (*v1.StatefulSet, error) {
 	return f.KubeClient.AppsV1().StatefulSets(namespace).Get(name, metav1.GetOptions{})
 }
 
-// DeleteStatefulSet deletes the specified deployment
+// DeleteStatefulSet deletes the specified StatefulSet.
 func (f *Framework) DeleteStatefulSet(name, namespace string) error {
 	return f.KubeClient.AppsV1().StatefulSets(namespace).Delete(name, &metav1.DeleteOptions{})
 }
 
-// WaitForStatefulSet waits until the specified StatefulSet is created or the timeout is reached
+// WaitForStatefulSet waits until the specified StatefulSet is created or the timeout is reached.
 func (f *Framework) WaitForStatefulSet(name, namespace string, timeout time.Duration) error {
 	return wait.Poll(time.Second*5, timeout, func() (bool, error) {
 		if _, err := f.GetStatefulSet(name, namespace); err != nil {
@@ -71,7 +71,7 @@ func (f *Framework) WaitForStatefulSet(name, namespace string, timeout time.Dura
 	})
 }
 
-// WaitForStatefulSetPods waits until the specified deployment's pods are created or the timeout is reached
+// WaitForStatefulSetPods waits until the specified StatefulSet's pods are created or the timeout is reached.
 func (f *Framework) WaitForStatefulSetPods(name, namespace string, timeout time.Duration) error {
 	return wait.Poll(time.Second*5, timeout, func() (bool, error) {
 		statefulset, err := f.GetStatefulSet(name, namespace)
@@ -85,7 +85,7 @@ func (f *Framework) WaitForStatefulSetPods(name, namespace string, timeout time.
 	})
 }
 
-// ListStatefulSet retrieves all StatefulSet associated with the installed Helm release
+// ListStatefulSet lists the StatefulSets that are associated with the installed Helm release.
 func (f *Framework) ListStatefulSet() (*v1.StatefulSetList, error) {
 	opts := f.getHelmReleaseSelectorListOptions()
 	return f.KubeClient.AppsV1().StatefulSets(corev1.NamespaceAll).List(opts)

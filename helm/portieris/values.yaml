@@ -8,7 +8,7 @@ image:
   host: icr.io/portieris
   pullSecret:
   image: portieris
-  tag: v0.10.1
+  tag: v0.10.2
   pullPolicy: Always
 
 service:
@@ -84,3 +84,6 @@ clusterPolicy:
     # This permissive policy allows all images in namespaces which do not have an ImagePolicy.
     # IMPORTANT: Review this policy and replace it with one that meets your requirements.
     - name: "*"
+
+# use hostNetwork for Portieris webhook
+useHostNetwork: false
