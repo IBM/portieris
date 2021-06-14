@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/yaml"
 )
 
-// LoadDaemonSetManifest takes a manifest and decodes it into a daemonset object
+// LoadDaemonSetManifest takes a manifest and decodes it into a DaemonSet object.
 func (f *Framework) LoadDaemonSetManifest(pathToManifest string) (*v1.DaemonSet, error) {
 	manifest, err := openFile(pathToManifest)
 	if err != nil {
@@ -39,7 +39,7 @@ func (f *Framework) LoadDaemonSetManifest(pathToManifest string) (*v1.DaemonSet,
 	return &daemonset, nil
 }
 
-// CreateDaemonSet creates a daemonset resource and then waits for it to appear
+// CreateDaemonSet creates a DaemonSet resource and then waits for it to show.
 func (f *Framework) CreateDaemonSet(namespace string, daemonset *v1.DaemonSet) error {
 	if _, err := f.KubeClient.AppsV1().DaemonSets(namespace).Create(daemonset); err != nil {
 		return err
@@ -51,7 +51,7 @@ func (f *Framework) CreateDaemonSet(namespace string, daemonset *v1.DaemonSet) e
 	return nil
 }
 
-// GetDaemonSets retrieves the specified deployment
+// GetDaemonSets retrieves the specified DaemonSets.
 func (f *Framework) GetDaemonSets(name, namespace string) (*v1.DaemonSet, error) {
 	return f.KubeClient.AppsV1().DaemonSets(namespace).Get(name, metav1.GetOptions{})
 }
@@ -61,12 +61,12 @@ func (f *Framework) GetDaemonSets(name, namespace string) (*v1.DaemonSet, error)
 // 	return f.KubeClient.AppsV1().Deployments(namespace).Patch(name, types.StrategicMergePatchType, []byte(patch))
 // }
 
-// DeleteDaemonSet deletes the specified deployment
+// DeleteDaemonSet deletes the specified DaemonSet.
 func (f *Framework) DeleteDaemonSet(name, namespace string) error {
 	return f.KubeClient.AppsV1().DaemonSets(namespace).Delete(name, &metav1.DeleteOptions{})
 }
 
-// WaitForDaemonSet waits until the specified daemonset is created or the timeout is reached
+// WaitForDaemonSet waits until the specified DaemonSet is created or the timeout is reached.
 func (f *Framework) WaitForDaemonSet(name, namespace string, timeout time.Duration) error {
 	return wait.Poll(time.Second*5, timeout, func() (bool, error) {
 		if _, err := f.GetDaemonSets(name, namespace); err != nil {
@@ -76,7 +76,7 @@ func (f *Framework) WaitForDaemonSet(name, namespace string, timeout time.Durati
 	})
 }
 
-// WaitForDaemonSetPods waits until the specified deployment's pods are created or the timeout is reached
+// WaitForDaemonSetPods waits until the specified DaemonSet's pods are created or the timeout is reached.
 func (f *Framework) WaitForDaemonSetPods(name, namespace string, timeout time.Duration) error {
 	return wait.Poll(time.Second*5, timeout, func() (bool, error) {
 		daemonset, err := f.GetDaemonSets(name, namespace)
@@ -90,7 +90,7 @@ func (f *Framework) WaitForDaemonSetPods(name, namespace string, timeout time.Du
 	})
 }
 
-// ListDaemonSet retrieves all daemonset associated with the installed Helm release
+// ListDaemonSet Lists all DaemonSets that are associated with the installed Helm release.
 func (f *Framework) ListDaemonSet() (*v1.DaemonSetList, error) {
 	opts := f.getHelmReleaseSelectorListOptions()
 	return f.KubeClient.AppsV1().DaemonSets(corev1.NamespaceAll).List(opts)
