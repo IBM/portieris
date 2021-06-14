@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,18 +26,18 @@ import (
 	"k8s.io/apimachinery/pkg/util/yaml"
 )
 
-// ListCronJobs retrieves all jobs associated with the installed Helm release
+// ListCronJobs lists all the Cron Jobs that are associated with the installed Helm release.
 func (f *Framework) ListCronJobs() (*batchv1.CronJobList, error) {
 	opts := f.getHelmReleaseSelectorListOptions()
 	return f.KubeClient.BatchV1beta1().CronJobs(corev1.NamespaceAll).List(opts)
 }
 
-// GetCronJob retrieves the specified deployment
+// GetCronJob retrieves the specified Cron Job.
 func (f *Framework) GetCronJob(name, namespace string) (*batchv1.CronJob, error) {
 	return f.KubeClient.BatchV1beta1().CronJobs(namespace).Get(name, metav1.GetOptions{})
 }
 
-// LoadCronJobManifest takes a manifest and decodes it into a CronJob object
+// LoadCronJobManifest takes a manifest and decodes it into a Cron Job object.
 func (f *Framework) LoadCronJobManifest(pathToManifest string) (*batchv1.CronJob, error) {
 	manifest, err := openFile(pathToManifest)
 	if err != nil {
@@ -50,7 +50,7 @@ func (f *Framework) LoadCronJobManifest(pathToManifest string) (*batchv1.CronJob
 	return &job, nil
 }
 
-// CreateCronJob creates a CronJob resource and then waits for it to appear
+// CreateCronJob creates a Cron Job resource and then waits for it to show.
 func (f *Framework) CreateCronJob(namespace string, job *batchv1.CronJob) error {
 	if _, err := f.KubeClient.BatchV1beta1().CronJobs(namespace).Create(job); err != nil {
 		return err
@@ -58,12 +58,12 @@ func (f *Framework) CreateCronJob(namespace string, job *batchv1.CronJob) error 
 	return f.WaitForCronJob(job.Name, namespace, 2*time.Minute)
 }
 
-// DeleteCronJob deletes the specified deployment
+// DeleteCronJob deletes the specified Cron Job.
 func (f *Framework) DeleteCronJob(name, namespace string) error {
 	return f.KubeClient.BatchV1beta1().CronJobs(namespace).Delete(name, &metav1.DeleteOptions{})
 }
 
-// WaitForCronJob waits until job deployment has completed
+// WaitForCronJob waits until the Cron Job deployment is complete.
 func (f *Framework) WaitForCronJob(name, namespace string, timeout time.Duration) error {
 	return wait.Poll(time.Second*5, timeout, func() (bool, error) {
 		job, err := f.GetCronJob(name, namespace)

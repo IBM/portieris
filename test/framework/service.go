@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@ package framework
 
 import corev1 "k8s.io/api/core/v1"
 
-// ListServices retrieves all services associated with the installed Helm release
+// ListServices lists all services that are associated with the installed Helm release.
 func (f *Framework) ListServices() (*corev1.ServiceList, error) {
 	opts := f.getHelmReleaseSelectorListOptions()
 	return f.KubeClient.CoreV1().Services(corev1.NamespaceAll).List(opts)
