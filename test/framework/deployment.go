@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/yaml"
 )
 
-// LoadDeploymentManifest takes a manifest and decodes it into a deployment object
+// LoadDeploymentManifest takes a manifest and decodes it into a deployment object.
 func (f *Framework) LoadDeploymentManifest(pathToManifest string) (*v1.Deployment, error) {
 	manifest, err := openFile(pathToManifest)
 	if err != nil {
@@ -39,7 +39,7 @@ func (f *Framework) LoadDeploymentManifest(pathToManifest string) (*v1.Deploymen
 	return &deployment, nil
 }
 
-// CreateDeployment creates a deployment resource and then waits for it to appear
+// CreateDeployment creates a deployment and waits for it to show.
 func (f *Framework) CreateDeployment(namespace string, deployment *v1.Deployment) error {
 	if _, err := f.KubeClient.AppsV1().Deployments(namespace).Create(deployment); err != nil {
 		return err
@@ -51,27 +51,27 @@ func (f *Framework) CreateDeployment(namespace string, deployment *v1.Deployment
 	return nil
 }
 
-// GetDeployment retrieves the specified deployment
+// GetDeployment retrieves the specified deployment.
 func (f *Framework) GetDeployment(name, namespace string) (*v1.Deployment, error) {
 	return f.KubeClient.AppsV1().Deployments(namespace).Get(name, metav1.GetOptions{})
 }
 
-// PatchDeployment patches the specified deployment
+// PatchDeployment patches the specified deployment.
 func (f *Framework) PatchDeployment(name, namespace, patch string) (*v1.Deployment, error) {
 	return f.KubeClient.AppsV1().Deployments(namespace).Patch(name, types.StrategicMergePatchType, []byte(patch))
 }
 
-// ReplaceDeployment patches the specified deployment
+// ReplaceDeployment replaces the specified deployment.
 func (f *Framework) ReplaceDeployment(namespace string, deployment *v1.Deployment) (*v1.Deployment, error) {
 	return f.KubeClient.AppsV1().Deployments(namespace).Update(deployment)
 }
 
-// DeleteDeployment deletes the specified deployment
+// DeleteDeployment deletes the specified deployment.
 func (f *Framework) DeleteDeployment(name, namespace string) error {
 	return f.KubeClient.AppsV1().Deployments(namespace).Delete(name, &metav1.DeleteOptions{})
 }
 
-// WaitForDeployment waits until the specified deployment is created or the timeout is reached
+// WaitForDeployment waits until the specified deployment is created or the timeout is reached.
 func (f *Framework) WaitForDeployment(name, namespace string, timeout time.Duration) error {
 	return wait.Poll(time.Second*5, timeout, func() (bool, error) {
 		if _, err := f.GetDeployment(name, namespace); err != nil {
@@ -81,7 +81,7 @@ func (f *Framework) WaitForDeployment(name, namespace string, timeout time.Durat
 	})
 }
 
-// WaitForDeploymentPods waits until the specified deployment's pods are created or the timeout is reached
+// WaitForDeploymentPods waits until the specified deployment's pods are created or the timeout is reached.
 func (f *Framework) WaitForDeploymentPods(name, namespace string, timeout time.Duration) error {
 	return wait.Poll(time.Second*5, timeout, func() (bool, error) {
 		deployment, err := f.GetDeployment(name, namespace)
@@ -95,7 +95,7 @@ func (f *Framework) WaitForDeploymentPods(name, namespace string, timeout time.D
 	})
 }
 
-// ListDeployments retrieves all deployments associated with the installed Helm release
+// ListDeployments lists all deployments that are associated with the installed Helm release.
 func (f *Framework) ListDeployments() (*v1.DeploymentList, error) {
 	opts := f.getHelmReleaseSelectorListOptions()
 	return f.KubeClient.AppsV1().Deployments(corev1.NamespaceAll).List(opts)

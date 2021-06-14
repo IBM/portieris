@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,12 +24,12 @@ import (
 	"k8s.io/apimachinery/pkg/util/yaml"
 )
 
-// GetPod retrieves the specified deployment
+// GetPod retrieves the specified pod.
 func (f *Framework) GetPod(name, namespace string) (*corev1.Pod, error) {
 	return f.KubeClient.CoreV1().Pods(namespace).Get(name, metav1.GetOptions{})
 }
 
-// LoadPodManifest takes a manifest and decodes it into a Replicaset object
+// LoadPodManifest takes a manifest and decodes it into a pod.
 func (f *Framework) LoadPodManifest(pathToManifest string) (*corev1.Pod, error) {
 	manifest, err := openFile(pathToManifest)
 	if err != nil {
@@ -42,7 +42,7 @@ func (f *Framework) LoadPodManifest(pathToManifest string) (*corev1.Pod, error) 
 	return &pod, nil
 }
 
-// CreatePod creates a Replicaset resource and then waits for it to appear
+// CreatePod creates a pod and waits for it to show.
 func (f *Framework) CreatePod(namespace string, pod *corev1.Pod) error {
 	if _, err := f.KubeClient.CoreV1().Pods(namespace).Create(pod); err != nil {
 		return err
@@ -50,12 +50,12 @@ func (f *Framework) CreatePod(namespace string, pod *corev1.Pod) error {
 	return f.WaitForPod(pod.Name, namespace, 2*time.Minute)
 }
 
-// DeletePod deletes the specified deployment
+// DeletePod deletes the specified pod.
 func (f *Framework) DeletePod(name, namespace string) error {
 	return f.KubeClient.CoreV1().Pods(namespace).Delete(name, &metav1.DeleteOptions{})
 }
 
-// WaitForPod waits until pod deployment has completed
+// WaitForPod waits until the pod deployment completes.
 func (f *Framework) WaitForPod(name, namespace string, timeout time.Duration) error {
 	return wait.Poll(time.Second*5, timeout, func() (bool, error) {
 		pod, err := f.GetPod(name, namespace)
@@ -70,7 +70,7 @@ func (f *Framework) WaitForPod(name, namespace string, timeout time.Duration) er
 	})
 }
 
-// WaitForPodDelete waits until pod has been deleted
+// WaitForPodDelete waits until the pod is deleted.
 func (f *Framework) WaitForPodDelete(name, namespace string, timeout time.Duration) error {
 	return wait.Poll(time.Second*5, timeout, func() (bool, error) {
 		_, err := f.GetPod(name, namespace)
@@ -81,7 +81,7 @@ func (f *Framework) WaitForPodDelete(name, namespace string, timeout time.Durati
 	})
 }
 
-//DeleteRandomPod deletes first pod returned in pod list for a given namespace
+// DeleteRandomPod deletes the first pod that is returned in the list of pods for a specified namespace.
 func (f *Framework) DeleteRandomPod(namespace string) error {
 	podList, err := f.KubeClient.CoreV1().Pods(namespace).List(metav1.ListOptions{})
 	if err != nil {
