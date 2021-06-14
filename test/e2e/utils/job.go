@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ func buildJob(t *testing.T, fw *framework.Framework, manifestLocation, namespace
 	return job
 }
 
-// TestJobRunnable tests whether a manifest is deployable to the specified namespace
+// TestJobRunnable tests whether a manifest is deployable to the specified namespace.
 func TestJobRunnable(t *testing.T, fw *framework.Framework, manifestLocation, namespace string) {
 	job := buildJob(t, fw, manifestLocation, namespace, false)
 	defer fw.DeleteJob(job.Name, job.Namespace)
@@ -58,7 +58,7 @@ func TestJobRunnable(t *testing.T, fw *framework.Framework, manifestLocation, na
 
 }
 
-// TestJobNotRunnable tests whether a manifest is deployable to the specified namespace
+// TestJobNotRunnable tests whether a manifest is deployable to the specified namespace.
 func TestJobNotRunnable(t *testing.T, fw *framework.Framework, manifestLocation, namespace string) {
 	job := buildJob(t, fw, manifestLocation, namespace, true)
 	if job != nil {

@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ func (f *Framework) getHelmReleaseSelectorListOptions() metav1.ListOptions {
 	}
 }
 
-// GenerateTestAnnotation returns a unique test annotation for patching resources
+// GenerateTestAnnotation returns a unique test annotation that is used to patch resources.
 func (f *Framework) GenerateTestAnnotation() string {
 	return fmt.Sprintf(`
 		{
