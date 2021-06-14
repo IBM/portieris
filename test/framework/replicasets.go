@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/yaml"
 )
 
-// LoadReplicaSetManifest takes a manifest and decodes it into a Replicaset object
+// LoadReplicaSetManifest takes a manifest and decodes it into a ReplicaSet object.
 func (f *Framework) LoadReplicaSetManifest(pathToManifest string) (*v1.ReplicaSet, error) {
 	manifest, err := openFile(pathToManifest)
 	if err != nil {
@@ -39,7 +39,7 @@ func (f *Framework) LoadReplicaSetManifest(pathToManifest string) (*v1.ReplicaSe
 	return &replicaset, nil
 }
 
-// CreateReplicaSet creates a Replicaset resource and then waits for it to appear
+// CreateReplicaSet creates a ReplicaSet and waits for it to show.
 func (f *Framework) CreateReplicaSet(namespace string, replicaset *v1.ReplicaSet) error {
 	if _, err := f.KubeClient.AppsV1().ReplicaSets(namespace).Create(replicaset); err != nil {
 		return err
@@ -51,22 +51,22 @@ func (f *Framework) CreateReplicaSet(namespace string, replicaset *v1.ReplicaSet
 	return nil
 }
 
-// GetReplicaSet retrieves the specified deployment
+// GetReplicaSet retrieves the specified ReplicaSet.
 func (f *Framework) GetReplicaSet(name, namespace string) (*v1.ReplicaSet, error) {
 	return f.KubeClient.AppsV1().ReplicaSets(namespace).Get(name, metav1.GetOptions{})
 }
 
-// // PatchDeployment patches the specified deployment
+// // PatchDeployment patches the specified deployment.
 // func (f *Framework) PatchDeployment(name, namespace, patch string) (*v1.Deployment, error) {
 // 	return f.KubeClient.AppsV1().Deployments(namespace).Patch(name, types.StrategicMergePatchType, []byte(patch))
 // }
 
-// DeleteReplicaSet deletes the specified deployment
+// DeleteReplicaSet deletes the specified ReplicaSet.
 func (f *Framework) DeleteReplicaSet(name, namespace string) error {
 	return f.KubeClient.AppsV1().ReplicaSets(namespace).Delete(name, &metav1.DeleteOptions{})
 }
 
-// WaitForReplicaSet waits until the specified Replicaset is created or the timeout is reached
+// WaitForReplicaSet waits until the specified ReplicaSet is created or the timeout is reached.
 func (f *Framework) WaitForReplicaSet(name, namespace string, timeout time.Duration) error {
 	return wait.Poll(time.Second*5, timeout, func() (bool, error) {
 		if _, err := f.GetReplicaSet(name, namespace); err != nil {
@@ -76,7 +76,7 @@ func (f *Framework) WaitForReplicaSet(name, namespace string, timeout time.Durat
 	})
 }
 
-// WaitForReplicaSetPods waits until the specified deployment's pods are created or the timeout is reached
+// WaitForReplicaSetPods waits until the specified ReplicaSet's pods are created or the timeout is reached.
 func (f *Framework) WaitForReplicaSetPods(name, namespace string, timeout time.Duration) error {
 	return wait.Poll(time.Second*5, timeout, func() (bool, error) {
 		replicaset, err := f.GetReplicaSet(name, namespace)
@@ -90,7 +90,7 @@ func (f *Framework) WaitForReplicaSetPods(name, namespace string, timeout time.D
 	})
 }
 
-// ListReplicaSet retrieves all Replicaset associated with the installed Helm release
+// ListReplicaSet lists all the ReplicaSets that are associated with the installed Helm release.
 func (f *Framework) ListReplicaSet() (*v1.ReplicaSetList, error) {
 	opts := f.getHelmReleaseSelectorListOptions()
 	return f.KubeClient.AppsV1().ReplicaSets(corev1.NamespaceAll).List(opts)

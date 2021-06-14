@@ -26,7 +26,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/yaml"
 )
 
-// LoadClusterImagePolicyManifest takes a manifest and decodes it into a ImagePolicy object
+// LoadClusterImagePolicyManifest takes a manifest and decodes it into a cluster image policy (ClusterImagePolicy) object.
 func (f *Framework) LoadClusterImagePolicyManifest(pathToManifest string) (*policyv1.ClusterImagePolicy, error) {
 	manifest, err := openFile(pathToManifest)
 	if err != nil {
@@ -39,7 +39,7 @@ func (f *Framework) LoadClusterImagePolicyManifest(pathToManifest string) (*poli
 	return &ip, nil
 }
 
-// CreateClusterImagePolicy creates the ClusterImagePolicy
+// CreateClusterImagePolicy creates the cluster image policy (ClusterImagePolicy).
 func (f *Framework) CreateClusterImagePolicy(clusterImagePolicy *policyv1.ClusterImagePolicy) error {
 	if _, err := f.ClusterImagePolicyClient.PortierisV1().ClusterImagePolicies().Create(clusterImagePolicy); err != nil {
 		return fmt.Errorf("Error creating ClusterImagePolicy %q: %v", clusterImagePolicy.Name, err)
@@ -47,17 +47,17 @@ func (f *Framework) CreateClusterImagePolicy(clusterImagePolicy *policyv1.Cluste
 	return f.WaitForClusterImagePolicy(clusterImagePolicy.Name, time.Minute)
 }
 
-// GetClusterImagePolicy retrieves the ClusterImagePolicy
+// GetClusterImagePolicy retrieves the cluster image policy (ClusterImagePolicy).
 func (f *Framework) GetClusterImagePolicy(name string) (*policyv1.ClusterImagePolicy, error) {
 	return f.ClusterImagePolicyClient.PortierisV1().ClusterImagePolicies().Get(name, metav1.GetOptions{})
 }
 
-// ListClusterImagePolicies creates the ClusterImagePolicy
+// ListClusterImagePolicies lists the cluster image policies.
 func (f *Framework) ListClusterImagePolicies() (*policyv1.ClusterImagePolicyList, error) {
 	return f.ClusterImagePolicyClient.PortierisV1().ClusterImagePolicies().List(metav1.ListOptions{})
 }
 
-// WaitForClusterImagePolicy waits until the ClusterImagePolicy is created or the timeout is reached
+// WaitForClusterImagePolicy waits until the cluster image policy (ClusterImagePolicy) is created or the timeout is reached.
 func (f *Framework) WaitForClusterImagePolicy(name string, timeout time.Duration) error {
 	return wait.Poll(time.Second*5, timeout, func() (bool, error) {
 		if _, err := f.GetClusterImagePolicy(name); err != nil {
@@ -67,7 +67,7 @@ func (f *Framework) WaitForClusterImagePolicy(name string, timeout time.Duration
 	})
 }
 
-// WaitForClusterImagePolicyDefinition waits until the ClusterImagePolicy CRD is created or the timeout is reached
+// WaitForClusterImagePolicyDefinition waits until the cluster image policy (ClusterImagePolicy) custom resource definition (CRD) is created or the timeout is reached.
 func (f *Framework) WaitForClusterImagePolicyDefinition(timeout time.Duration) error {
 	return wait.Poll(time.Second*5, timeout, func() (bool, error) {
 		if _, err := f.GetClusterImagePolicyDefinition(); err != nil {
@@ -78,12 +78,12 @@ func (f *Framework) WaitForClusterImagePolicyDefinition(timeout time.Duration) e
 	})
 }
 
-// GetClusterImagePolicyDefinition retrieves the ClusterImagePolicy CRD
+// GetClusterImagePolicyDefinition retrieves the cluster image policy (ClusterImagePolicy) custom resource definition (CRD).
 func (f *Framework) GetClusterImagePolicyDefinition() (*apiextensions.CustomResourceDefinition, error) {
 	return f.CustomResourceDefinitionClient.Get(clusterImagePolicyCRDName, metav1.GetOptions{})
 }
 
-// DeleteClusterImagePolicy deletes the specified ClusterImagePolicy
+// DeleteClusterImagePolicy deletes the specified cluster image policy (ClusterImagePolicy).
 func (f *Framework) DeleteClusterImagePolicy(name string) error {
 	return f.ClusterImagePolicyClient.PortierisV1().ClusterImagePolicies().Delete(name, &metav1.DeleteOptions{})
 }

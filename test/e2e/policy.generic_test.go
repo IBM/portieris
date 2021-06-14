@@ -79,7 +79,7 @@ func Test_JobTypesSuccess(t *testing.T) {
 	})
 }
 
-// TODO uncomment when issue #34 has been addressed
+// TODO uncomment when issue #34 is addressed.
 /* func Test_JobTypesSuccessCustomTrustServer(t *testing.T) {
 	utils.CheckIfTesting(t, testGeneric)
 
@@ -252,15 +252,15 @@ func Test_OperationsSucces(t *testing.T) {
 
 	t.Run("Policy not enforced on child resource (pod)", func(t *testing.T) {
 		t.Parallel()
-		// Create namespace and policy to allow all
+		// Create a namespace and policy to allow all.
 		namespace := utils.CreateImagePolicyInstalledNamespace(t, framework, "./testdata/imagepolicy/allow-all.yaml", "")
-		//Start deployment
+		// Start the deployment.
 		deploymentName := utils.TestStartDeployNoDelete(t, framework, "./testdata/deployment/global-nginx-unsigned.yaml", namespace.Name)
-		// Change policy to deny
+		// Change the policy to deny.
 		utils.UpdateImagePolicy(t, framework, "./testdata/imagepolicy/allow-signed.yaml", namespace.Name, "allow-all")
-		// Kill Pod
+		// Stop the pod.
 		utils.KillPod(t, framework, namespace.Name)
-		// Check pod comes back
+		// Check the pod comes back.
 		utils.TestCurrentDeployStatus(t, framework, namespace.Name, deploymentName)
 		utils.CleanUpImagePolicyTest(t, framework, namespace.Name)
 	})
@@ -281,11 +281,11 @@ func Test_OperationsSucces(t *testing.T) {
 			   }
 			}
 		 }`
-		// Create namespace and policy to allow all
+		// Create a namespace and policy to allow all.
 		namespace := utils.CreateImagePolicyInstalledNamespace(t, framework, "./testdata/imagepolicy/allow-signed.yaml", "")
-		//Start deployment
+		// Start the deployment.
 		deploymentName := utils.TestStartDeployNoDelete(t, framework, "./testdata/deployment/global-nginx-signed.yaml", namespace.Name)
-		// Change policy to deny
+		// Change the policy to deny.
 		utils.TestDeploymentNotRunnableOnPatch(t, framework, deploymentName, patchString, namespace.Name)
 
 		utils.CleanUpImagePolicyTest(t, framework, namespace.Name)
@@ -293,11 +293,11 @@ func Test_OperationsSucces(t *testing.T) {
 
 	t.Run("Policy enforced on replace", func(t *testing.T) {
 		t.Parallel()
-		// Create namespace and policy to allow all
+		// Create a namespace and policy to allow all.
 		namespace := utils.CreateImagePolicyInstalledNamespace(t, framework, "./testdata/imagepolicy/allow-signed.yaml", "")
-		//Start deployment
+		// Start the deployment.
 		_ = utils.TestStartDeployNoDelete(t, framework, "./testdata/deployment/global-nginx-signed.yaml", namespace.Name)
-		// Change policy to deny
+		// Change the policy to deny.
 		utils.TestDeploymentNotRunnableOnReplace(t, framework, "./testdata/deployment/global-signed-patch-to-unsigned.yaml", namespace.Name)
 
 		utils.CleanUpImagePolicyTest(t, framework, namespace.Name)
