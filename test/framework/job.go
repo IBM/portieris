@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,18 +25,18 @@ import (
 	"k8s.io/apimachinery/pkg/util/yaml"
 )
 
-// ListJobs retrieves all jobs associated with the installed Helm release
+// ListJobs lists all jobs that are associated with the installed Helm release.
 func (f *Framework) ListJobs() (*batchv1.JobList, error) {
 	opts := f.getHelmReleaseSelectorListOptions()
 	return f.KubeClient.BatchV1().Jobs(corev1.NamespaceAll).List(opts)
 }
 
-// GetJob retrieves the specified deployment
+// GetJob retrieves the specified job.
 func (f *Framework) GetJob(name, namespace string) (*batchv1.Job, error) {
 	return f.KubeClient.BatchV1().Jobs(namespace).Get(name, metav1.GetOptions{})
 }
 
-// LoadJobManifest takes a manifest and decodes it into a Job object
+// LoadJobManifest takes a manifest and decodes it into a job.
 func (f *Framework) LoadJobManifest(pathToManifest string) (*batchv1.Job, error) {
 	manifest, err := openFile(pathToManifest)
 	if err != nil {
@@ -49,7 +49,7 @@ func (f *Framework) LoadJobManifest(pathToManifest string) (*batchv1.Job, error)
 	return &job, nil
 }
 
-// CreateJob creates a Job resource and then waits for it to appear
+// CreateJob creates a job and waits for it to show.
 func (f *Framework) CreateJob(namespace string, job *batchv1.Job) error {
 	if _, err := f.KubeClient.BatchV1().Jobs(namespace).Create(job); err != nil {
 		return err
@@ -57,12 +57,12 @@ func (f *Framework) CreateJob(namespace string, job *batchv1.Job) error {
 	return f.WaitForJob(job.Name, namespace, time.Minute)
 }
 
-// DeleteJob deletes the specified deployment
+// DeleteJob deletes the specified job.
 func (f *Framework) DeleteJob(name, namespace string) error {
 	return f.KubeClient.BatchV1().Jobs(namespace).Delete(name, &metav1.DeleteOptions{})
 }
 
-// WaitForJob waits until job deployment has completed
+// WaitForJob waits until the job completes.
 func (f *Framework) WaitForJob(name, namespace string, timeout time.Duration) error {
 	return wait.Poll(time.Second*5, timeout, func() (bool, error) {
 		job, err := f.GetJob(name, namespace)
