@@ -18,7 +18,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"k8s.io/api/admission/v1beta1"
+	admissionv1 "k8s.io/api/admission/v1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	extensionsv1beta1 "k8s.io/api/extensions/v1beta1"
@@ -651,7 +651,7 @@ func TestWrapper_GetPodSpec(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			ar := &v1beta1.AdmissionRequest{
+			ar := &admissionv1.AdmissionRequest{
 				Resource:  tt.ar.Resource,
 				Namespace: tt.ar.Namespace,
 				Object: runtime.RawExtension{

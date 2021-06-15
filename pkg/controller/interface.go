@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018,2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,9 +14,9 @@
 
 package controller
 
-import admissionv1beta1 "k8s.io/api/admission/v1beta1"
+import admissionv1 "k8s.io/api/admission/v1"
 
 // Interface are the methods required to implement a controller for the webhook package
 type Interface interface {
-	Admit(*admissionv1beta1.AdmissionRequest) *admissionv1beta1.AdmissionResponse
+	Admit(*admissionv1.AdmissionRequest) *admissionv1.AdmissionResponse
 }

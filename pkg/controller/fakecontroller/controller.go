@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018,2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@
 
 package fakecontroller
 
-import admissionv1beta1 "k8s.io/api/admission/v1beta1"
+import admissionv1 "k8s.io/api/admission/v1"
 
 // Controller is a fake controller for stubbing
 type Controller struct {
 }
 
 // Admit is a fake admit function for stubbing
-func (c *Controller) Admit(admissionRequest *admissionv1beta1.AdmissionRequest) *admissionv1beta1.AdmissionResponse {
-	return &admissionv1beta1.AdmissionResponse{Allowed: true}
+func (c *Controller) Admit(admissionRequest *admissionv1.AdmissionRequest) *admissionv1.AdmissionResponse {
+	return &admissionv1.AdmissionResponse{Allowed: true}
 }

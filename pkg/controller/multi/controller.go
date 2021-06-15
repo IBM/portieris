@@ -28,7 +28,7 @@ import (
 	"github.com/IBM/portieris/pkg/webhook"
 	"github.com/IBM/portieris/types"
 	"github.com/golang/glog"
-	admissionv1beta1 "k8s.io/api/admission/v1beta1"
+	admissionv1 "k8s.io/api/admission/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
@@ -60,7 +60,7 @@ func NewController(kubeWrapper kubernetes.WrapperInterface, policyClient policy.
 }
 
 // Admit is the admissionRequest handler
-func (c *Controller) Admit(admissionRequest *admissionv1beta1.AdmissionRequest) *admissionv1beta1.AdmissionResponse {
+func (c *Controller) Admit(admissionRequest *admissionv1.AdmissionRequest) *admissionv1.AdmissionResponse {
 	glog.Infof("Processing admission request for %s on %s", admissionRequest.Operation, admissionRequest.Name)
 
 	podSpecLocation, ps, err := c.kubeClientsetWrapper.GetPodSpec(admissionRequest)
@@ -68,7 +68,7 @@ func (c *Controller) Admit(admissionRequest *admissionv1beta1.AdmissionRequest) 
 	case nil:
 		break
 	case kubernetes.ErrObjectHasParents, kubernetes.ErrObjectHasZeroReplicas:
-		return &admissionv1beta1.AdmissionResponse{
+		return &admissionv1.AdmissionResponse{
 			Allowed: true,
 		}
 	default:
@@ -80,7 +80,7 @@ func (c *Controller) Admit(admissionRequest *admissionv1beta1.AdmissionRequest) 
 	return c.admitPod(admissionRequest.Namespace, podSpecLocation, *ps)
 }
 
-func (c *Controller) admitPod(namespace, specPath string, pod corev1.PodSpec) *admissionv1beta1.AdmissionResponse {
+func (c *Controller) admitPod(namespace, specPath string, pod corev1.PodSpec) *admissionv1.AdmissionResponse {
 	a := &webhook.AdmissionResponder{}
 	patches := []types.JSONPatch{}
 	decisions := map[string][]string{}

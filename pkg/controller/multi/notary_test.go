@@ -33,7 +33,7 @@ import (
 	notaryclient "github.com/theupdateframework/notary/client"
 	store "github.com/theupdateframework/notary/storage"
 	"github.com/theupdateframework/notary/tuf/data"
-	"k8s.io/api/admission/v1beta1"
+	admissionv1 "k8s.io/api/admission/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8sfake "k8s.io/client-go/kubernetes/fake"
@@ -55,7 +55,7 @@ var _ = Describe("Main", func() {
 			registry1, registry2                                     string
 			fakeSecret, fakeSecret1, fakeSecret2, fakeSecretWrongReg *corev1.Secret
 			w                                                        *httptest.ResponseRecorder
-			resp                                                     *v1beta1.AdmissionReview
+			resp                                                     *admissionv1.AdmissionReview
 		)
 
 		fakeGetRepo := func() {
@@ -168,7 +168,7 @@ var _ = Describe("Main", func() {
 
 			BeforeEach(func() {
 				w = httptest.NewRecorder()
-				resp = &v1beta1.AdmissionReview{}
+				resp = &admissionv1.AdmissionReview{}
 			})
 
 			Context("if there is not a relevant policy to apply`", func() {
@@ -193,7 +193,7 @@ var _ = Describe("Main", func() {
 
 			BeforeEach(func() {
 				w = httptest.NewRecorder()
-				resp = &v1beta1.AdmissionReview{}
+				resp = &admissionv1.AdmissionReview{}
 			})
 
 			Context("if the `trust` policy was not specified`", func() {

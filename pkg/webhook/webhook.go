@@ -1,4 +1,4 @@
-// Copyright 2018, 2020 Portieris Authors.
+// Copyright 2018, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import (
 	"github.com/golang/glog"
 
 	"github.com/IBM/portieris/pkg/controller"
-	admissionv1beta1 "k8s.io/api/admission/v1beta1"
+	admissionv1 "k8s.io/api/admission/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 )
@@ -63,7 +63,7 @@ func (s *Server) HandleAdmissionRequest(w http.ResponseWriter, r *http.Request) 
 	defer r.Body.Close()
 	body, _ := ioutil.ReadAll(r.Body)
 
-	var admissionReview admissionv1beta1.AdmissionReview
+	var admissionReview admissionv1.AdmissionReview
 	responder := &AdmissionResponder{}
 	deserializer := codec.UniversalDeserializer()
 	if _, _, err := deserializer.Decode(body, nil, &admissionReview); err != nil {
@@ -129,8 +129,8 @@ func (s *Server) Run() {
 	server.ListenAndServeTLS("", "")
 }
 
-func reviewResponseToByte(admissionResponse *admissionv1beta1.AdmissionResponse, admissionReview admissionv1beta1.AdmissionReview) []byte {
-	response := admissionv1beta1.AdmissionReview{}
+func reviewResponseToByte(admissionResponse *admissionv1.AdmissionResponse, admissionReview admissionv1.AdmissionReview) []byte {
+	response := admissionv1.AdmissionReview{}
 	if admissionResponse != nil {
 		response.Response = admissionResponse
 		if admissionReview.Request != nil {
