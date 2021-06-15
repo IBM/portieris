@@ -26,6 +26,7 @@ import (
 
 	fakeController "github.com/IBM/portieris/pkg/controller/fakecontroller"
 	admissionv1 "k8s.io/api/admission/v1"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -80,7 +81,7 @@ func Test_reviewResponseToByte(t *testing.T) {
 		wantAdmissionReview admissionv1.AdmissionReview
 	}{
 		{
-			name:              "Review response matches inputted review with matching request/response UID",
+			name:              "Review response matches input review with matching request/response UID",
 			admissionResponse: &admissionv1.AdmissionResponse{UID: "responseUID", Allowed: true},
 			admissionReview: admissionv1.AdmissionReview{
 				Request: &admissionv1.AdmissionRequest{UID: "requestUID"},
@@ -94,13 +95,24 @@ func Test_reviewResponseToByte(t *testing.T) {
 			admissionResponse: &admissionv1.AdmissionResponse{},
 			admissionReview: admissionv1.AdmissionReview{
 				Request: &admissionv1.AdmissionRequest{
-					UID:       "requestUID",
 					Object:    runtime.RawExtension{Raw: []byte("SomeBytes")},
 					OldObject: runtime.RawExtension{Raw: []byte("SomeBytes")},
 				},
 			},
 			wantAdmissionReview: admissionv1.AdmissionReview{
-				Response: &admissionv1.AdmissionResponse{UID: "requestUID"},
+				Response: &admissionv1.AdmissionResponse{},
+			},
+		},
+		{
+			name:              "Review response object has TypeMeta from incoming review",
+			admissionResponse: &admissionv1.AdmissionResponse{},
+			admissionReview: admissionv1.AdmissionReview{
+				TypeMeta: v1.TypeMeta{Kind: "someKind", APIVersion: "APIVersion10"},
+				Request:  &admissionv1.AdmissionRequest{},
+			},
+			wantAdmissionReview: admissionv1.AdmissionReview{
+				TypeMeta: v1.TypeMeta{Kind: "someKind", APIVersion: "APIVersion10"},
+				Response: &admissionv1.AdmissionResponse{},
 			},
 		},
 	}

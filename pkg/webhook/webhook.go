@@ -132,6 +132,7 @@ func (s *Server) Run() {
 func reviewResponseToByte(admissionResponse *admissionv1.AdmissionResponse, admissionReview admissionv1.AdmissionReview) []byte {
 	response := admissionv1.AdmissionReview{}
 	if admissionResponse != nil {
+		response.TypeMeta = admissionReview.TypeMeta
 		response.Response = admissionResponse
 		if admissionReview.Request != nil {
 			response.Response.UID = admissionReview.Request.UID
