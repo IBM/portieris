@@ -112,25 +112,25 @@ type TrustSigner struct {
 // Simple .
 type Simple struct {
 	Requirements []SimpleRequirement `json:"requirements"`
-	StoreURL     string              `json:"storeURL,omitEmpty"`
-	StoreSecret  string              `json:"storeSecret,omitEmpty"`
+	StoreURL     string              `json:"storeURL,omitempty"`
+	StoreSecret  string              `json:"storeSecret,omitempty"`
 }
 
 // SimpleRequirement .
 type SimpleRequirement struct {
 	Type               string              `json:"type"`
-	KeySecret          string              `json:"keySecret,omitEmpty"`
-	KeySecretNamespace string              `json:"keySecretNamespace,omitEmpty"`
-	SignedIdentity     IdentityRequirement `json:"signedIdentity,omitEmpty"`
+	KeySecret          string              `json:"keySecret,omitempty"`
+	KeySecretNamespace string              `json:"keySecretNamespace,omitempty"`
+	SignedIdentity     IdentityRequirement `json:"signedIdentity,omitempty"`
 }
 
 // IdentityRequirement .
 type IdentityRequirement struct {
 	Type             string `json:"type"`
-	DockerReference  string `json:"dockerReference,omitEmpty"`
-	DockerRepository string `json:"dockerRepository,omitEmpty"`
-	Prefix           string `json:"prefix,omitEmpty"`
-	SignedPrefix     string `json:"signedPrefix,omitEmpty"`
+	DockerReference  string `json:"dockerReference,omitempty"`
+	DockerRepository string `json:"dockerRepository,omitempty"`
+	Prefix           string `json:"prefix,omitempty"`
+	SignedPrefix     string `json:"signedPrefix,omitempty"`
 }
 
 // Vulnerability policy
