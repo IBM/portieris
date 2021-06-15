@@ -18,7 +18,7 @@ import (
 	"fmt"
 
 	"github.com/golang/glog"
-	"k8s.io/api/admission/v1beta1"
+	admissionv1 "k8s.io/api/admission/v1"
 	appsv1 "k8s.io/api/apps/v1"
 	appsv1beta1 "k8s.io/api/apps/v1beta1"
 	appsv1beta2 "k8s.io/api/apps/v1beta2"
@@ -60,7 +60,7 @@ var supportedKinds = map[string]struct{}{
 }
 
 // GetPodSpec retrieves the podspec from the admission request passed in
-func (w *Wrapper) GetPodSpec(ar *v1beta1.AdmissionRequest) (string, *corev1.PodSpec, error) {
+func (w *Wrapper) GetPodSpec(ar *admissionv1.AdmissionRequest) (string, *corev1.PodSpec, error) {
 	ps := corev1.PodSpec{}
 	var templateString string
 

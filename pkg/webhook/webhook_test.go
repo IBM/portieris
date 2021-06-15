@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	fakeController "github.com/IBM/portieris/pkg/controller/fakecontroller"
-	admissionv1beta1 "k8s.io/api/admission/v1beta1"
+	admissionv1 "k8s.io/api/admission/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -40,13 +40,13 @@ func TestServer_HandleAdmissionRequest(t *testing.T) {
 
 	tests := []struct {
 		name            string
-		admissionReview admissionv1beta1.AdmissionReview
+		admissionReview admissionv1.AdmissionReview
 		allowed         bool
 	}{
 		{
 			name: "Calls controller admit with admissionRequest from http request",
-			admissionReview: admissionv1beta1.AdmissionReview{
-				Request: &admissionv1beta1.AdmissionRequest{UID: "requestUID"},
+			admissionReview: admissionv1.AdmissionReview{
+				Request: &admissionv1.AdmissionRequest{UID: "requestUID"},
 			},
 			allowed: true,
 		},
@@ -64,7 +64,7 @@ func TestServer_HandleAdmissionRequest(t *testing.T) {
 			handler := http.HandlerFunc(server.HandleAdmissionRequest)
 			handler.ServeHTTP(rr, req)
 
-			var reviewOut admissionv1beta1.AdmissionReview
+			var reviewOut admissionv1.AdmissionReview
 			bytesOut, _ := ioutil.ReadAll(rr.Body)
 			json.Unmarshal(bytesOut, &reviewOut)
 			assert.Equal(t, tt.allowed, reviewOut.Response.Allowed)
@@ -75,39 +75,39 @@ func TestServer_HandleAdmissionRequest(t *testing.T) {
 func Test_reviewResponseToByte(t *testing.T) {
 	tests := []struct {
 		name                string
-		admissionResponse   *admissionv1beta1.AdmissionResponse
-		admissionReview     admissionv1beta1.AdmissionReview
-		wantAdmissionReview admissionv1beta1.AdmissionReview
+		admissionResponse   *admissionv1.AdmissionResponse
+		admissionReview     admissionv1.AdmissionReview
+		wantAdmissionReview admissionv1.AdmissionReview
 	}{
 		{
 			name:              "Review response matches inputted review with matching request/response UID",
-			admissionResponse: &admissionv1beta1.AdmissionResponse{UID: "responseUID", Allowed: true},
-			admissionReview: admissionv1beta1.AdmissionReview{
-				Request: &admissionv1beta1.AdmissionRequest{UID: "requestUID"},
+			admissionResponse: &admissionv1.AdmissionResponse{UID: "responseUID", Allowed: true},
+			admissionReview: admissionv1.AdmissionReview{
+				Request: &admissionv1.AdmissionRequest{UID: "requestUID"},
 			},
-			wantAdmissionReview: admissionv1beta1.AdmissionReview{
-				Response: &admissionv1beta1.AdmissionResponse{UID: "requestUID", Allowed: true},
+			wantAdmissionReview: admissionv1.AdmissionReview{
+				Response: &admissionv1.AdmissionResponse{UID: "requestUID", Allowed: true},
 			},
 		},
 		{
 			name:              "Review response object and oldobject are reset",
-			admissionResponse: &admissionv1beta1.AdmissionResponse{},
-			admissionReview: admissionv1beta1.AdmissionReview{
-				Request: &admissionv1beta1.AdmissionRequest{
+			admissionResponse: &admissionv1.AdmissionResponse{},
+			admissionReview: admissionv1.AdmissionReview{
+				Request: &admissionv1.AdmissionRequest{
 					UID:       "requestUID",
 					Object:    runtime.RawExtension{Raw: []byte("SomeBytes")},
 					OldObject: runtime.RawExtension{Raw: []byte("SomeBytes")},
 				},
 			},
-			wantAdmissionReview: admissionv1beta1.AdmissionReview{
-				Response: &admissionv1beta1.AdmissionResponse{UID: "requestUID"},
+			wantAdmissionReview: admissionv1.AdmissionReview{
+				Response: &admissionv1.AdmissionResponse{UID: "requestUID"},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			bytes := reviewResponseToByte(tt.admissionResponse, tt.admissionReview)
-			var review admissionv1beta1.AdmissionReview
+			var review admissionv1.AdmissionReview
 			json.Unmarshal(bytes, &review)
 			assert.Equal(t, tt.wantAdmissionReview, review)
 		})

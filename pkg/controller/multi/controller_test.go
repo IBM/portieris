@@ -30,7 +30,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
-	k8sv1beta1 "k8s.io/api/admission/v1beta1"
+	admissionv1 "k8s.io/api/admission/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
 )
@@ -49,7 +49,7 @@ type mockKubeWrapper struct {
 	kubernetes.Interface
 }
 
-func (mkw *mockKubeWrapper) GetPodSpec(req *k8sv1beta1.AdmissionRequest) (string, *corev1.PodSpec, error) {
+func (mkw *mockKubeWrapper) GetPodSpec(req *admissionv1.AdmissionRequest) (string, *corev1.PodSpec, error) {
 	args := mkw.Called(req)
 	return args.String(0), args.Get(1).(*corev1.PodSpec), args.Error(2)
 }

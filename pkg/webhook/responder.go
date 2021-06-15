@@ -1,4 +1,4 @@
-// Copyright 2018,2020 Portieris Authors.
+// Copyright 2018, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import (
 	"strings"
 
 	"github.com/golang/glog"
-	"k8s.io/api/admission/v1beta1"
+	v1 "k8s.io/api/admission/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -33,20 +33,20 @@ type AdmissionResponder struct {
 }
 
 // Flush creates the admission response to return
-func (a *AdmissionResponder) Flush() *v1beta1.AdmissionResponse {
+func (a *AdmissionResponder) Flush() *v1.AdmissionResponse {
 	if a.allowed && !a.HasErrors() {
-		res := &v1beta1.AdmissionResponse{
+		res := &v1.AdmissionResponse{
 			Allowed: true,
 		}
 
 		if a.patches != nil {
 			res.Patch = a.patches
-			pt := v1beta1.PatchTypeJSONPatch
+			pt := v1.PatchTypeJSONPatch
 			res.PatchType = &pt
 		}
 		return res
 	}
-	return &v1beta1.AdmissionResponse{
+	return &v1.AdmissionResponse{
 		Allowed: false,
 		Result: &metav1.Status{
 			Message: fmt.Sprintf("\n%s", strings.Join(a.errors, "\n")),
@@ -75,7 +75,7 @@ func (a *AdmissionResponder) SetPatch(patch []byte) {
 }
 
 // Write writes the output of flush to the passed responsewriter
-func (a *AdmissionResponder) Write(w http.ResponseWriter, ar v1beta1.AdmissionReview) {
+func (a *AdmissionResponder) Write(w http.ResponseWriter, ar v1.AdmissionReview) {
 	resp := reviewResponseToByte(a.Flush(), ar)
 	if _, err := w.Write(resp); err != nil {
 		glog.Error(err)

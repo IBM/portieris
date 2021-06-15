@@ -199,7 +199,7 @@ func newFakeRequest(image string) *http.Request {
 	req, _ := http.NewRequest("POST", "/", bytes.NewBufferString(fmt.Sprintf(`
 		{
 		  "kind": "AdmissionReview",
-		  "apiVersion": "admission.k8s.io/v1beta1",
+		  "apiVersion": "admission.k8s.io/v1",
 		  "request": {
 		    "uid": "ed782967-1c99-11e8-936d-08002789d446",
 		    "kind": {

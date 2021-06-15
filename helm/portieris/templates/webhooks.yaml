@@ -23,6 +23,7 @@ webhooks:
       caBundle: {{ .Files.Get "certs/ca.crt" | b64enc }}
       {{ end }}
     rules: []
+    sideEffects: None
     admissionReviewVersions: ["v1"]
 ---
 # webhook replaces the inoperative one, after the service is installed
