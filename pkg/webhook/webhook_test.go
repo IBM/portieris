@@ -81,7 +81,7 @@ func Test_reviewResponseToByte(t *testing.T) {
 		wantAdmissionReview admissionv1.AdmissionReview
 	}{
 		{
-			name:              "Review response matches input review with matching request/response UID",
+			name:              "Review response has UUID matching the request",
 			admissionResponse: &admissionv1.AdmissionResponse{UID: "responseUID", Allowed: true},
 			admissionReview: admissionv1.AdmissionReview{
 				Request: &admissionv1.AdmissionRequest{UID: "requestUID"},
