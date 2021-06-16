@@ -15,9 +15,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ##
 
 # v0.11.0
-## 2021-06-14
+## 2021-06-16
 * Further documentation improvements including godoc
-* Update webhook resources to v1 
+* use current resource versions ([215](https://github.com/IBM/portieris/issues/215))
 * update dependencies and golang version to 1.16.5
 * a template fix to correctly identify openshift ([PR#326](https://github.com/IBM/portieris/pull/326))
 
