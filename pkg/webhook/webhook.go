@@ -110,6 +110,7 @@ func (s *Server) Run() {
 	}
 	tlsConfig := &tls.Config{
 		Certificates: []tls.Certificate{certs},
+		MinVersion:   tls.VersionTLS12,
 		// TODO: Use mutual tls after we agree on what cert the apiserver should use.
 		// ClientAuth determines the server's policy for TLS Client Authentication. The default is NoClientCert.
 		// ClientCAs:    apiserverCA,
