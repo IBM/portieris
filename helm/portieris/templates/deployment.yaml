@@ -17,8 +17,10 @@ spec:
   template:
     metadata:
       annotations:
-        prometheus.io/scrape: 'true'
-        prometheus.io/port: '8080'
+      {{- $metric_annotations := dict "prometheus.io/scrape" "true" "prometheus.io/port" "8080" }}
+      {{- with mergeOverwrite $metric_annotations .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       labels:
         app: portieris
         release: {{ .Release.Name }}
