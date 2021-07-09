@@ -107,7 +107,7 @@ spec:
           trustServer: "https://icr.io:4443" # Optional, custom trust server for repository
 ```
 
-For more information, see the [IBM Cloud docs](https://cloud.ibm.com/docs/services/Registry?topic=registry-security_enforce#customize_policies).
+For more information, see the [IBM Cloud docs](https://cloud.ibm.com/docs/Registry?topic=Registry-security_enforce#customize_policies).
 
 ### `simple` (Red Hat simple signing)
 
