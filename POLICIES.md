@@ -2,7 +2,7 @@
 
 copyright:
   years: 2020, 2021
-lastupdated: "2021-07-21"
+lastupdated: "2021-07-23"
 
 ---
 
@@ -112,6 +112,30 @@ spec:
 
 For more information, see [Customizing policies](#customizing-policies).
 
+### Specifying trusted content signers in custom policies
+
+If you use content trust, you can verify that images are signed by particular signers. Deployment is allowed only if the most recent signed version is signed by all the listed signers. To add a signer to a repository, see [Managing trusted signers](https://cloud.ibm.com/docs/Registry?topic=Registry-registry_trustedcontent#trustedcontent_signers).
+
+To configure the policy to verify that an image is signed by a particular signer:
+
+1. Get the signer name (the name that was used in `docker trust signer add`), and the signer's public key.
+2. Generate a Kubernetes secret with the signer name and their public key.
+
+   ```
+   kubectl create secret generic <secret_name> --from-literal=name=<signer_name> --from-file=publicKey=<key.pub>
+   ```
+
+3. Add the secret to the `signerSecrets` list for the repository in your policy.
+
+   ```yaml
+   - name: example
+     policy:
+       trust:
+         enabled: true
+         signerSecrets:
+         - name: <secret_name>
+   ```
+   
 ### `simple` (Red Hat simple signing)
 
 The policy requirements are similar to those defined for the configuration files that are consulted when you're using the Red Hat&reg; tools [policy requirements](https://github.com/containers/image/blob/master/docs/containers-policy.json.5.md#policy-requirements). However, the main difference is that the public key in a `signedBy` requirement is defined in a `keySecret` attribute, the value is the name of an in-scope Kubernetes secret that contains a public key block. The value of `keyType`, `keyPath`, and `keyData`, see [policy requirements](https://github.com/containers/image/blob/master/docs/containers-policy.json.5.md#policy-requirements), can't be provided. If multiple keys are present in the key ring, the requirement is satisfied if the signature is signed by any of them.
@@ -260,7 +284,7 @@ The following table explains the `.yaml` components that you must set in your Ku
 
 **Table 1**. Understanding the `.yaml` components for the Kubernetes custom resource definition.
 
-Before you begin, [target your `kubectl` CLI](https://cloud.ibm.com/docs/containers?topic=containers-cs_cli_install#cs_cli_configure) to the cluster. Then, complete the following steps:
+To customize your policies, complete the following steps:
 
 1. Create a [Kubernetes custom resource definition](https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/) `.yaml` file. For more information, see Table 1.
 
@@ -287,33 +311,9 @@ Before you begin, [target your `kubectl` CLI](https://cloud.ibm.com/docs/contain
    kubectl apply -f <filepath>
    ```
    
-### Specifying trusted content signers in custom policies
-
-If you use content trust, you can verify that images are signed by particular signers. Deployment is allowed only if the most recent signed version is signed by all the listed signers. To add a signer to a repository, see [Managing trusted signers](https://cloud.ibm.com/docs/Registry?topic=Registry-registry_trustedcontent#trustedcontent_signers).
-
-To configure the policy to verify that an image is signed by a particular signer:
-
-1. Get the signer name (the name that was used in `docker trust signer add`), and the signer's public key.
-2. Generate a Kubernetes secret with the signer name and their public key.
-
-   ```
-   kubectl create secret generic <secret_name> --from-literal=name=<signer_name> --from-file=publicKey=<key.pub>
-   ```
-
-3. Add the secret to the `signerSecrets` list for the repository in your policy.
-
-   ```yaml
-   - name: example
-     policy:
-       trust:
-         enabled: true
-         signerSecrets:
-         - name: <secret_name>
-   ```
-   
 ## Controlling who can customize policies
 
-If role-based access control (RBAC) is enabled on your Kubernetes cluster, you can create a role to govern who can administer security policies on your cluster. For more information about applying RBAC rules to your cluster, see [Understanding RBAC permissions](https://cloud.ibm.com/docs/containers?topic=containers-users#understand-rbac) and [Creating custom RBAC permissions for users, groups, or service accounts](https://cloud.ibm.com/docs/containers?topic=containers-users#rbac).
+If role-based access control (RBAC) is enabled on your Kubernetes cluster, you can create a role to govern who can administer security policies on your cluster. For more information about applying RBAC rules to your cluster, see [Using RBAC Authorization](https://kubernetes.io/docs/reference/access-authn-authz/rbac/).
 
 * In your role, add a rule for security policies:
 
