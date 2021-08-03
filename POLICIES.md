@@ -112,7 +112,7 @@ spec:
 
 For more information, see [Customizing policies](#customizing-policies).
 
-### Specifying trusted content signers in custom policies
+#### Specifying trusted content signers in custom policies
 
 If you use content trust, you can verify that images are signed by particular signers. Deployment is allowed only if the most recent signed version is signed by all the listed signers. To add a signer to a repository, see [Managing trusted signers](https://cloud.ibm.com/docs/Registry?topic=Registry-registry_trustedcontent#trustedcontent_signers).
 
