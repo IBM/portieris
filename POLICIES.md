@@ -271,7 +271,6 @@ When you apply a deployment, Portieris checks whether the Kubernetes namespace t
 
 The following table explains the `.yaml` components that you must set in your Kubernetes custom resource definition `.yaml` file.
 
-
 | Field | Description |
 |-------|-------------|
 | `kind` | For a cluster-wide policy, specify the `kind` as `ClusterImagePolicy`. For a Kubernetes namespace policy, specify as `ImagePolicy`. |
@@ -283,6 +282,16 @@ The following table explains the `.yaml` components that you must set in your Ku
 | `../../../../va/enabled` | Set as `true` to allow only images that pass the [Vulnerability Advisor](https://cloud.ibm.com/docs/Registry?topic=va-va_index) scan. Set as `false` to ignore the Vulnerability Advisor scan. |
 
 **Table 1**. Understanding the `.yaml` components for the Kubernetes custom resource definition.
+
+| Field | Description |
+|-------|-------------|
+| `spec/repositories/name/policy/simple/requirements/type/insecureAcceptAnything` | This option accepts any image where signature validation isn't required. For more information, see [insecureAcceptAnything](https://github.com/containers/image/blob/main/docs/containers-policy.json.5.md#insecureacceptanything). |
+| `../../../../../../../reject` | This option rejects all images and signatures. For more information, see [reject](https://github.com/containers/image/blob/main/docs/containers-policy.json.5.md#reject).|
+| `../../../../../../../signedBy` | This option ensures that the image is signed with an expected identity and key. Valid options for this field are: `matchExact`, `matchRepoDigestOrExact` (This one doesn't show in the [.yaml](https://github.com/IBM/portieris/blob/master/helm/portieris/crds/crds.yaml) file - should it?), `matchRepository`, `exactReference` (This is `matchExactReference`in the yaml file - is that right?), `exactRepository` (This is `matchExactRepository`in the yaml file - is that right?), `remapIdentity`. For more information about these options, see [signedBy](https://github.com/containers/image/blob/main/docs/containers-policy.json.5.md#signedby).|
+
+**Table 2**. Understanding the `.yaml` components for the Kubernetes custom resource definition for `simple`.
+
+For more information, see [Policy Requirements](https://github.com/containers/image/blob/main/docs/containers-policy.json.5.md#policy-requirements).
 
 To customize your policies, complete the following steps:
 
