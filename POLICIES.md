@@ -2,7 +2,7 @@
 
 copyright:
   years: 2020, 2021
-lastupdated: "2021-08-04"
+lastupdated: "2021-08-09"
 
 ---
 
@@ -269,7 +269,7 @@ You can change the policy that Portieris uses to permit images, either at the cl
 
 When you apply a deployment, Portieris checks whether the Kubernetes namespace that you are deploying to has a policy to apply. If it does not, Portieris uses the cluster-wide policy. Your deployment is denied if no namespace or cluster-wide policy exists.
 
-The following table explains the `.yaml` components that you must set in your Kubernetes custom resource definition `.yaml` file.
+The following table explains the `.yaml` properties that you must set in your Kubernetes custom resource definition `.yaml` file.
 
 | Field | Description |
 |-------|-------------|
@@ -281,7 +281,7 @@ The following table explains the `.yaml` components that you must set in your Ku
 | `../../../../trust/signerSecrets/name` | If you want to allow only images that are signed by particular users, specify the Kubernetes secret with the signer name. Omit this field or leave it empty to verify that images are signed without enforcing particular signers. For more information, see [Specifying trusted content signers in custom policies](#specifying-trusted-content-signers-in-custom-policies). |
 | `../../../../va/enabled` | Set as `true` to allow only images that pass the [Vulnerability Advisor](https://cloud.ibm.com/docs/Registry?topic=va-va_index) scan. Set as `false` to ignore the Vulnerability Advisor scan. |
 
-**Table 1**. Understanding the `.yaml` components for the Kubernetes custom resource definition.
+**Table 1**. Understanding the `.yaml` properties for the Kubernetes custom resource definition.
 
 | Field | Description |
 |-------|-------------|
