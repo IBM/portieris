@@ -39,7 +39,7 @@ func boolPointer(boolean bool) *bool {
 
 // ImagePolicy is a specification for a ImagePolicy resource
 type ImagePolicy struct {
-	metav1.TypeMeta   `json:",inline"`
+	metav1.TypeMeta
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	Spec ImagePolicySpec `json:"spec"`
@@ -49,7 +49,7 @@ type ImagePolicy struct {
 
 // ImagePolicyList is a list of ImagePolicy resources
 type ImagePolicyList struct {
-	metav1.TypeMeta `json:",inline"`
+	metav1.TypeMeta
 	metav1.ListMeta `json:"metadata"`
 
 	Items []ImagePolicy `json:"items"`
@@ -62,7 +62,7 @@ type ImagePolicyList struct {
 
 // ClusterImagePolicy is a specification for a ClusterImagePolicy resource
 type ClusterImagePolicy struct {
-	metav1.TypeMeta   `json:",inline"`
+	metav1.TypeMeta
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	Spec ImagePolicySpec `json:"spec"`
@@ -72,7 +72,7 @@ type ClusterImagePolicy struct {
 
 // ClusterImagePolicyList is a list of ClusterImagePolicy resources
 type ClusterImagePolicyList struct {
-	metav1.TypeMeta `json:",inline"`
+	metav1.TypeMeta
 	metav1.ListMeta `json:"metadata"`
 
 	Items []ClusterImagePolicy `json:"items"`
