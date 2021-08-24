@@ -84,13 +84,19 @@ func (v verifier) VerifyByPolicy(imageToVerify string, credentials credential.Cr
 
 func verifyAttempt(imageSource types.ImageSource, policyContext *signature.PolicyContext) (*bytes.Buffer, error, error) {
 	unparsedImage := image.UnparsedInstance(imageSource, nil)
-	_, deny := policyContext.IsRunningImageAllowed(context.Background(), unparsedImage)
-	if deny != nil {
-		return nil, deny, nil
+	_, err := policyContext.IsRunningImageAllowed(context.Background(), unparsedImage)
+	switch err.(type) {
+	case nil:
+	case signature.PolicyRequirementError:
+		return nil, err, nil
+	default:
+		return nil, nil, err
 	}
-
 	// get the digest
 	m, _, err := unparsedImage.Manifest(context.Background())
+	if err != nil {
+		return nil, nil, err
+	}
 	digest, err := manifest.Digest(m)
 	if err != nil {
 		return nil, nil, err
