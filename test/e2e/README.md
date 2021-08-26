@@ -2,7 +2,7 @@
 
 copyright:
   years: 2020, 2021
-lastupdated: "2021-02-19"
+lastupdated: "2021-08-26"
 
 ---
 
@@ -14,8 +14,8 @@ Before you begin, contact a maintainer to find out what to set for exporting the
 
 Run a test by completing the following steps.
 
-1. [Order a new IBM Cloud Kubernetes Service cluster](https://cloud.ibm.com/docs/containers-cli-plugin?topic=containers-cli-plugin-kubernetes-service-cli#cs_cluster_create), or use an existing cluster.
-2. Get the cluster configuration by running the following command. 
+1. Order an IBM Cloud Kubernetes Service cluster, see [Creating clusters](https://cloud.ibm.com/docs/containers?topic=containers-clusters), or use an existing cluster.
+2. Get the cluster configuration by running the following [`ibmcloud ks cluster config`](https://cloud.ibm.com/docs/containers?topic=containers-kubernetes-service-cli#cs_cluster_config) command. 
    
    ```
    ibmcloud ks cluster config -c <cluster-name>
