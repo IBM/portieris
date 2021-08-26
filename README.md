@@ -2,7 +2,7 @@
 
 copyright:
   years: 2018, 2021
-lastupdated: "2021-02-17"
+lastupdated: "2021-08-26"
 
 ---
 
@@ -16,7 +16,7 @@ Portieris is a Kubernetes admission controller for the enforcement of image secu
 
 Portieris uses a Kubernetes mutating admission webhook to modify your Kubernetes resources, at the point of creation, to ensure that Kubernetes runs only policy compliant images. When configured to do so, Portieris can enforce Docker Content Trust with optional trust pinning, or can verify signatures that are created by using Red Hat's simple signing model and prevents the creation of resources that use untrusted or unverified images.
 
-If your cloud provider provides a [Notary](https://github.com/theupdateframework/notary) server (sometimes referred to as Content Trust), Portieris accesses trust data in that Notary server that corresponds to the image that you are deploying. To verify Red Hat simple signatures, the signatures must be accessible by using registry extension APIs or a configured signature store.
+If your cloud provider provides a [Notary](https://github.com/notaryproject/notary) server (sometimes referred to as Content Trust), Portieris accesses trust data in that Notary server that corresponds to the image that you are deploying. To verify Red Hat simple signatures, the signatures must be accessible by using registry extension APIs or a configured signature store.
 
 When you create or edit a workload, the Kubernetes API server sends a request to Portieris. The AdmissionRequest contains the content of your workload. For each image in your workload, Portieris finds a matching security policy.
 
@@ -39,7 +39,7 @@ The default behavior is to mutate the image reference on successful admission so
 Some closed loop deployment technologies verify that the image that is running is the expected one by looking at the image reference in the running container and seeing a mutated image reference as different, then attempt to correct the discrepancy, with no effect. In this case, an infinite reconciliation loop driving the Kubernetes API, Portieris, and registry traffic can start. To avoid this scenario, you can specify `mutateImage: false` in the policy behavior setting, which does not change the image that is admitted under this policy and prevents the undesirable consequences. The benefit is at the expense of reintroducing the window between admission and pull for other images to be substituted and run without verification.
 
 Use this option only where absolutely necessary and don't use it alongside `trust` requirements because `notaryV1` tags aren't directly linked to registry tags and  unexpected images can run with trust verification even in the steady state (without registry changes).  
-See, [Policies](POLICIES.md#image-mutation-option).
+See, [Image mutation option](POLICIES.md#image-mutation-option).
 
 ## Portieris metrics
 
@@ -60,7 +60,7 @@ Portieris is installed by using a Helm chart. Before you begin, ensure that you 
 
 * To install Portieris in the default namespace (`portieris`), complete the following steps:
 
-  1. Find the release you want to run, see [releases](https://github.com/IBM/portieris/releases), and download the Helm chart package. 
+  1. Find the release you want to run, see [Releases](https://github.com/IBM/portieris/releases), and download the Helm chart package. 
   2. Unpack the charts, for example, run: 
   
      ```
@@ -138,7 +138,7 @@ Image security policies define Portieris' behavior in your cluster. You must con
 
 ## Configuring access controls for your security policies
 
-You can configure Kubernetes role-based access control (RBAC) rules to define which users and applications can modify your security policies. For more information, see the [Kubernetes docs](https://kubernetes.io/docs/reference/access-authn-authz/rbac/) and [IBM Cloud docs](https://cloud.ibm.com/docs/containers?topic=containers-users#role-binding-assign).
+You can configure Kubernetes role-based access control (RBAC) rules to define which users and applications can modify your security policies. For more information, see the [Kubernetes](https://kubernetes.io/docs/reference/access-authn-authz/rbac/) docs and [Controlling user access with IBM Cloud IAM and Kubernetes RBAC](https://cloud.ibm.com/docs/containers?topic=containers-users) in the IBM Cloud Kubernetes Service docs.
 
 If Portieris is installed with `AllowAdmissionSkip=true`, you can prevent Portieris' admission webhook from being called in specific namespaces by labelling the namespace with `securityenforcement.admission.cloud.ibm.com/namespace: skip`. This action allows pods in that namespace to recover when the admission webhook is down, but note that no policies are applied in that namespace. For example, the Portieris installation namespace is configured with this label to allow Portieris itself to recover when it is down. Ensure that you control who can add labels to namespaces and who can access namespaces with this label so that a malicious party can't use this label to bypass Portieris.
 
