@@ -81,7 +81,13 @@ affinity:
 # However, if this is enabled, anyone with access to annotate namespaces could bypass Portieris by
 # setting the annotation on their namespaces. Therefore, be careful with your RBAC policies if you
 # enable this option!
-AllowAdmissionSkip: false
+AllowAdmissionSkip: true
+
+ObjectSelectorAdmissionSkip: {}
+    # - key: xxxxx.xxxxx/xxx
+    #   operator: NotIn
+    #   values:
+    #   - xxxx
 
 clusterPolicy:
   allowedRepositories:
