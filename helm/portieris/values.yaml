@@ -83,11 +83,14 @@ affinity:
 # enable this option!
 AllowAdmissionSkip: false
 
-ObjectSelectorAdmissionSkip: {}
-    # - key: xxxxx.xxxxx/xxx
-    #   operator: NotIn
-    #   values:
-    #   - xxxx
+ObjectSelectorAdmissionSkip: 
+    # matchLabels:
+    #   app: xxx
+    # matchExpressions:
+    #   - key: xxxxx.xxxxx/xxx
+    #     operator: NotIn
+    #     values:
+    #     - xxxx
 
 clusterPolicy:
   allowedRepositories:

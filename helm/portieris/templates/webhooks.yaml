@@ -69,6 +69,5 @@ webhooks:
     {{ end }}
     {{ if .Values.ObjectSelectorAdmissionSkip }}
     objectSelector:
-      matchExpressions:
 {{ toYaml .Values.ObjectSelectorAdmissionSkip | indent 6 }}
     {{ end }}
