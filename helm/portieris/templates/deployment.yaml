@@ -30,6 +30,9 @@ spec:
       hostNetwork: true  
       dnsPolicy: ClusterFirstWithHostNet
       {{- end }}
+      {{- if .Values.priorityClass }}
+      priorityClassName: {{ .Values.priorityClass }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.host | default "docker.io/ibmcom"  }}/{{ .Values.image.image }}:{{ .Values.image.tag }}"
