@@ -26,10 +26,13 @@ import (
 )
 
 // ClusterImagePolicyLister helps list ClusterImagePolicies.
+// All objects returned here must be treated as read-only.
 type ClusterImagePolicyLister interface {
 	// List lists all ClusterImagePolicies in the indexer.
+	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1.ClusterImagePolicy, err error)
 	// Get retrieves the ClusterImagePolicy from the index for a given name.
+	// Objects returned here must be treated as read-only.
 	Get(name string) (*v1.ClusterImagePolicy, error)
 	ClusterImagePolicyListerExpansion
 }

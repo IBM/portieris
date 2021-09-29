@@ -15,10 +15,11 @@
 package framework
 
 import (
+	"context"
 	"fmt"
 	"time"
 
-	"k8s.io/api/apps/v1"
+	v1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -41,7 +42,7 @@ func (f *Framework) LoadStatefulSetManifest(pathToManifest string) (*v1.Stateful
 
 // CreateStatefulSet creates a StatefulSet and waits for it to show.
 func (f *Framework) CreateStatefulSet(namespace string, statefulset *v1.StatefulSet) error {
-	if _, err := f.KubeClient.AppsV1().StatefulSets(namespace).Create(statefulset); err != nil {
+	if _, err := f.KubeClient.AppsV1().StatefulSets(namespace).Create(context.TODO(), statefulset, metav1.CreateOptions{}); err != nil {
 		return err
 	}
 	if err := f.WaitForStatefulSet(statefulset.Name, namespace, time.Minute); err != nil {
@@ -53,12 +54,12 @@ func (f *Framework) CreateStatefulSet(namespace string, statefulset *v1.Stateful
 
 // GetStatefulSet retrieves the specified StatefulSet.
 func (f *Framework) GetStatefulSet(name, namespace string) (*v1.StatefulSet, error) {
-	return f.KubeClient.AppsV1().StatefulSets(namespace).Get(name, metav1.GetOptions{})
+	return f.KubeClient.AppsV1().StatefulSets(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 }
 
 // DeleteStatefulSet deletes the specified StatefulSet.
 func (f *Framework) DeleteStatefulSet(name, namespace string) error {
-	return f.KubeClient.AppsV1().StatefulSets(namespace).Delete(name, &metav1.DeleteOptions{})
+	return f.KubeClient.AppsV1().StatefulSets(namespace).Delete(context.TODO(), name, metav1.DeleteOptions{})
 }
 
 // WaitForStatefulSet waits until the specified StatefulSet is created or the timeout is reached.
@@ -88,5 +89,5 @@ func (f *Framework) WaitForStatefulSetPods(name, namespace string, timeout time.
 // ListStatefulSet lists the StatefulSets that are associated with the installed Helm release.
 func (f *Framework) ListStatefulSet() (*v1.StatefulSetList, error) {
 	opts := f.getHelmReleaseSelectorListOptions()
-	return f.KubeClient.AppsV1().StatefulSets(corev1.NamespaceAll).List(opts)
+	return f.KubeClient.AppsV1().StatefulSets(corev1.NamespaceAll).List(context.TODO(), opts)
 }

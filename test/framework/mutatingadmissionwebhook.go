@@ -15,6 +15,7 @@
 package framework
 
 import (
+	"context"
 	"log"
 	"time"
 
@@ -26,7 +27,7 @@ import (
 // WaitForMutatingAdmissionWebhook waits until the specified mutating admission webhook is created or the timeout is reached.
 func (f *Framework) WaitForMutatingAdmissionWebhook(name string, timeout time.Duration) error {
 	return wait.Poll(time.Second*5, timeout, func() (bool, error) {
-		if _, err := f.KubeClient.AdmissionregistrationV1().MutatingWebhookConfigurations().Get(name, metav1.GetOptions{}); err != nil {
+		if _, err := f.KubeClient.AdmissionregistrationV1().MutatingWebhookConfigurations().Get(context.TODO(), name, metav1.GetOptions{}); err != nil {
 			return false, err
 		}
 		log.Printf("Found MutatingWebhookConfiguration %q", name)
@@ -37,5 +38,5 @@ func (f *Framework) WaitForMutatingAdmissionWebhook(name string, timeout time.Du
 // ListMutatingAdmissionWebhooks lists the mutating admission webhooks that are associated with the installed Helm release.
 func (f *Framework) ListMutatingAdmissionWebhooks() (*v1.MutatingWebhookConfigurationList, error) {
 	opts := f.getHelmReleaseSelectorListOptions()
-	return f.KubeClient.AdmissionregistrationV1().MutatingWebhookConfigurations().List(opts)
+	return f.KubeClient.AdmissionregistrationV1().MutatingWebhookConfigurations().List(context.TODO(), opts)
 }

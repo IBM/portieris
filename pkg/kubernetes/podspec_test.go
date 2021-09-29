@@ -595,7 +595,28 @@ func TestWrapper_GetPodSpec(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "Properly handles a cronjob",
+			name: "Properly handles a v1 cronjob",
+			ar: ar{
+				Object:    []byte(`{"metadata":{"name":"nginx","namespace":"default"},"spec":{"jobTemplate":{"spec":{"template":{"spec":{"containers":[{"name":"nginx","image":"docker.io/nginx"}]}}}}}}`),
+				Namespace: "",
+				Resource:  metav1.GroupVersionResource{Group: "batch", Version: "v1", Resource: "cronjobs"},
+			},
+			want:  "/spec/jobTemplate/spec/template/spec",
+			want1: nginxSpec,
+		},
+		{
+			name: "Errors for a malformed v1 cronjob",
+			ar: ar{
+				Object:    []byte(`lololol`),
+				Namespace: "default",
+				Resource:  metav1.GroupVersionResource{Group: "batch", Version: "v1", Resource: "cronjobs"},
+			},
+			want:    "",
+			want1:   nil,
+			wantErr: true,
+		},
+		{
+			name: "Properly handles a v1beta1 cronjob",
 			ar: ar{
 				Object:    []byte(`{"metadata":{"name":"nginx","namespace":"default"},"spec":{"jobTemplate":{"spec":{"template":{"spec":{"containers":[{"name":"nginx","image":"docker.io/nginx"}]}}}}}}`),
 				Namespace: "",
@@ -605,7 +626,7 @@ func TestWrapper_GetPodSpec(t *testing.T) {
 			want1: nginxSpec,
 		},
 		{
-			name: "Errors for a malformed cronjob",
+			name: "Errors for a malformed v1beta1 cronjob",
 			ar: ar{
 				Object:    []byte(`lololol`),
 				Namespace: "default",

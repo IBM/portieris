@@ -66,7 +66,7 @@ func TestVerifyByPolicy(t *testing.T) {
 			credentials: credential.Credentials{{Username: "user", Password: "password"}},
 			policies:    &policyRequirementInsecure,
 			wantErr:     true,
-			errMsg:      "pinging docker registry ",
+			errMsg:      "pinging container registry ",
 		},
 	}
 	for _, tt := range tests {

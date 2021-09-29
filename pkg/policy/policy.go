@@ -15,6 +15,7 @@
 package policy
 
 import (
+	"context"
 	"fmt"
 
 	policyClientSet "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/client/clientset/versioned"
@@ -42,7 +43,7 @@ func NewClient(policyClientSet policyClientSet.Interface) *Client {
 
 // getImagePolicyList retrieves the list of image policies in the specified namespace
 func (c *Client) getImagePolicyList(namespace string) (*policyV1.ImagePolicyList, error) {
-	policies, err := c.policyClientSet.PortierisV1().ImagePolicies(namespace).List(metav1.ListOptions{})
+	policies, err := c.policyClientSet.PortierisV1().ImagePolicies(namespace).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +52,7 @@ func (c *Client) getImagePolicyList(namespace string) (*policyV1.ImagePolicyList
 
 // getClusterPolicySpec retrieves the lost of clusterwide image policies
 func (c *Client) getClusterImagePolicyList() (*policyV1.ClusterImagePolicyList, error) {
-	policies, err := c.policyClientSet.PortierisV1().ClusterImagePolicies().List(metav1.ListOptions{})
+	policies, err := c.policyClientSet.PortierisV1().ClusterImagePolicies().List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		return nil, err
 	}

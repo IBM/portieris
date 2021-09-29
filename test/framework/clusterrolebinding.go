@@ -14,10 +14,14 @@
 
 package framework
 
-import v1beta1 "k8s.io/api/rbac/v1beta1"
+import (
+	"context"
+
+	v1beta1 "k8s.io/api/rbac/v1beta1"
+)
 
 // ListClusterRoleBindings lists all the cluster role bindings that are associated with the installed Helm release.
 func (f *Framework) ListClusterRoleBindings() (*v1beta1.ClusterRoleBindingList, error) {
 	opts := f.getHelmReleaseSelectorListOptions()
-	return f.KubeClient.RbacV1beta1().ClusterRoleBindings().List(opts)
+	return f.KubeClient.RbacV1beta1().ClusterRoleBindings().List(context.TODO(), opts)
 }

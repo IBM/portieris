@@ -20,7 +20,7 @@ import (
 
 	"github.com/IBM/portieris/test/framework"
 	"github.com/stretchr/testify/assert"
-	batchv1 "k8s.io/api/batch/v1beta1"
+	batchv1 "k8s.io/api/batch/v1"
 )
 
 func buildCronJob(t *testing.T, fw *framework.Framework, manifestLocation, namespace string, expectCreateFail bool) *batchv1.CronJob {

@@ -15,6 +15,7 @@
 package framework
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -39,7 +40,7 @@ func (f *Framework) LoadSecretManifest(pathToManifest string) (*corev1.Secret, e
 
 // CreateSecret creates a secret and waits for it to show.
 func (f *Framework) CreateSecret(namespace string, secret *corev1.Secret) error {
-	if _, err := f.KubeClient.CoreV1().Secrets(namespace).Create(secret); err != nil {
+	if _, err := f.KubeClient.CoreV1().Secrets(namespace).Create(context.TODO(), secret, metav1.CreateOptions{}); err != nil {
 		return err
 	}
 	return f.WaitForSecret(secret.Name, namespace, time.Minute)
@@ -47,7 +48,7 @@ func (f *Framework) CreateSecret(namespace string, secret *corev1.Secret) error 
 
 // GetSecret retrieves the specified secret.
 func (f *Framework) GetSecret(name, namespace string) (*corev1.Secret, error) {
-	return f.KubeClient.CoreV1().Secrets(namespace).Get(name, metav1.GetOptions{})
+	return f.KubeClient.CoreV1().Secrets(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 }
 
 // WaitForSecret waits until the specified secret is created or the timeout is reached.

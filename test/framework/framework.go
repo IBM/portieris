@@ -26,7 +26,8 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 
 	policyclientset "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/client/clientset/versioned"
-	customResourceDefinitionClientSet "github.com/kubernetes/apiextensions-apiserver/pkg/client/clientset/internalclientset/typed/apiextensions/internalversion"
+	apiExtensionClientSet "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
+	v1 "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1"
 
 	// Needed for testing using oidc (Armada)
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
@@ -48,7 +49,7 @@ type Framework struct {
 	KubeClient                     kubernetes.Interface
 	ImagePolicyClient              policyclientset.Interface
 	ClusterImagePolicyClient       policyclientset.Interface
-	CustomResourceDefinitionClient customResourceDefinitionClientSet.CustomResourceDefinitionInterface
+	CustomResourceDefinitionClient v1.CustomResourceDefinitionInterface
 	HTTPClient                     *http.Client
 	Namespace                      string
 	HelmRelease                    string
@@ -77,11 +78,11 @@ func New(kubeconfig, helmChart string, noInstall bool) (*Framework, error) {
 	if err != nil {
 		return nil, fmt.Errorf("unable to create ClusterImagePolicy client: %v", err)
 	}
-	apiExtenstionsClient, err := customResourceDefinitionClientSet.NewForConfig(config)
+	apiExtenstionsClient, err := apiExtensionClientSet.NewForConfig(config)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create CustomResourceDefinition client: %v", err)
 	}
-	customResourceDefintionClient := apiExtenstionsClient.CustomResourceDefinitions()
+	customResourceDefintionClient := apiExtenstionsClient.ApiextensionsV1().CustomResourceDefinitions()
 
 	fw := &Framework{
 		KubeClient:                     kubeClient,

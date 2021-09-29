@@ -19,6 +19,7 @@ limitations under the License.
 package v1
 
 import (
+	"context"
 	"time"
 
 	scheme "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/client/clientset/versioned/scheme"
@@ -37,14 +38,14 @@ type ImagePoliciesGetter interface {
 
 // ImagePolicyInterface has methods to work with ImagePolicy resources.
 type ImagePolicyInterface interface {
-	Create(*v1.ImagePolicy) (*v1.ImagePolicy, error)
-	Update(*v1.ImagePolicy) (*v1.ImagePolicy, error)
-	Delete(name string, options *metav1.DeleteOptions) error
-	DeleteCollection(options *metav1.DeleteOptions, listOptions metav1.ListOptions) error
-	Get(name string, options metav1.GetOptions) (*v1.ImagePolicy, error)
-	List(opts metav1.ListOptions) (*v1.ImagePolicyList, error)
-	Watch(opts metav1.ListOptions) (watch.Interface, error)
-	Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1.ImagePolicy, err error)
+	Create(ctx context.Context, imagePolicy *v1.ImagePolicy, opts metav1.CreateOptions) (*v1.ImagePolicy, error)
+	Update(ctx context.Context, imagePolicy *v1.ImagePolicy, opts metav1.UpdateOptions) (*v1.ImagePolicy, error)
+	Delete(ctx context.Context, name string, opts metav1.DeleteOptions) error
+	DeleteCollection(ctx context.Context, opts metav1.DeleteOptions, listOpts metav1.ListOptions) error
+	Get(ctx context.Context, name string, opts metav1.GetOptions) (*v1.ImagePolicy, error)
+	List(ctx context.Context, opts metav1.ListOptions) (*v1.ImagePolicyList, error)
+	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
+	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.ImagePolicy, err error)
 	ImagePolicyExpansion
 }
 
@@ -63,20 +64,20 @@ func newImagePolicies(c *PortierisV1Client, namespace string) *imagePolicies {
 }
 
 // Get takes name of the imagePolicy, and returns the corresponding imagePolicy object, and an error if there is any.
-func (c *imagePolicies) Get(name string, options metav1.GetOptions) (result *v1.ImagePolicy, err error) {
+func (c *imagePolicies) Get(ctx context.Context, name string, options metav1.GetOptions) (result *v1.ImagePolicy, err error) {
 	result = &v1.ImagePolicy{}
 	err = c.client.Get().
 		Namespace(c.ns).
 		Resource("imagepolicies").
 		Name(name).
 		VersionedParams(&options, scheme.ParameterCodec).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }
 
 // List takes label and field selectors, and returns the list of ImagePolicies that match those selectors.
-func (c *imagePolicies) List(opts metav1.ListOptions) (result *v1.ImagePolicyList, err error) {
+func (c *imagePolicies) List(ctx context.Context, opts metav1.ListOptions) (result *v1.ImagePolicyList, err error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {
 		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
@@ -87,13 +88,13 @@ func (c *imagePolicies) List(opts metav1.ListOptions) (result *v1.ImagePolicyLis
 		Resource("imagepolicies").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }
 
 // Watch returns a watch.Interface that watches the requested imagePolicies.
-func (c *imagePolicies) Watch(opts metav1.ListOptions) (watch.Interface, error) {
+func (c *imagePolicies) Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {
 		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
@@ -104,71 +105,74 @@ func (c *imagePolicies) Watch(opts metav1.ListOptions) (watch.Interface, error) 
 		Resource("imagepolicies").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
-		Watch()
+		Watch(ctx)
 }
 
 // Create takes the representation of a imagePolicy and creates it.  Returns the server's representation of the imagePolicy, and an error, if there is any.
-func (c *imagePolicies) Create(imagePolicy *v1.ImagePolicy) (result *v1.ImagePolicy, err error) {
+func (c *imagePolicies) Create(ctx context.Context, imagePolicy *v1.ImagePolicy, opts metav1.CreateOptions) (result *v1.ImagePolicy, err error) {
 	result = &v1.ImagePolicy{}
 	err = c.client.Post().
 		Namespace(c.ns).
 		Resource("imagepolicies").
+		VersionedParams(&opts, scheme.ParameterCodec).
 		Body(imagePolicy).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }
 
 // Update takes the representation of a imagePolicy and updates it. Returns the server's representation of the imagePolicy, and an error, if there is any.
-func (c *imagePolicies) Update(imagePolicy *v1.ImagePolicy) (result *v1.ImagePolicy, err error) {
+func (c *imagePolicies) Update(ctx context.Context, imagePolicy *v1.ImagePolicy, opts metav1.UpdateOptions) (result *v1.ImagePolicy, err error) {
 	result = &v1.ImagePolicy{}
 	err = c.client.Put().
 		Namespace(c.ns).
 		Resource("imagepolicies").
 		Name(imagePolicy.Name).
+		VersionedParams(&opts, scheme.ParameterCodec).
 		Body(imagePolicy).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }
 
 // Delete takes name of the imagePolicy and deletes it. Returns an error if one occurs.
-func (c *imagePolicies) Delete(name string, options *metav1.DeleteOptions) error {
+func (c *imagePolicies) Delete(ctx context.Context, name string, opts metav1.DeleteOptions) error {
 	return c.client.Delete().
 		Namespace(c.ns).
 		Resource("imagepolicies").
 		Name(name).
-		Body(options).
-		Do().
+		Body(&opts).
+		Do(ctx).
 		Error()
 }
 
 // DeleteCollection deletes a collection of objects.
-func (c *imagePolicies) DeleteCollection(options *metav1.DeleteOptions, listOptions metav1.ListOptions) error {
+func (c *imagePolicies) DeleteCollection(ctx context.Context, opts metav1.DeleteOptions, listOpts metav1.ListOptions) error {
 	var timeout time.Duration
-	if listOptions.TimeoutSeconds != nil {
-		timeout = time.Duration(*listOptions.TimeoutSeconds) * time.Second
+	if listOpts.TimeoutSeconds != nil {
+		timeout = time.Duration(*listOpts.TimeoutSeconds) * time.Second
 	}
 	return c.client.Delete().
 		Namespace(c.ns).
 		Resource("imagepolicies").
-		VersionedParams(&listOptions, scheme.ParameterCodec).
+		VersionedParams(&listOpts, scheme.ParameterCodec).
 		Timeout(timeout).
-		Body(options).
-		Do().
+		Body(&opts).
+		Do(ctx).
 		Error()
 }
 
 // Patch applies the patch and returns the patched imagePolicy.
-func (c *imagePolicies) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1.ImagePolicy, err error) {
+func (c *imagePolicies) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.ImagePolicy, err error) {
 	result = &v1.ImagePolicy{}
 	err = c.client.Patch(pt).
 		Namespace(c.ns).
 		Resource("imagepolicies").
-		SubResource(subresources...).
 		Name(name).
+		SubResource(subresources...).
+		VersionedParams(&opts, scheme.ParameterCodec).
 		Body(data).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }

@@ -26,8 +26,10 @@ import (
 )
 
 // ImagePolicyLister helps list ImagePolicies.
+// All objects returned here must be treated as read-only.
 type ImagePolicyLister interface {
 	// List lists all ImagePolicies in the indexer.
+	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1.ImagePolicy, err error)
 	// ImagePolicies returns an object that can list and get ImagePolicies.
 	ImagePolicies(namespace string) ImagePolicyNamespaceLister
@@ -58,10 +60,13 @@ func (s *imagePolicyLister) ImagePolicies(namespace string) ImagePolicyNamespace
 }
 
 // ImagePolicyNamespaceLister helps list and get ImagePolicies.
+// All objects returned here must be treated as read-only.
 type ImagePolicyNamespaceLister interface {
 	// List lists all ImagePolicies in the indexer for a given namespace.
+	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1.ImagePolicy, err error)
 	// Get retrieves the ImagePolicy from the indexer for a given namespace and name.
+	// Objects returned here must be treated as read-only.
 	Get(name string) (*v1.ImagePolicy, error)
 	ImagePolicyNamespaceListerExpansion
 }

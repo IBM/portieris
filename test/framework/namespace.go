@@ -15,6 +15,7 @@
 package framework
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"time"
@@ -43,7 +44,7 @@ var IBMGlobalRegistry = "icr.io"
 // CreateNamespace creates a namespace.
 func (f *Framework) CreateNamespace(name string) (*corev1.Namespace, error) {
 
-	if _, err := f.KubeClient.CoreV1().Namespaces().Create(generateNamespace(name)); err != nil {
+	if _, err := f.KubeClient.CoreV1().Namespaces().Create(context.TODO(), generateNamespace(name), metav1.CreateOptions{}); err != nil {
 		return nil, err
 	}
 	namespace, err := f.GetNamespace(name)
@@ -56,7 +57,7 @@ func (f *Framework) CreateNamespace(name string) (*corev1.Namespace, error) {
 
 // GetNamespace retrieves the specified namespace.
 func (f *Framework) GetNamespace(name string) (*corev1.Namespace, error) {
-	return f.KubeClient.CoreV1().Namespaces().Get(name, metav1.GetOptions{})
+	return f.KubeClient.CoreV1().Namespaces().Get(context.TODO(), name, metav1.GetOptions{})
 }
 
 // WaitForNamespace waits until the specified namespace is created or the timeout is reached.
@@ -78,7 +79,7 @@ func (f *Framework) CreateNamespaceWithIPS(name string) (*corev1.Namespace, erro
 	}
 	var imagePullSecret *v1.Secret
 	for _, secretName := range IBMCloudSecretNames {
-		imagePullSecret, err = f.KubeClient.CoreV1().Secrets("default").Get(secretName, metav1.GetOptions{})
+		imagePullSecret, err = f.KubeClient.CoreV1().Secrets("default").Get(context.TODO(), secretName, metav1.GetOptions{})
 		if err == nil {
 			break
 		}
@@ -88,7 +89,7 @@ func (f *Framework) CreateNamespaceWithIPS(name string) (*corev1.Namespace, erro
 	}
 	imagePullSecret.Namespace = namespace.Name
 	imagePullSecret.ResourceVersion = ""
-	if _, err := f.KubeClient.CoreV1().Secrets(namespace.Name).Create(imagePullSecret); err != nil {
+	if _, err := f.KubeClient.CoreV1().Secrets(namespace.Name).Create(context.TODO(), imagePullSecret, metav1.CreateOptions{}); err != nil {
 		return nil, fmt.Errorf("error creating imagePullSecret: %v", err)
 	}
 
@@ -109,7 +110,7 @@ func (f *Framework) CreateNamespaceWithIPS(name string) (*corev1.Namespace, erro
 		}
 		badAuthData, _ := json.Marshal(badAuths)
 		badPullSecret.Data[".dockerconfigjson"] = badAuthData
-		if _, err := f.KubeClient.CoreV1().Secrets(namespace.Name).Create(badPullSecret); err != nil {
+		if _, err := f.KubeClient.CoreV1().Secrets(namespace.Name).Create(context.TODO(), badPullSecret, metav1.CreateOptions{}); err != nil {
 			return nil, fmt.Errorf("error creating bad imagePullSecret: %v", err)
 		}
 	}
@@ -120,7 +121,7 @@ func (f *Framework) CreateNamespaceWithIPS(name string) (*corev1.Namespace, erro
 		{Name: badPullSecret.GetName()},
 		{Name: imagePullSecret.GetName()},
 	}
-	if _, err := f.KubeClient.CoreV1().ServiceAccounts(namespace.Name).Update(sa); err != nil {
+	if _, err := f.KubeClient.CoreV1().ServiceAccounts(namespace.Name).Update(context.TODO(), sa, metav1.UpdateOptions{}); err != nil {
 		return nil, fmt.Errorf("error adding imagePullSecret to ServiceAccount: %v", err)
 	}
 	return namespace, nil
@@ -128,5 +129,5 @@ func (f *Framework) CreateNamespaceWithIPS(name string) (*corev1.Namespace, erro
 
 // DeleteNamespace deletes the specified namespace.
 func (f *Framework) DeleteNamespace(name string) error {
-	return f.KubeClient.CoreV1().Namespaces().Delete(name, &metav1.DeleteOptions{})
+	return f.KubeClient.CoreV1().Namespaces().Delete(context.TODO(), name, metav1.DeleteOptions{})
 }

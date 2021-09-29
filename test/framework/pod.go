@@ -15,6 +15,7 @@
 package framework
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -26,7 +27,7 @@ import (
 
 // GetPod retrieves the specified pod.
 func (f *Framework) GetPod(name, namespace string) (*corev1.Pod, error) {
-	return f.KubeClient.CoreV1().Pods(namespace).Get(name, metav1.GetOptions{})
+	return f.KubeClient.CoreV1().Pods(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 }
 
 // LoadPodManifest takes a manifest and decodes it into a pod.
@@ -44,7 +45,7 @@ func (f *Framework) LoadPodManifest(pathToManifest string) (*corev1.Pod, error) 
 
 // CreatePod creates a pod and waits for it to show.
 func (f *Framework) CreatePod(namespace string, pod *corev1.Pod) error {
-	if _, err := f.KubeClient.CoreV1().Pods(namespace).Create(pod); err != nil {
+	if _, err := f.KubeClient.CoreV1().Pods(namespace).Create(context.TODO(), pod, metav1.CreateOptions{}); err != nil {
 		return err
 	}
 	return f.WaitForPod(pod.Name, namespace, 2*time.Minute)
@@ -52,7 +53,7 @@ func (f *Framework) CreatePod(namespace string, pod *corev1.Pod) error {
 
 // DeletePod deletes the specified pod.
 func (f *Framework) DeletePod(name, namespace string) error {
-	return f.KubeClient.CoreV1().Pods(namespace).Delete(name, &metav1.DeleteOptions{})
+	return f.KubeClient.CoreV1().Pods(namespace).Delete(context.TODO(), name, metav1.DeleteOptions{})
 }
 
 // WaitForPod waits until the pod deployment completes.
@@ -83,7 +84,7 @@ func (f *Framework) WaitForPodDelete(name, namespace string, timeout time.Durati
 
 // DeleteRandomPod deletes the first pod that is returned in the list of pods for a specified namespace.
 func (f *Framework) DeleteRandomPod(namespace string) error {
-	podList, err := f.KubeClient.CoreV1().Pods(namespace).List(metav1.ListOptions{})
+	podList, err := f.KubeClient.CoreV1().Pods(namespace).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		return err
 	}

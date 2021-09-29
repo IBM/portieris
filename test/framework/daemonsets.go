@@ -15,10 +15,11 @@
 package framework
 
 import (
+	"context"
 	"fmt"
 	"time"
 
-	"k8s.io/api/apps/v1"
+	v1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -41,7 +42,7 @@ func (f *Framework) LoadDaemonSetManifest(pathToManifest string) (*v1.DaemonSet,
 
 // CreateDaemonSet creates a DaemonSet resource and then waits for it to show.
 func (f *Framework) CreateDaemonSet(namespace string, daemonset *v1.DaemonSet) error {
-	if _, err := f.KubeClient.AppsV1().DaemonSets(namespace).Create(daemonset); err != nil {
+	if _, err := f.KubeClient.AppsV1().DaemonSets(namespace).Create(context.TODO(), daemonset, metav1.CreateOptions{}); err != nil {
 		return err
 	}
 	if err := f.WaitForDaemonSet(daemonset.Name, namespace, time.Minute); err != nil {
@@ -53,7 +54,7 @@ func (f *Framework) CreateDaemonSet(namespace string, daemonset *v1.DaemonSet) e
 
 // GetDaemonSets retrieves the specified DaemonSets.
 func (f *Framework) GetDaemonSets(name, namespace string) (*v1.DaemonSet, error) {
-	return f.KubeClient.AppsV1().DaemonSets(namespace).Get(name, metav1.GetOptions{})
+	return f.KubeClient.AppsV1().DaemonSets(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 }
 
 // // PatchDeployment patches the specified deployment
@@ -63,7 +64,7 @@ func (f *Framework) GetDaemonSets(name, namespace string) (*v1.DaemonSet, error)
 
 // DeleteDaemonSet deletes the specified DaemonSet.
 func (f *Framework) DeleteDaemonSet(name, namespace string) error {
-	return f.KubeClient.AppsV1().DaemonSets(namespace).Delete(name, &metav1.DeleteOptions{})
+	return f.KubeClient.AppsV1().DaemonSets(namespace).Delete(context.TODO(), name, metav1.DeleteOptions{})
 }
 
 // WaitForDaemonSet waits until the specified DaemonSet is created or the timeout is reached.
@@ -93,5 +94,5 @@ func (f *Framework) WaitForDaemonSetPods(name, namespace string, timeout time.Du
 // ListDaemonSet Lists all DaemonSets that are associated with the installed Helm release.
 func (f *Framework) ListDaemonSet() (*v1.DaemonSetList, error) {
 	opts := f.getHelmReleaseSelectorListOptions()
-	return f.KubeClient.AppsV1().DaemonSets(corev1.NamespaceAll).List(opts)
+	return f.KubeClient.AppsV1().DaemonSets(corev1.NamespaceAll).List(context.TODO(), opts)
 }

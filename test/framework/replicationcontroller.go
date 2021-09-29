@@ -15,6 +15,7 @@
 package framework
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -40,7 +41,7 @@ func (f *Framework) LoadReplicationControllerManifest(pathToManifest string) (*c
 
 // CreateReplicationController creates a replication controller and waits for it to show.
 func (f *Framework) CreateReplicationController(namespace string, replicationcontroller *corev1.ReplicationController) error {
-	if _, err := f.KubeClient.CoreV1().ReplicationControllers(namespace).Create(replicationcontroller); err != nil {
+	if _, err := f.KubeClient.CoreV1().ReplicationControllers(namespace).Create(context.TODO(), replicationcontroller, metav1.CreateOptions{}); err != nil {
 		return err
 	}
 	if err := f.WaitForReplicationController(replicationcontroller.Name, namespace, time.Minute); err != nil {
@@ -52,7 +53,7 @@ func (f *Framework) CreateReplicationController(namespace string, replicationcon
 
 // GetReplicationController retrieves the specified replication controller.
 func (f *Framework) GetReplicationController(name, namespace string) (*corev1.ReplicationController, error) {
-	return f.KubeClient.CoreV1().ReplicationControllers(namespace).Get(name, metav1.GetOptions{})
+	return f.KubeClient.CoreV1().ReplicationControllers(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 }
 
 // // PatchDeployment patches the specified deployment.
@@ -62,7 +63,7 @@ func (f *Framework) GetReplicationController(name, namespace string) (*corev1.Re
 
 // DeleteReplicationController deletes the specified replication controller.
 func (f *Framework) DeleteReplicationController(name, namespace string) error {
-	return f.KubeClient.CoreV1().ReplicationControllers(namespace).Delete(name, &metav1.DeleteOptions{})
+	return f.KubeClient.CoreV1().ReplicationControllers(namespace).Delete(context.TODO(), name, metav1.DeleteOptions{})
 }
 
 // WaitForReplicationController waits until the specified replication controller is created or the timeout is reached.
@@ -92,5 +93,5 @@ func (f *Framework) WaitForReplicationControllerPods(name, namespace string, tim
 // ListReplicationController lists all replication controllers that are associated with the installed Helm release.
 func (f *Framework) ListReplicationController() (*corev1.ReplicationControllerList, error) {
 	opts := f.getHelmReleaseSelectorListOptions()
-	return f.KubeClient.CoreV1().ReplicationControllers(corev1.NamespaceAll).List(opts)
+	return f.KubeClient.CoreV1().ReplicationControllers(corev1.NamespaceAll).List(context.TODO(), opts)
 }

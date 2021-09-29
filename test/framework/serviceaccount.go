@@ -14,7 +14,11 @@
 
 package framework
 
-import corev1 "k8s.io/api/core/v1"
+import (
+	"context"
+
+	corev1 "k8s.io/api/core/v1"
+)
 
 func generateServiceAccount(name string) *corev1.ServiceAccount {
 	sa := &corev1.ServiceAccount{}
@@ -26,5 +30,5 @@ func generateServiceAccount(name string) *corev1.ServiceAccount {
 // ListServiceAccounts lists all service accounts that are associated with the installed Helm release.
 func (f *Framework) ListServiceAccounts() (*corev1.ServiceAccountList, error) {
 	opts := f.getHelmReleaseSelectorListOptions()
-	return f.KubeClient.CoreV1().ServiceAccounts(corev1.NamespaceAll).List(opts)
+	return f.KubeClient.CoreV1().ServiceAccounts(corev1.NamespaceAll).List(context.TODO(), opts)
 }

@@ -15,10 +15,11 @@
 package framework
 
 import (
+	"context"
 	"fmt"
 	"time"
 
-	"k8s.io/api/apps/v1"
+	v1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -41,7 +42,7 @@ func (f *Framework) LoadReplicaSetManifest(pathToManifest string) (*v1.ReplicaSe
 
 // CreateReplicaSet creates a ReplicaSet and waits for it to show.
 func (f *Framework) CreateReplicaSet(namespace string, replicaset *v1.ReplicaSet) error {
-	if _, err := f.KubeClient.AppsV1().ReplicaSets(namespace).Create(replicaset); err != nil {
+	if _, err := f.KubeClient.AppsV1().ReplicaSets(namespace).Create(context.TODO(), replicaset, metav1.CreateOptions{}); err != nil {
 		return err
 	}
 	if err := f.WaitForReplicaSet(replicaset.Name, namespace, time.Minute); err != nil {
@@ -53,7 +54,7 @@ func (f *Framework) CreateReplicaSet(namespace string, replicaset *v1.ReplicaSet
 
 // GetReplicaSet retrieves the specified ReplicaSet.
 func (f *Framework) GetReplicaSet(name, namespace string) (*v1.ReplicaSet, error) {
-	return f.KubeClient.AppsV1().ReplicaSets(namespace).Get(name, metav1.GetOptions{})
+	return f.KubeClient.AppsV1().ReplicaSets(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 }
 
 // // PatchDeployment patches the specified deployment.
@@ -63,7 +64,7 @@ func (f *Framework) GetReplicaSet(name, namespace string) (*v1.ReplicaSet, error
 
 // DeleteReplicaSet deletes the specified ReplicaSet.
 func (f *Framework) DeleteReplicaSet(name, namespace string) error {
-	return f.KubeClient.AppsV1().ReplicaSets(namespace).Delete(name, &metav1.DeleteOptions{})
+	return f.KubeClient.AppsV1().ReplicaSets(namespace).Delete(context.TODO(), name, metav1.DeleteOptions{})
 }
 
 // WaitForReplicaSet waits until the specified ReplicaSet is created or the timeout is reached.
@@ -93,5 +94,5 @@ func (f *Framework) WaitForReplicaSetPods(name, namespace string, timeout time.D
 // ListReplicaSet lists all the ReplicaSets that are associated with the installed Helm release.
 func (f *Framework) ListReplicaSet() (*v1.ReplicaSetList, error) {
 	opts := f.getHelmReleaseSelectorListOptions()
-	return f.KubeClient.AppsV1().ReplicaSets(corev1.NamespaceAll).List(opts)
+	return f.KubeClient.AppsV1().ReplicaSets(corev1.NamespaceAll).List(context.TODO(), opts)
 }
