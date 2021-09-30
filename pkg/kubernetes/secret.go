@@ -54,7 +54,7 @@ func (w *Wrapper) GetSecretKey(namespace, secretName string) ([]byte, error) {
 	if key, ok := secret.Data["key"]; ok {
 		return key, nil
 	}
-	return nil, fmt.Errorf("Secret %q in %q does not contain a \"key\" attribute", secretName, namespace)
+	return nil, fmt.Errorf("secret %q in %q does not contain a \"key\" attribute", secretName, namespace)
 }
 
 // GetSecretToken retrieve the token (password field) for the given namespace/secret/registry
@@ -92,7 +92,7 @@ func (w *Wrapper) GetSecretToken(namespace, secretName, registry string) (string
 	if login, ok := registries[registry]; ok {
 		username, password = w.extractRegistryCredentials(login)
 	} else {
-		err = fmt.Errorf("Secret %s not defined for registry: %s", secretName, registry)
+		err = fmt.Errorf("secret %s not defined for registry: %s", secretName, registry)
 	}
 	// glog.Infof("getSecretToken >> : token(%s)", token)
 	return username, password, err
