@@ -91,3 +91,6 @@ clusterPolicy:
 
 # use hostNetwork for Portieris webhook
 useHostNetwork: false
+
+# Set podPriorityClass of the portieris deployment. This will tell kube api to schedule the pods as high priority and stop timing issues where applications try to start before the webhook is available
+priorityClass: system-cluster-critical
