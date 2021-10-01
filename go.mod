@@ -12,6 +12,7 @@ replace (
 require (
 	github.com/IBM/go-sdk-core/v4 v4.10.0
 	github.com/agl/ed25519 v0.0.0-20170116200512-5312a6153412 // indirect
+	github.com/bitly/go-hostpool v0.1.0 // indirect
 	github.com/bugsnag/bugsnag-go v1.5.3 // indirect
 	github.com/bugsnag/panicwrap v1.2.0 // indirect
 	github.com/cenkalti/backoff v2.2.1+incompatible // indirect
