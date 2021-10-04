@@ -67,3 +67,7 @@ webhooks:
         values:
         - skip
     {{ end }}
+    {{ if .Values.ObjectSelectorAdmissionSkip }}
+    objectSelector:
+{{ toYaml .Values.ObjectSelectorAdmissionSkip | indent 6 }}
+    {{ end }}

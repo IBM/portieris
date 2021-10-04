@@ -83,6 +83,15 @@ affinity:
 # enable this option!
 AllowAdmissionSkip: false
 
+ObjectSelectorAdmissionSkip: 
+    # matchLabels:
+    #   app: xxx
+    # matchExpressions:
+    #   - key: xxxxx.xxxxx/xxx
+    #     operator: NotIn
+    #     values:
+    #     - xxxx
+
 clusterPolicy:
   allowedRepositories:
     # This permissive policy allows all images in namespaces which do not have an ImagePolicy.
