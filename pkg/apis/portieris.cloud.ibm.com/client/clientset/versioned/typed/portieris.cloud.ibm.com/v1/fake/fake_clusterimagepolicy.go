@@ -19,6 +19,8 @@ limitations under the License.
 package fake
 
 import (
+	"context"
+
 	portieriscloudibmcomv1 "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
@@ -38,7 +40,7 @@ var clusterimagepoliciesResource = schema.GroupVersionResource{Group: "portieris
 var clusterimagepoliciesKind = schema.GroupVersionKind{Group: "portieris.cloud.ibm.com", Version: "v1", Kind: "ClusterImagePolicy"}
 
 // Get takes name of the clusterImagePolicy, and returns the corresponding clusterImagePolicy object, and an error if there is any.
-func (c *FakeClusterImagePolicies) Get(name string, options v1.GetOptions) (result *portieriscloudibmcomv1.ClusterImagePolicy, err error) {
+func (c *FakeClusterImagePolicies) Get(ctx context.Context, name string, options v1.GetOptions) (result *portieriscloudibmcomv1.ClusterImagePolicy, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewRootGetAction(clusterimagepoliciesResource, name), &portieriscloudibmcomv1.ClusterImagePolicy{})
 	if obj == nil {
@@ -48,7 +50,7 @@ func (c *FakeClusterImagePolicies) Get(name string, options v1.GetOptions) (resu
 }
 
 // List takes label and field selectors, and returns the list of ClusterImagePolicies that match those selectors.
-func (c *FakeClusterImagePolicies) List(opts v1.ListOptions) (result *portieriscloudibmcomv1.ClusterImagePolicyList, err error) {
+func (c *FakeClusterImagePolicies) List(ctx context.Context, opts v1.ListOptions) (result *portieriscloudibmcomv1.ClusterImagePolicyList, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewRootListAction(clusterimagepoliciesResource, clusterimagepoliciesKind, opts), &portieriscloudibmcomv1.ClusterImagePolicyList{})
 	if obj == nil {
@@ -69,13 +71,13 @@ func (c *FakeClusterImagePolicies) List(opts v1.ListOptions) (result *portierisc
 }
 
 // Watch returns a watch.Interface that watches the requested clusterImagePolicies.
-func (c *FakeClusterImagePolicies) Watch(opts v1.ListOptions) (watch.Interface, error) {
+func (c *FakeClusterImagePolicies) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	return c.Fake.
 		InvokesWatch(testing.NewRootWatchAction(clusterimagepoliciesResource, opts))
 }
 
 // Create takes the representation of a clusterImagePolicy and creates it.  Returns the server's representation of the clusterImagePolicy, and an error, if there is any.
-func (c *FakeClusterImagePolicies) Create(clusterImagePolicy *portieriscloudibmcomv1.ClusterImagePolicy) (result *portieriscloudibmcomv1.ClusterImagePolicy, err error) {
+func (c *FakeClusterImagePolicies) Create(ctx context.Context, clusterImagePolicy *portieriscloudibmcomv1.ClusterImagePolicy, opts v1.CreateOptions) (result *portieriscloudibmcomv1.ClusterImagePolicy, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewRootCreateAction(clusterimagepoliciesResource, clusterImagePolicy), &portieriscloudibmcomv1.ClusterImagePolicy{})
 	if obj == nil {
@@ -85,7 +87,7 @@ func (c *FakeClusterImagePolicies) Create(clusterImagePolicy *portieriscloudibmc
 }
 
 // Update takes the representation of a clusterImagePolicy and updates it. Returns the server's representation of the clusterImagePolicy, and an error, if there is any.
-func (c *FakeClusterImagePolicies) Update(clusterImagePolicy *portieriscloudibmcomv1.ClusterImagePolicy) (result *portieriscloudibmcomv1.ClusterImagePolicy, err error) {
+func (c *FakeClusterImagePolicies) Update(ctx context.Context, clusterImagePolicy *portieriscloudibmcomv1.ClusterImagePolicy, opts v1.UpdateOptions) (result *portieriscloudibmcomv1.ClusterImagePolicy, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewRootUpdateAction(clusterimagepoliciesResource, clusterImagePolicy), &portieriscloudibmcomv1.ClusterImagePolicy{})
 	if obj == nil {
@@ -95,22 +97,22 @@ func (c *FakeClusterImagePolicies) Update(clusterImagePolicy *portieriscloudibmc
 }
 
 // Delete takes name of the clusterImagePolicy and deletes it. Returns an error if one occurs.
-func (c *FakeClusterImagePolicies) Delete(name string, options *v1.DeleteOptions) error {
+func (c *FakeClusterImagePolicies) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
 		Invokes(testing.NewRootDeleteAction(clusterimagepoliciesResource, name), &portieriscloudibmcomv1.ClusterImagePolicy{})
 	return err
 }
 
 // DeleteCollection deletes a collection of objects.
-func (c *FakeClusterImagePolicies) DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error {
-	action := testing.NewRootDeleteCollectionAction(clusterimagepoliciesResource, listOptions)
+func (c *FakeClusterImagePolicies) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
+	action := testing.NewRootDeleteCollectionAction(clusterimagepoliciesResource, listOpts)
 
 	_, err := c.Fake.Invokes(action, &portieriscloudibmcomv1.ClusterImagePolicyList{})
 	return err
 }
 
 // Patch applies the patch and returns the patched clusterImagePolicy.
-func (c *FakeClusterImagePolicies) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *portieriscloudibmcomv1.ClusterImagePolicy, err error) {
+func (c *FakeClusterImagePolicies) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *portieriscloudibmcomv1.ClusterImagePolicy, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewRootPatchSubresourceAction(clusterimagepoliciesResource, name, pt, data, subresources...), &portieriscloudibmcomv1.ClusterImagePolicy{})
 	if obj == nil {

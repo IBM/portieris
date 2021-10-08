@@ -116,14 +116,12 @@ func TestDeploymentRunnableCheck(t *testing.T, fw *framework.Framework, manifest
 			DumpEvents(t, fw, namespace)
 			DumpPolicies(t, fw, namespace)
 		}
-		break
 	case VerifyNoSha:
 		err := noImagesContain(deployment.Spec.Template, "@sha256:")
 		if !assert.NoError(t, err) {
 			DumpEvents(t, fw, namespace)
 			DumpPolicies(t, fw, namespace)
 		}
-		break
 	}
 	if !assert.Equal(t, *deployment.Spec.Replicas, deployment.Status.AvailableReplicas, "Deployment failed: available replicas did not match expected replicas") {
 		DumpEvents(t, fw, namespace)

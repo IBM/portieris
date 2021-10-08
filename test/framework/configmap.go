@@ -14,10 +14,14 @@
 
 package framework
 
-import corev1 "k8s.io/api/core/v1"
+import (
+	"context"
+
+	corev1 "k8s.io/api/core/v1"
+)
 
 // ListConfigMaps lists all the configuration maps that are associated with the installed Helm release.
 func (f *Framework) ListConfigMaps() (*corev1.ConfigMapList, error) {
 	opts := f.getHelmReleaseSelectorListOptions()
-	return f.KubeClient.CoreV1().ConfigMaps(corev1.NamespaceAll).List(opts)
+	return f.KubeClient.CoreV1().ConfigMaps(corev1.NamespaceAll).List(context.TODO(), opts)
 }

@@ -15,6 +15,7 @@
 package framework
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -41,7 +42,7 @@ func (f *Framework) LoadDeploymentManifest(pathToManifest string) (*v1.Deploymen
 
 // CreateDeployment creates a deployment and waits for it to show.
 func (f *Framework) CreateDeployment(namespace string, deployment *v1.Deployment) error {
-	if _, err := f.KubeClient.AppsV1().Deployments(namespace).Create(deployment); err != nil {
+	if _, err := f.KubeClient.AppsV1().Deployments(namespace).Create(context.TODO(), deployment, metav1.CreateOptions{}); err != nil {
 		return err
 	}
 	if err := f.WaitForDeployment(deployment.Name, namespace, time.Minute); err != nil {
@@ -53,22 +54,22 @@ func (f *Framework) CreateDeployment(namespace string, deployment *v1.Deployment
 
 // GetDeployment retrieves the specified deployment.
 func (f *Framework) GetDeployment(name, namespace string) (*v1.Deployment, error) {
-	return f.KubeClient.AppsV1().Deployments(namespace).Get(name, metav1.GetOptions{})
+	return f.KubeClient.AppsV1().Deployments(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 }
 
 // PatchDeployment patches the specified deployment.
 func (f *Framework) PatchDeployment(name, namespace, patch string) (*v1.Deployment, error) {
-	return f.KubeClient.AppsV1().Deployments(namespace).Patch(name, types.StrategicMergePatchType, []byte(patch))
+	return f.KubeClient.AppsV1().Deployments(namespace).Patch(context.TODO(), name, types.StrategicMergePatchType, []byte(patch), metav1.PatchOptions{})
 }
 
 // ReplaceDeployment replaces the specified deployment.
 func (f *Framework) ReplaceDeployment(namespace string, deployment *v1.Deployment) (*v1.Deployment, error) {
-	return f.KubeClient.AppsV1().Deployments(namespace).Update(deployment)
+	return f.KubeClient.AppsV1().Deployments(namespace).Update(context.TODO(), deployment, metav1.UpdateOptions{})
 }
 
 // DeleteDeployment deletes the specified deployment.
 func (f *Framework) DeleteDeployment(name, namespace string) error {
-	return f.KubeClient.AppsV1().Deployments(namespace).Delete(name, &metav1.DeleteOptions{})
+	return f.KubeClient.AppsV1().Deployments(namespace).Delete(context.TODO(), name, metav1.DeleteOptions{})
 }
 
 // WaitForDeployment waits until the specified deployment is created or the timeout is reached.
@@ -98,5 +99,5 @@ func (f *Framework) WaitForDeploymentPods(name, namespace string, timeout time.D
 // ListDeployments lists all deployments that are associated with the installed Helm release.
 func (f *Framework) ListDeployments() (*v1.DeploymentList, error) {
 	opts := f.getHelmReleaseSelectorListOptions()
-	return f.KubeClient.AppsV1().Deployments(corev1.NamespaceAll).List(opts)
+	return f.KubeClient.AppsV1().Deployments(corev1.NamespaceAll).List(context.TODO(), opts)
 }

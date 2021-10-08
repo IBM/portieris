@@ -15,11 +15,12 @@
 package framework
 
 import (
+	"context"
 	"fmt"
 
 	"time"
 
-	batchv1 "k8s.io/api/batch/v1beta1"
+	batchv1beta1 "k8s.io/api/batch/v1beta1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -27,23 +28,23 @@ import (
 )
 
 // ListCronJobs lists all the Cron Jobs that are associated with the installed Helm release.
-func (f *Framework) ListCronJobs() (*batchv1.CronJobList, error) {
+func (f *Framework) ListCronJobs() (*batchv1beta1.CronJobList, error) {
 	opts := f.getHelmReleaseSelectorListOptions()
-	return f.KubeClient.BatchV1beta1().CronJobs(corev1.NamespaceAll).List(opts)
+	return f.KubeClient.BatchV1beta1().CronJobs(corev1.NamespaceAll).List(context.TODO(), opts)
 }
 
 // GetCronJob retrieves the specified Cron Job.
-func (f *Framework) GetCronJob(name, namespace string) (*batchv1.CronJob, error) {
-	return f.KubeClient.BatchV1beta1().CronJobs(namespace).Get(name, metav1.GetOptions{})
+func (f *Framework) GetCronJob(name, namespace string) (*batchv1beta1.CronJob, error) {
+	return f.KubeClient.BatchV1beta1().CronJobs(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 }
 
 // LoadCronJobManifest takes a manifest and decodes it into a Cron Job object.
-func (f *Framework) LoadCronJobManifest(pathToManifest string) (*batchv1.CronJob, error) {
+func (f *Framework) LoadCronJobManifest(pathToManifest string) (*batchv1beta1.CronJob, error) {
 	manifest, err := openFile(pathToManifest)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to open file %q: %v", pathToManifest, err)
 	}
-	job := batchv1.CronJob{}
+	job := batchv1beta1.CronJob{}
 	if err := yaml.NewYAMLOrJSONDecoder(manifest, 100).Decode(&job); err != nil {
 		return nil, fmt.Errorf("Unable to decode file %q: %v", pathToManifest, err)
 	}
@@ -51,8 +52,8 @@ func (f *Framework) LoadCronJobManifest(pathToManifest string) (*batchv1.CronJob
 }
 
 // CreateCronJob creates a Cron Job resource and then waits for it to show.
-func (f *Framework) CreateCronJob(namespace string, job *batchv1.CronJob) error {
-	if _, err := f.KubeClient.BatchV1beta1().CronJobs(namespace).Create(job); err != nil {
+func (f *Framework) CreateCronJob(namespace string, job *batchv1beta1.CronJob) error {
+	if _, err := f.KubeClient.BatchV1beta1().CronJobs(namespace).Create(context.TODO(), job, metav1.CreateOptions{}); err != nil {
 		return err
 	}
 	return f.WaitForCronJob(job.Name, namespace, 2*time.Minute)
@@ -60,7 +61,7 @@ func (f *Framework) CreateCronJob(namespace string, job *batchv1.CronJob) error 
 
 // DeleteCronJob deletes the specified Cron Job.
 func (f *Framework) DeleteCronJob(name, namespace string) error {
-	return f.KubeClient.BatchV1beta1().CronJobs(namespace).Delete(name, &metav1.DeleteOptions{})
+	return f.KubeClient.BatchV1().CronJobs(namespace).Delete(context.TODO(), name, metav1.DeleteOptions{})
 }
 
 // WaitForCronJob waits until the Cron Job deployment is complete.

@@ -1,4 +1,4 @@
-// Copyright 2018, 2020 Portieris Authors.
+// Copyright 2018, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 package kubernetes
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -43,7 +44,7 @@ type RegistryCredentials struct {
 // GetSecretKey obtains the "key" data from the named secret
 func (w *Wrapper) GetSecretKey(namespace, secretName string) ([]byte, error) {
 	// Retrieve secret
-	secret, err := w.CoreV1().Secrets(namespace).Get(secretName, metav1.GetOptions{})
+	secret, err := w.CoreV1().Secrets(namespace).Get(context.TODO(), secretName, metav1.GetOptions{})
 	if err != nil {
 		glog.Error("Error: ", err)
 		return nil, err
@@ -53,7 +54,7 @@ func (w *Wrapper) GetSecretKey(namespace, secretName string) ([]byte, error) {
 	if key, ok := secret.Data["key"]; ok {
 		return key, nil
 	}
-	return nil, fmt.Errorf("Secret %q in %q does not contain a \"key\" attribute", secretName, namespace)
+	return nil, fmt.Errorf("secret %q in %q does not contain a \"key\" attribute", secretName, namespace)
 }
 
 // GetSecretToken retrieve the token (password field) for the given namespace/secret/registry
@@ -62,7 +63,7 @@ func (w *Wrapper) GetSecretToken(namespace, secretName, registry string) (string
 	var username, password string
 
 	// Retrieve secret
-	secret, err := w.CoreV1().Secrets(namespace).Get(secretName, metav1.GetOptions{})
+	secret, err := w.CoreV1().Secrets(namespace).Get(context.TODO(), secretName, metav1.GetOptions{})
 	if err != nil {
 		glog.Error("Error: ", err)
 		return username, password, err
@@ -91,7 +92,7 @@ func (w *Wrapper) GetSecretToken(namespace, secretName, registry string) (string
 	if login, ok := registries[registry]; ok {
 		username, password = w.extractRegistryCredentials(login)
 	} else {
-		err = fmt.Errorf("Secret %s not defined for registry: %s", secretName, registry)
+		err = fmt.Errorf("secret %s not defined for registry: %s", secretName, registry)
 	}
 	// glog.Infof("getSecretToken >> : token(%s)", token)
 	return username, password, err
@@ -138,7 +139,7 @@ func (w *Wrapper) GetBasicCredentials(namespace, name string) (string, string, e
 	}
 
 	// Retrieve secret
-	secret, err := w.CoreV1().Secrets(namespace).Get(name, metav1.GetOptions{})
+	secret, err := w.CoreV1().Secrets(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 	if err != nil {
 		return "", "", err
 	}

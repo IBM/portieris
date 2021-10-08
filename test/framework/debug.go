@@ -15,6 +15,7 @@
 package framework
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"log"
@@ -28,7 +29,7 @@ import (
 // DumpEvents returns a reader that has events that are written to a specified namespace.
 func (f *Framework) DumpEvents(namespace string) io.Reader {
 	fmt.Printf("Dumping events for namespace: %v\n", namespace)
-	events, err := f.KubeClient.CoreV1().Events(namespace).List(metav1.ListOptions{})
+	events, err := f.KubeClient.CoreV1().Events(namespace).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		log.Printf("error retrieving events from %q: %v", namespace, err)
 	}

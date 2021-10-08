@@ -19,6 +19,7 @@ limitations under the License.
 package v1
 
 import (
+	"context"
 	time "time"
 
 	versioned "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/client/clientset/versioned"
@@ -61,13 +62,13 @@ func NewFilteredImagePolicyInformer(client versioned.Interface, namespace string
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.PortierisV1().ImagePolicies(namespace).List(options)
+				return client.PortierisV1().ImagePolicies(namespace).List(context.TODO(), options)
 			},
 			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.PortierisV1().ImagePolicies(namespace).Watch(options)
+				return client.PortierisV1().ImagePolicies(namespace).Watch(context.TODO(), options)
 			},
 		},
 		&portieriscloudibmcomv1.ImagePolicy{},

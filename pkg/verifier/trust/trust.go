@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2021 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@ package trust
 
 import (
 	"bytes"
+	"context"
 	"encoding/hex"
 	"fmt"
 	"path"
@@ -124,7 +125,7 @@ func (v *Verifier) getDigest(server, image, notaryToken, targetName string, sign
 func (v *Verifier) getSignerSecret(namespace, signerSecretName string) (Signer, error) {
 
 	// Retrieve secret
-	secret, err := v.kubeClientsetWrapper.CoreV1().Secrets(namespace).Get(signerSecretName, metav1.GetOptions{})
+	secret, err := v.kubeClientsetWrapper.CoreV1().Secrets(namespace).Get(context.TODO(), signerSecretName, metav1.GetOptions{})
 	if err != nil {
 		glog.Error("Error: ", err)
 		return Signer{}, err

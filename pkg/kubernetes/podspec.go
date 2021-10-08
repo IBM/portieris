@@ -15,6 +15,7 @@
 package kubernetes
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/golang/glog"
@@ -24,7 +25,6 @@ import (
 	appsv1beta2 "k8s.io/api/apps/v1beta2"
 	batchv1 "k8s.io/api/batch/v1"
 	batchv1beta1 "k8s.io/api/batch/v1beta1"
-	batchv2alpha1 "k8s.io/api/batch/v2alpha1"
 	corev1 "k8s.io/api/core/v1"
 	extensionsv1beta1 "k8s.io/api/extensions/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -225,16 +225,16 @@ func (w *Wrapper) GetPodSpec(ar *admissionv1.AdmissionRequest) (string, *corev1.
 		ps = job.Spec.Template.Spec
 		w.mutateWithSA(ar.Namespace, &ps)
 		templateString = templateSpecPath
-	case metav1.GroupVersionResource{Group: "batch", Version: "v1beta1", Resource: "cronjobs"}:
-		job := batchv1beta1.CronJob{}
+	case metav1.GroupVersionResource{Group: "batch", Version: "v1", Resource: "cronjobs"}:
+		job := batchv1.CronJob{}
 		if err := w.decodeObject(ar.Object.Raw, &job); err != nil {
 			return "", nil, err
 		}
 		ps = job.Spec.JobTemplate.Spec.Template.Spec //:sob:
 		w.mutateWithSA(ar.Namespace, &ps)
 		templateString = cronJobSpecPath
-	case metav1.GroupVersionResource{Group: "batch", Version: "v2alpha1", Resource: "cronjobs"}:
-		job := batchv2alpha1.CronJob{}
+	case metav1.GroupVersionResource{Group: "batch", Version: "v1beta1", Resource: "cronjobs"}:
+		job := batchv1beta1.CronJob{}
 		if err := w.decodeObject(ar.Object.Raw, &job); err != nil {
 			return "", nil, err
 		}
@@ -274,7 +274,7 @@ func (w *Wrapper) mutateWithSA(ns string, ps *corev1.PodSpec) error {
 	if ps.ServiceAccountName != "" {
 		name = ps.ServiceAccountName
 	}
-	sa, err := w.CoreV1().ServiceAccounts(ns).Get(name, metav1.GetOptions{})
+	sa, err := w.CoreV1().ServiceAccounts(ns).Get(context.TODO(), name, metav1.GetOptions{})
 	if err != nil {
 		return err
 	}

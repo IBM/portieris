@@ -15,6 +15,7 @@
 package framework
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -28,12 +29,12 @@ import (
 // ListJobs lists all jobs that are associated with the installed Helm release.
 func (f *Framework) ListJobs() (*batchv1.JobList, error) {
 	opts := f.getHelmReleaseSelectorListOptions()
-	return f.KubeClient.BatchV1().Jobs(corev1.NamespaceAll).List(opts)
+	return f.KubeClient.BatchV1().Jobs(corev1.NamespaceAll).List(context.TODO(), opts)
 }
 
 // GetJob retrieves the specified job.
 func (f *Framework) GetJob(name, namespace string) (*batchv1.Job, error) {
-	return f.KubeClient.BatchV1().Jobs(namespace).Get(name, metav1.GetOptions{})
+	return f.KubeClient.BatchV1().Jobs(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 }
 
 // LoadJobManifest takes a manifest and decodes it into a job.
@@ -51,7 +52,7 @@ func (f *Framework) LoadJobManifest(pathToManifest string) (*batchv1.Job, error)
 
 // CreateJob creates a job and waits for it to show.
 func (f *Framework) CreateJob(namespace string, job *batchv1.Job) error {
-	if _, err := f.KubeClient.BatchV1().Jobs(namespace).Create(job); err != nil {
+	if _, err := f.KubeClient.BatchV1().Jobs(namespace).Create(context.TODO(), job, metav1.CreateOptions{}); err != nil {
 		return err
 	}
 	return f.WaitForJob(job.Name, namespace, time.Minute)
@@ -59,7 +60,7 @@ func (f *Framework) CreateJob(namespace string, job *batchv1.Job) error {
 
 // DeleteJob deletes the specified job.
 func (f *Framework) DeleteJob(name, namespace string) error {
-	return f.KubeClient.BatchV1().Jobs(namespace).Delete(name, &metav1.DeleteOptions{})
+	return f.KubeClient.BatchV1().Jobs(namespace).Delete(context.TODO(), name, metav1.DeleteOptions{})
 }
 
 // WaitForJob waits until the job completes.

@@ -14,10 +14,14 @@
 
 package framework
 
-import corev1 "k8s.io/api/core/v1"
+import (
+	"context"
+
+	corev1 "k8s.io/api/core/v1"
+)
 
 // ListServices lists all services that are associated with the installed Helm release.
 func (f *Framework) ListServices() (*corev1.ServiceList, error) {
 	opts := f.getHelmReleaseSelectorListOptions()
-	return f.KubeClient.CoreV1().Services(corev1.NamespaceAll).List(opts)
+	return f.KubeClient.CoreV1().Services(corev1.NamespaceAll).List(context.TODO(), opts)
 }
