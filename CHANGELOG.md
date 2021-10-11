@@ -2,7 +2,7 @@
 
 copyright:
   years: 2020, 2021
-lastupdated: "2021-03-25"
+lastupdated: "2021-10-11"
 
 ---
 
@@ -28,6 +28,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * use current resource versions ([215](https://github.com/IBM/portieris/issues/215))
 * update dependencies and golang version to 1.16.5
 * a template fix to correctly identify openshift ([PR#326](https://github.com/IBM/portieris/pull/326))
+
+# v0.10.3
+## 2021-06-22
+* update dependencies and golang to 1.16.5
 
 # v0.10.2
 ## 2021-03-25
