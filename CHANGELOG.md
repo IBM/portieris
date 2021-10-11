@@ -7,19 +7,18 @@ lastupdated: "2021-03-25"
 ---
 
 # Change Log
-
 Notable changes recorded here.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 # v-next
 ##
 
-# v0.11.1
-## 2021-10-8
+# v0.12.0
+## 2021-10-11
 * Added support for batch/v1/cronjobs and dropped batch/v1alpha1/cronjobs inline with 1.21 apis ([350](https://github.com/IBM/portieris/issues/350))
 * Many more documentation improvements
 * Set sane priorityClass ([352](https://github.com/IBM/portieris/issues/352))
-* Build using ubi go toolset, and run in ubi-minimal ([351](https://github.com/IBM/portieris/issues/351))
+* Build using ubi go toolset (golang 1.15.14), and run in ubi-minimal ([351](https://github.com/IBM/portieris/issues/351))
 * Support ObjectSelectorAdmissionSkip ([349](https://github.com/IBM/portieris/issues/349))
 * Require TLS1.2 on webhook
 
