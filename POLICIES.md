@@ -298,7 +298,7 @@ To customize your policies, complete the following steps:
 1. Create a [Kubernetes custom resource definition](https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/) `.yaml` file. For more information, see Table 1.
 
    ```yaml
-   apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
+   apiVersion: portieris.cloud.ibm.com/v1
    kind: <ClusterImagePolicy_or_ImagePolicy>
    metadata:
      name: <crd_name>
@@ -327,7 +327,7 @@ If role-based access control (RBAC) is enabled on your Kubernetes cluster, you c
 * In your role, add a rule for security policies:
 
   ```yaml
-  - apiGroups: ["securityenforcement.admission.cloud.ibm.com"]
+  - apiGroups: ["portieris.cloud.ibm.com"]
     resources: ["imagepolicies", "clusterimagepolicies"]
     verbs: ["get", "watch", "list", "create", "update", "patch", "delete"]
   ```
@@ -337,7 +337,7 @@ If role-based access control (RBAC) is enabled on your Kubernetes cluster, you c
 * Users who have access to delete custom resource definitions (CRDs) can delete the resource definition for security policies, which also deletes your security policies. Make sure to control who is allowed to delete CRDs. To grant access to delete CRDs, add a rule:
 
   ```yaml
-  - apiGroups: ["apiextensions.k8s.io/v1beta1"]
+  - apiGroups: ["apiextensions.k8s.io/v1"]
     resources: ["CustomResourceDefinition"]
     verbs: ["delete"]
   ```
