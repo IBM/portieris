@@ -153,7 +153,7 @@ When you create the secret, ensure that you're creating the key with a value of 
 kubectl create secret generic my-pubkey --from-file=key=<your_pub_key_file>
 ```
 
-The following example requires that images from `icr.io` are signed by the identity with a public key in `my-pubkey`. If multiple public keys are present in `my-pubkey` the image is requred to be signed by one of them. 
+The following example requires that images from `icr.io` are signed by the identity with its public key in `my-pubkey`. If multiple public keys are present in `my-pubkey` the image is required to be signed by any one of them. 
 
 ```yaml
 apiVersion: portieris.cloud.ibm.com/v1
