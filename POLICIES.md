@@ -138,22 +138,22 @@ To configure the policy to verify that an image is signed by a particular signer
    
 ### `simple` (Red Hat simple signing)
 
-The policy requirements are similar to those defined for the configuration files that are consulted when you're using the Red Hat&reg; tools [policy requirements](https://github.com/containers/image/blob/master/docs/containers-policy.json.5.md#policy-requirements). However, the main difference is that the public key in a `signedBy` requirement is defined in a `keySecret` attribute, the value is the name of an in-scope Kubernetes secret that contains a public key block. The value of `keyType`, `keyPath`, and `keyData`, see [policy requirements](https://github.com/containers/image/blob/master/docs/containers-policy.json.5.md#policy-requirements), can't be provided. If multiple keys are present in the key ring, the requirement is satisfied if the signature is signed by any of them.
+The policy requirements are similar to those defined for the configuration files that are consulted when you're using the Red Hat&reg; tools [policy requirements](https://github.com/containers/image/blob/master/docs/containers-policy.json.5.md#policy-requirements). However, the main difference is that the public key in a `signedBy` requirement is defined in a `keySecret` attribute, the value is the name of an in-scope Kubernetes secret that contains a public key block. The value of `keyType`, `keyPath`, and `keyData`, see [policy requirements](https://github.com/containers/image/blob/master/docs/containers-policy.json.5.md#policy-requirements), can't be provided. If multiple keys are present in the key ring, the requirement is satisfied if the signature is signed by any one of them.
 
-To export a single public key identified by `<finger-print>` from GNU Privacy Guard (GPG) and create a KeySecret from it, you can use the following script.
+To export one or more public keys identified by `<finger-print>`, to a keyring, from GNU Privacy Guard (GPG) and create a KeySecret from it, you can use the following script.
 
 ```bash
-gpg --export --armour <finger-print> > my.pubkey
+gpg --export --armour <finger-print> [<finger-print>] > my.pubkey
 kubectl create secret generic my-pubkey --from-file=key=my.pubkey
 ```
 
 When you create the secret, ensure that you're creating the key with a value of `key`.
 
 ```
-kubectl create secret generic my-pubkey --from-file=key=<your_pub_key>
+kubectl create secret generic my-pubkey --from-file=key=<your_pub_key_file>
 ```
 
-The following example requires that images from `icr.io` are signed by the identity with public key in `my-pubkey`.
+The following example requires that images from `icr.io` are signed by the identity with its public key in `my-pubkey`. If multiple public keys are present in `my-pubkey` the image is required to be signed by any one of them. 
 
 ```yaml
 apiVersion: portieris.cloud.ibm.com/v1
@@ -168,6 +168,25 @@ spec:
           requirements:
           - type: "signedBy"
             keySecret: my-pubkey
+```
+
+The following example requires that images from `icr.io` are signed by the identity with public key in `my-pubkey` AND the the identity with public key in `your-pubkey`
+
+```yaml
+apiVersion: portieris.cloud.ibm.com/v1
+kind: ImagePolicy
+metadata:
+  name: signedby-me
+spec:
+   repositories:
+    - name: "icr.io/*"
+      policy:
+        simple:
+          requirements:
+          - type: "signedBy"
+            keySecret: my-pubkey
+          - type: "signedBy"
+            keySecret: your-pubkey
 ```
 
 The following example requires that a specific image is signed, but it allows the registry location to change. In this pattern, a policy for each image is required to exactly define the new location.
@@ -298,7 +317,7 @@ To customize your policies, complete the following steps:
 1. Create a [Kubernetes custom resource definition](https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/) `.yaml` file. For more information, see Table 1.
 
    ```yaml
-   apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
+   apiVersion: portieris.cloud.ibm.com/v1
    kind: <ClusterImagePolicy_or_ImagePolicy>
    metadata:
      name: <crd_name>
@@ -327,7 +346,7 @@ If role-based access control (RBAC) is enabled on your Kubernetes cluster, you c
 * In your role, add a rule for security policies:
 
   ```yaml
-  - apiGroups: ["securityenforcement.admission.cloud.ibm.com"]
+  - apiGroups: ["portieris.cloud.ibm.com"]
     resources: ["imagepolicies", "clusterimagepolicies"]
     verbs: ["get", "watch", "list", "create", "update", "patch", "delete"]
   ```
@@ -337,7 +356,7 @@ If role-based access control (RBAC) is enabled on your Kubernetes cluster, you c
 * Users who have access to delete custom resource definitions (CRDs) can delete the resource definition for security policies, which also deletes your security policies. Make sure to control who is allowed to delete CRDs. To grant access to delete CRDs, add a rule:
 
   ```yaml
-  - apiGroups: ["apiextensions.k8s.io/v1beta1"]
+  - apiGroups: ["apiextensions.k8s.io/v1"]
     resources: ["CustomResourceDefinition"]
     verbs: ["delete"]
   ```
