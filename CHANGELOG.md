@@ -13,6 +13,15 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 # v-next
 ##
 
+# v0.12.1
+##
+* Resolves CVE-2021-23840
+* Resolves CVE-2021-23841
+* Resolves CVE-2021-27645
+* Resolves CVE-2021-33574
+* Resolves CVE-2021-35942
+* Supports cert-manager >= 1.6 
+
 # v0.12.0
 ## 2021-10-11
 * Added support for batch/v1/cronjobs and dropped batch/v1alpha1/cronjobs inline with 1.21 apis ([350](https://github.com/IBM/portieris/issues/350))
