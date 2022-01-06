@@ -15,8 +15,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 # v0.12.2
 ##
-* Image rebuild only 
 * Resolves CVE-2021-3712
+* Build with go-toolset:1.16.12
 
 # v0.12.1
 ##
