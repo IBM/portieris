@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/ubi8/go-toolset:1.15.14-10 as gobuild
+FROM registry.access.redhat.com/ubi8/go-toolset:1.16.12 as gobuild
 # This first stage of the build is purely to build the Golang binary for Portieris
 ARG VERSION=undefined
 # Work within the /opt/app-root/src working directory of the UBI go-toolset image
