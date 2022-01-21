@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2022 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@ package fakenotary
 import (
 	"sync"
 
+	"github.com/IBM/portieris/helpers/image"
+	"github.com/IBM/portieris/pkg/notary"
 	notaryclient "github.com/theupdateframework/notary/client"
 )
 
@@ -32,6 +34,16 @@ type FakeNotary struct {
 	getNotaryRepoReturns []struct {
 		notaryRepo notaryclient.Repository
 		err        error
+	}
+	CheckAuthRequiredStub        func(notaryURL string, img *image.Reference) (*notary.AuthEndpoint, error)
+	checkAuthRequiredMutex       sync.RWMutex
+	CheckAuthRequiredArgsForCall []struct {
+		NotaryURL string
+		Img       *image.Reference
+	}
+	checkAuthRequiredReturns []struct {
+		endpoint *notary.AuthEndpoint
+		err      error
 	}
 }
 
@@ -65,4 +77,45 @@ func (fake *FakeNotary) GetNotaryRepoReturns(notaryRepo notaryclient.Repository,
 		notaryRepo notaryclient.Repository
 		err        error
 	}{notaryRepo, err})
+}
+
+// CheckAuthRequired ...
+func (fake *FakeNotary) CheckAuthRequired(notaryURL string, img *image.Reference) (*notary.AuthEndpoint, error) {
+	fake.checkAuthRequiredMutex.Lock()
+	fake.CheckAuthRequiredArgsForCall = append(fake.CheckAuthRequiredArgsForCall, struct {
+		NotaryURL string
+		Img       *image.Reference
+	}{notaryURL, img})
+	fake.checkAuthRequiredMutex.Unlock()
+	if fake.CheckAuthRequiredStub != nil {
+		return fake.CheckAuthRequiredStub(notaryURL, img)
+	}
+
+	if len(fake.checkAuthRequiredReturns) < 1 {
+		panic("CheckAuthRequired called before it is stubbed")
+	}
+	returns := fake.checkAuthRequiredReturns[0]
+	fake.checkAuthRequiredReturns = fake.checkAuthRequiredReturns[1:]
+
+	return returns.endpoint, returns.err
+}
+
+// CheckAuthRequiredReturns ...
+func (fake *FakeNotary) CheckAuthRequiredReturns(endpoint *notary.AuthEndpoint, err error) {
+	fake.checkAuthRequiredMutex.Lock()
+	defer fake.checkAuthRequiredMutex.Unlock()
+	fake.checkAuthRequiredReturns = append(fake.checkAuthRequiredReturns, struct {
+		endpoint *notary.AuthEndpoint
+		err      error
+	}{endpoint, err})
+}
+
+// DefaultAuthEndpointStub does always return an auth endpoint
+func (fake *FakeNotary) DefaultAuthEndpointStub(notaryURL string, img *image.Reference) (*notary.AuthEndpoint, error) {
+	return &notary.AuthEndpoint{URL: notaryURL + "/oauth/token", Service: "notary", Scope: "pull"}, nil
+}
+
+// NoAuthRequiredStub does not return an auth endpoint to simulate cases where no authentication is required
+func (fake *FakeNotary) NoAuthRequiredStub(notaryURL string, img *image.Reference) (*notary.AuthEndpoint, error) {
+	return nil, nil
 }

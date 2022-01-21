@@ -1,4 +1,4 @@
-// Copyright 2018, 2020 Portieris Authors.
+// Copyright 2018, 2022 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/IBM/portieris/helpers/oauth"
 	"github.com/IBM/portieris/pkg/registry"
 )
 
@@ -26,13 +25,14 @@ var _ registry.Interface = &FakeRegistry{}
 
 // FakeRegistry .
 type FakeRegistry struct {
-	GetContentTrustTokenStub        func(username, password, imageRepo string, challengeSlice []oauth.Challenge) (string, error)
+	GetContentTrustTokenStub        func(oauthEndpoint string, username string, password string, service string, scope string) (string, error)
 	getContentTrustTokenMutex       sync.RWMutex
 	getContentTrustTokenArgsForCall []struct {
-		username       string
-		password       string
-		imageRepo      string
-		challengeSlice []oauth.Challenge
+		oauthEndpoint string
+		username      string
+		password      string
+		service       string
+		scope         string
 	}
 	getContentTrustTokenReturns struct {
 		token string
@@ -41,23 +41,24 @@ type FakeRegistry struct {
 }
 
 // GetContentTrustToken ...
-func (fake *FakeRegistry) GetContentTrustToken(username, password, imageRepo string, challengeSlice []oauth.Challenge) (string, error) {
+func (fake *FakeRegistry) GetContentTrustToken(oauthEndpoint string, username string, password string, service string, scope string) (string, error) {
 	fake.getContentTrustTokenMutex.Lock()
 	fake.getContentTrustTokenArgsForCall = append(fake.getContentTrustTokenArgsForCall, struct {
-		username       string
-		password       string
-		imageRepo      string
-		challengeSlice []oauth.Challenge
-	}{username, password, imageRepo, challengeSlice})
+		oauthEndpoint string
+		username      string
+		password      string
+		service       string
+		scope         string
+	}{oauthEndpoint, username, password, service, scope})
 	fake.getContentTrustTokenMutex.Unlock()
 	if fake.GetContentTrustTokenStub != nil {
-		return fake.GetContentTrustTokenStub(username, password, imageRepo, challengeSlice)
+		return fake.GetContentTrustTokenStub(oauthEndpoint, username, password, service, scope)
 	}
 	return fake.getContentTrustTokenReturns.token, fake.getContentTrustTokenReturns.err
 }
 
 // NoAnonymousContentTrustTokenStub ...
-func (fake *FakeRegistry) NoAnonymousContentTrustTokenStub(username, password, imageRepo, hostname string) (string, error) {
+func (fake *FakeRegistry) NoAnonymousContentTrustTokenStub(oauthEndpoint string, username string, password string, service string, scope string) (string, error) {
 	if username == "" {
 		return "", fmt.Errorf("not allowed")
 	}
@@ -75,6 +76,6 @@ func (fake *FakeRegistry) GetContentTrustTokenReturns(token string, err error) {
 }
 
 // GetRegistryToken ...
-func (fake *FakeRegistry) GetRegistryToken(username, password, imageRepo string, challengeSlice []oauth.Challenge) (string, error) {
+func (fake *FakeRegistry) GetRegistryToken(oauthEndpoint string, username string, password string, service string, scope string) (string, error) {
 	return "", fmt.Errorf("not implemented")
 }

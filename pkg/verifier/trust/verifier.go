@@ -1,4 +1,4 @@
-// Copyright 2018, 2021 Portieris Authors.
+// Copyright 2018, 2022 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -80,12 +80,21 @@ func (v *Verifier) VerifyByPolicy(namespace string, img *image.Reference, creden
 		}
 	}
 
+	authEndpoint, err := v.trust.CheckAuthRequired(notaryURL, img)
+	if err != nil {
+		return nil, nil, fmt.Errorf("Deny %q, could not resolve the auth-endpoint, %s", img.String(), err.Error())
+	}
+
 	credentials = append(credentials, credential.Credential{})
 	for _, credential := range credentials {
-		notaryToken, err := v.cr.GetContentTrustToken(credential.Username, credential.Password, img.NameWithoutTag(), img.GetRegistryURL())
-		if err != nil {
-			glog.Error(err)
-			continue
+		var notaryToken string
+
+		if authEndpoint != nil {
+			notaryToken, err = v.cr.GetContentTrustToken(authEndpoint.URL, credential.Username, credential.Password, authEndpoint.Service, authEndpoint.Scope)
+			if err != nil {
+				glog.Error(err)
+				continue
+			}
 		}
 
 		digest, err := v.getDigest(notaryURL, img.NameWithoutTag(), notaryToken, img.GetTag(), signers)
@@ -102,5 +111,6 @@ func (v *Verifier) VerifyByPolicy(namespace string, img *image.Reference, creden
 		}
 		return digest, nil, nil
 	}
+
 	return nil, fmt.Errorf("Deny %q, no valid ImagePullSecret defined for %s", img.String(), img.String()), nil
 }

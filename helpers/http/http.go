@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2022 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package oauth
+package http
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 )
@@ -71,32 +72,28 @@ func init() {
 	}
 }
 
-// ResponseChallenges takes in the response and it is unauthorized returns a challenge containing realm and service information
-func ResponseChallenges(resp *http.Response) []Challenge {
-	if resp.StatusCode == http.StatusUnauthorized {
-		// Parse the WWW-Authenticate Header and store the challenges
-		// on this endpoint object.
-		return parseAuthHeader(resp.Header)
-	}
-	return nil
-}
-
 // ParseAuthHeader takes the header info from a response and gives back realm and service information
-func parseAuthHeader(header http.Header) []Challenge {
+func ParseAuthHeader(header http.Header) ([]Challenge, error) {
 	challenges := []Challenge{}
 	for _, h := range header[http.CanonicalHeaderKey("WWW-Authenticate")] {
-		v, p := parseValueAndParams(h)
+		v, p, err := parseValueAndParams(h)
+
+		if err != nil {
+			return []Challenge{}, fmt.Errorf("Unable to parse WWW-Authenticate header '%s': %w", h, err)
+		}
+
 		if v != "" {
 			challenges = append(challenges, Challenge{Scheme: v, Parameters: p})
 		}
 	}
-	return challenges
+	return challenges, nil
 }
 
-func parseValueAndParams(header string) (value string, params map[string]string) {
+func parseValueAndParams(header string) (value string, params map[string]string, err error) {
 	params = make(map[string]string)
 	value, s := expectToken(header)
 	if value == "" {
+		err = fmt.Errorf("no auth-scheme found")
 		return
 	}
 	value = strings.ToLower(value)
@@ -105,14 +102,17 @@ func parseValueAndParams(header string) (value string, params map[string]string)
 		var pkey string
 		pkey, s = expectToken(skipSpace(s[1:]))
 		if pkey == "" {
+			err = fmt.Errorf("parameter expected")
 			return
 		}
 		if !strings.HasPrefix(s, "=") {
+			err = fmt.Errorf("parameter value missing")
 			return
 		}
 		var pvalue string
 		pvalue, s = expectTokenOrQuoted(s[1:])
 		if pvalue == "" {
+			err = fmt.Errorf("parameter value missing")
 			return
 		}
 		pkey = strings.ToLower(pkey)

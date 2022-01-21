@@ -1,4 +1,4 @@
-// Copyright 2018,2021 Portieris Authors.
+// Copyright 2018, 2022 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -73,43 +73,25 @@ func GetHTTPClient(customFile string) *http.Client {
 
 // Request is a helper for getting an OAuth token from the Registry OAuth Service.
 // Takes the following as input:
-//   token               - Auth token being used for the request
-//   repo                - Repo you are requesting access too e.g. bainsy88/busybox
+//   oauthEndpoint       - URL of the oauth endpoint to be used
 //   username            - Username for the OAuth request, identifies the type of token being passed in. Valid usernames are token (for registry token), iambearer, iamapikey, bearer (UAA bearer (legacy)), iamrefresh
-//   ChallengeSlice		 - Challenge slice contains the www-authenticate details
+//   token               - Auth token being used for the request
+//   service             - The service you are retrieving the OAuth token for. Current services are either "notary" or "registry"
+//   scope               - The scope to be requested for the oauth token
 // Returns:
 //   *auth.TokenResponse - Details of the type is here https://github.ibm.com/alchemy-registry/registry-types/tree/master/auth#type-tokenresponse
 //                         Token is the element you will need to forward to the registry/notary as part of a Bearer Authorization Header
 //   error
-func Request(token, repo, username string, challengeSlice []Challenge) (*TokenResponse, error) {
-	oauthEndpoint := ""
-	service := ""
-	scope := ""
-
-	if challengeSlice == nil {
-		errMessage := "unable to fetch www-authenticate header details"
-		glog.Errorf(errMessage)
-		return nil, fmt.Errorf(errMessage)
-	}
-
-	for _, challenge := range challengeSlice {
-		oauthEndpoint = challenge.Parameters["realm"]
-		service = challenge.Parameters["service"]
-		scope = challenge.Parameters["scope"]
-	}
-
+func Request(oauthEndpoint string, username string, token string, service string, scope string) (*TokenResponse, error) {
 	if oauthEndpoint == "" || service == "" {
 		errMessage := "unable to fetch oauth realm and service header details"
 		glog.Errorf(errMessage)
 		return nil, fmt.Errorf(errMessage)
 	}
 
-	client := GetHTTPClient("/etc/certs/ca.pem")
+	httpClient := GetHTTPClient("/etc/certs/ca.pem")
 
-	glog.Infof("Calling oauth endpoint: %s for registry service: %s and scope %s", oauthEndpoint, service, scope)
-	var resp *http.Response
-	var err error
-	resp, err = client.PostForm(oauthEndpoint, url.Values{
+	resp, err := httpClient.PostForm(oauthEndpoint, url.Values{
 		"service":    {service},
 		"grant_type": {"password"},
 		"client_id":  {"portieris-client"},
@@ -117,14 +99,13 @@ func Request(token, repo, username string, challengeSlice []Challenge) (*TokenRe
 		"password":   {token},
 		"scope":      {scope},
 	})
+
 	if err != nil {
 		glog.Errorf("Error sending POST request to registry-oauth: %v", err)
 		return nil, err
 	}
 
-	// TODO: confirm if status code of 405 needs to be handled in the below block
 	if resp.StatusCode == 404 || resp.StatusCode == 405 {
-		glog.Info("Calling: " + oauthEndpoint + "?service=" + service + "&scope=" + scope)
 		getURL, err := url.Parse(oauthEndpoint)
 		if err != nil {
 			return nil, err
@@ -133,7 +114,9 @@ func Request(token, repo, username string, challengeSlice []Challenge) (*TokenRe
 		q.Set("service", service)
 		q.Set("scope", scope)
 		getURL.RawQuery = q.Encode()
-		resp, err = client.Get(getURL.String())
+
+		glog.Infof("Calling: %s", getURL.String())
+		resp, err = httpClient.Get(getURL.String())
 		if err != nil {
 			glog.Errorf("Error sending GET request to registry-oauth: %v", err)
 			return nil, err
@@ -159,27 +142,4 @@ func Request(token, repo, username string, challengeSlice []Challenge) (*TokenRe
 	}
 
 	return &tokenResponse, nil
-}
-
-// CheckAuthRequired - checks if the given image needs to be authenticated to fetch metadata or not and returns the response
-func CheckAuthRequired(notaryURL, hostName, repoName string, official bool) (*http.Response, error) {
-	glog.Infof("Notary URL: %s Hostname %s RepoName %s", notaryURL, hostName, repoName)
-	// Github issue 51 Fix
-	var req *http.Request
-	var err error
-	client := GetHTTPClient("/etc/certs/ca.pem")
-	if hostName == "docker.io" && official {
-		req, err = http.NewRequest("GET", notaryURL+"/v2/"+hostName+"/library/"+repoName+"/_trust/tuf/root.json", nil)
-	} else {
-		req, err = http.NewRequest("GET", notaryURL+"/v2/"+hostName+"/"+repoName+"/_trust/tuf/root.json", nil)
-	}
-
-	resp, err := client.Do(req)
-
-	if err != nil {
-		glog.Errorf("Failed to query v2 tuf endpoint for notaryURL: %s", notaryURL)
-		return nil, err
-	}
-
-	return resp, nil
 }

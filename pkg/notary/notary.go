@@ -1,4 +1,4 @@
-// Copyright 2018,2021 Portieris Authors.
+// Copyright 2018, 2022 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,12 +23,21 @@ import (
 	"os"
 	"time"
 
+	httphelper "github.com/IBM/portieris/helpers/http"
+	"github.com/IBM/portieris/helpers/image"
 	"github.com/IBM/portieris/internal/info"
 	"github.com/docker/distribution/registry/client/transport"
 	notaryclient "github.com/theupdateframework/notary/client"
 	"github.com/theupdateframework/notary/trustpinning"
 	"github.com/theupdateframework/notary/tuf/data"
 )
+
+// AuthEndpoint .
+type AuthEndpoint struct {
+	URL     string
+	Service string
+	Scope   string
+}
 
 // Client .
 type Client struct {
@@ -39,6 +48,7 @@ type Client struct {
 // Interface .
 type Interface interface {
 	GetNotaryRepo(server, image, notaryToken string) (notaryclient.Repository, error)
+	CheckAuthRequired(notaryURL string, img *image.Reference) (*AuthEndpoint, error)
 }
 
 // NewClient creates and initializes the client
@@ -68,6 +78,56 @@ func (c Client) GetNotaryRepo(server, image, notaryToken string) (notaryclient.R
 		nil,
 		trustpinning.TrustPinConfig{},
 	)
+}
+
+// CheckAuthRequired checks if the notary requires authentication and returns information where to authenticate
+func (c Client) CheckAuthRequired(notaryURL string, img *image.Reference) (*AuthEndpoint, error) {
+	client := &http.Client{Transport: c.makeHubTransport("")}
+
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/v2/%s/_trust/tuf/root.json", notaryURL, img.NameWithoutTag()), nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := client.Do(req)
+
+	if err != nil || resp.StatusCode != http.StatusUnauthorized {
+		// either an error occured or authentication isn't required
+		return nil, err
+	}
+
+	challenges, err := httphelper.ParseAuthHeader(resp.Header)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for _, challenge := range challenges {
+		endpoint := AuthEndpoint{}
+
+		if v, ok := challenge.Parameters["realm"]; ok {
+			endpoint.URL = v
+		} else {
+			continue
+		}
+
+		if v, ok := challenge.Parameters["service"]; ok {
+			endpoint.Service = v
+		} else {
+			continue
+		}
+
+		if v, ok := challenge.Parameters["scope"]; ok {
+			endpoint.Scope = v
+		} else {
+			continue
+		}
+
+		return &endpoint, nil
+	}
+
+	return nil, fmt.Errorf("no supported auth-endpoint found")
 }
 
 func (c Client) makeHubTransport(notaryToken string) http.RoundTripper {
