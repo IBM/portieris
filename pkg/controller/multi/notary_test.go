@@ -275,6 +275,7 @@ var _ = Describe("Main", func() {
 					]`
 					clusterRepos := `"repositories": []`
 					fakeEnforcer(imageRepos, clusterRepos)
+					trust.CheckAuthRequiredStub = trust.NoAuthRequiredStub
 					updateController()
 					req := newFakeRequest("no-secret.icr.io/hello")
 					wh.HandleAdmissionRequest(w, req)
