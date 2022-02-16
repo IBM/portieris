@@ -20,10 +20,10 @@ import (
 
 	"github.com/IBM/portieris/test/framework"
 	"github.com/stretchr/testify/assert"
-	batchv1beta1 "k8s.io/api/batch/v1beta1"
+	batchv1 "k8s.io/api/batch/v1"
 )
 
-func buildCronJob(t *testing.T, fw *framework.Framework, manifestLocation, namespace string, expectCreateFail bool) *batchv1beta1.CronJob {
+func buildCronJob(t *testing.T, fw *framework.Framework, manifestLocation, namespace string, expectCreateFail bool) *batchv1.CronJob {
 	manifest, err := fw.LoadCronJobManifest(manifestLocation)
 	if err != nil {
 		t.Fatalf("Error loading manifest: %v", err)
