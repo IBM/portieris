@@ -85,9 +85,10 @@ func (v *Verifier) VerifyByPolicy(namespace string, img *image.Reference, creden
 		return nil, nil, fmt.Errorf("Deny %q, could not resolve the auth-endpoint, %s", img.String(), err.Error())
 	}
 
-        if authEndpoint == nil {
+	if authEndpoint == nil {
 		credentials = append(credentials, credential.Credential{})
 	}
+
 	for _, credential := range credentials {
 		var notaryToken string
 
