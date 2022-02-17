@@ -19,7 +19,7 @@ import (
 	"os"
 	"path/filepath"
 
-	uuid "github.com/satori/go.uuid"
+	"github.com/gofrs/uuid"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -28,6 +28,15 @@ func (f *Framework) getHelmReleaseSelectorListOptions() metav1.ListOptions {
 	return metav1.ListOptions{
 		LabelSelector: fmt.Sprintf("release=%v", f.HelmRelease),
 	}
+}
+
+// MakeTestUUID is a simple wrapper to return a UUID for testing purposes
+func MakeTestUUID() string {
+	u, err := uuid.NewV4()
+	if err != nil {
+		panic(err)
+	}
+	return u.String()
 }
 
 // GenerateTestAnnotation returns a unique test annotation that is used to patch resources.
@@ -40,7 +49,7 @@ func (f *Framework) GenerateTestAnnotation() string {
 				}
 			}
 		}
-	`, uuid.NewV4())
+	`, MakeTestUUID())
 }
 
 func openFile(relativePath string) (*os.File, error) {
