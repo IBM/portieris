@@ -1,4 +1,4 @@
-// Copyright 2020, 2021 Portieris Authors.
+// Copyright 2020, 2022 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,15 +18,13 @@ import (
 	"os"
 	"testing"
 
-	uuid "github.com/satori/go.uuid"
-
 	"github.com/IBM/portieris/test/framework"
 	corev1 "k8s.io/api/core/v1"
 )
 
 // CreateImagePolicyInstalledNamespaceOptionalSecrets ...
 func CreateImagePolicyInstalledNamespaceOptionalSecrets(t *testing.T, fw *framework.Framework, manifestPath string, ips bool, namespaceParam string) *corev1.Namespace {
-	ns := uuid.NewV4().String()
+	ns := framework.MakeTestUUID()
 	if namespaceParam != "" {
 		ns = namespaceParam
 	}
