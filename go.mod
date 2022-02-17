@@ -3,11 +3,10 @@ module github.com/IBM/portieris
 go 1.17
 
 replace (
-	github.com/googleapis/gnostic => github.com/google/gnostic v0.6.2
-	k8s.io/api => k8s.io/api v0.21.1
-	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.21.1
-	k8s.io/apimachinery => k8s.io/apimachinery v0.21.1
-	k8s.io/client-go => k8s.io/client-go v0.21.1
+	k8s.io/api => k8s.io/api v0.23.3
+	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.23.3
+	k8s.io/apimachinery => k8s.io/apimachinery v0.23.3
+	k8s.io/client-go => k8s.io/client-go v0.23.3
 )
 
 require (
@@ -24,10 +23,10 @@ require (
 	github.com/theupdateframework/notary v0.7.0
 	golang.org/x/crypto v0.0.0-20220214200702-86341886e292
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
-	k8s.io/api v0.21.1
+	k8s.io/api v0.23.3
 	k8s.io/apiextensions-apiserver v0.0.0-00010101000000-000000000000
-	k8s.io/apimachinery v0.21.1
-	k8s.io/client-go v0.21.1
+	k8s.io/apimachinery v0.23.3
+	k8s.io/client-go v0.23.3
 )
 
 require (
@@ -50,7 +49,7 @@ require (
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-metrics v0.0.1 // indirect
 	github.com/docker/go-units v0.4.0 // indirect
-	github.com/evanphx/json-patch v4.9.0+incompatible // indirect
+	github.com/evanphx/json-patch v4.12.0+incompatible // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-logr/logr v1.2.2 // indirect
@@ -62,13 +61,11 @@ require (
 	github.com/gofrs/uuid v3.2.0+incompatible // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
-	github.com/google/gnostic v0.6.6 // indirect
 	github.com/google/go-cmp v0.5.7 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
-	github.com/googleapis/gnostic v0.4.1 // indirect
+	github.com/googleapis/gnostic v0.5.5 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-retryablehttp v0.7.0 // indirect
-	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/jinzhu/gorm v1.9.12 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
@@ -113,8 +110,9 @@ require (
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	k8s.io/klog/v2 v2.40.1 // indirect
-	k8s.io/kube-openapi v0.0.0-20210305001622-591a79e4bda7 // indirect
+	k8s.io/kube-openapi v0.0.0-20211115234752-e816edb12b65 // indirect
 	k8s.io/utils v0.0.0-20220210201930-3a6ce19ff2f9 // indirect
+	sigs.k8s.io/json v0.0.0-20211020170558-c049b76a60c6 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.1 // indirect
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
