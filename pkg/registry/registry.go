@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2022 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ type Client struct{}
 
 // Interface .
 type Interface interface {
-	GetContentTrustToken(username, password, imageRepo, hostname string) (string, error)
-	GetRegistryToken(username, password, imageRepo, hostname string) (string, error)
+	GetContentTrustToken(oauthEndpoint string, username string, password string, service string, scope string) (string, error)
+	GetRegistryToken(oauthEndpoint string, username string, password string, service string, scope string) (string, error)
 }
 
 // NewClient .
@@ -33,11 +33,12 @@ func NewClient() Interface {
 }
 
 // GetContentTrustToken .
-func (c Client) GetContentTrustToken(username, password, imageRepo, hostname string) (string, error) {
+func (c Client) GetContentTrustToken(oauthEndpoint string, username string, password string, service string, scope string) (string, error) {
 	if username == "" && password == "" {
 		return "", nil
 	}
-	token, err := oauth.Request(password, imageRepo, username, false, "notary", hostname)
+
+	token, err := oauth.Request(oauthEndpoint, username, password, service, scope)
 	if err != nil {
 		return "", err
 	}
@@ -45,8 +46,8 @@ func (c Client) GetContentTrustToken(username, password, imageRepo, hostname str
 }
 
 // GetRegistryToken .
-func (c Client) GetRegistryToken(username, password, imageRepo, hostname string) (string, error) {
-	token, err := oauth.Request(password, imageRepo, username, false, "registry", hostname)
+func (c Client) GetRegistryToken(oauthEndpoint string, username string, password string, service string, scope string) (string, error) {
+	token, err := oauth.Request(oauthEndpoint, username, password, "registry", scope)
 	if err != nil {
 		return "", err
 	}
