@@ -1,4 +1,4 @@
-// Copyright 2018, 2021 Portieris Authors.
+// Copyright 2018, 2022 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -153,6 +153,8 @@ var _ = Describe("Main", func() {
 			cr.GetContentTrustTokenReturns("token", nil)
 
 			fakeGetRepo()
+
+			trust.CheckAuthRequiredStub = trust.DefaultAuthEndpointStub
 		}
 
 		updateController := func() {
@@ -273,6 +275,7 @@ var _ = Describe("Main", func() {
 					]`
 					clusterRepos := `"repositories": []`
 					fakeEnforcer(imageRepos, clusterRepos)
+					trust.CheckAuthRequiredStub = trust.NoAuthRequiredStub
 					updateController()
 					req := newFakeRequest("no-secret.icr.io/hello")
 					wh.HandleAdmissionRequest(w, req)
@@ -328,6 +331,30 @@ var _ = Describe("Main", func() {
 				})
 			})
 
+			Context("if `trust is enabled` but it failed to determine the auth endpoint for getting content trust tokens", func() {
+				It("should deny the image", func() {
+					imageRepos := `"repositories": [
+						{
+							"name": "us.icr.io/*",
+							"policy": {
+								"trust": {
+									"enabled": true
+								}
+							}
+						}
+					]`
+					clusterRepos := `"repositories": []`
+					fakeEnforcer(imageRepos, clusterRepos)
+					trust.CheckAuthRequiredStub = nil
+					trust.CheckAuthRequiredReturns(nil, fmt.Errorf("Unexpected error"))
+					updateController()
+					req := newFakeRequest("us.icr.io/hello")
+					wh.HandleAdmissionRequest(w, req)
+					parseResponse()
+					Expect(resp.Response.Allowed).To(BeFalse())
+					Expect(resp.Response.Result.Message).To(ContainSubstring(`Deny "us.icr.io/hello", could not resolve the auth-endpoint, Unexpected error`))
+				})
+			})
 			Context("if `trust is enabled` but it failed to get the content trust token", func() {
 				It("should deny the image", func() {
 					imageRepos := `"repositories": [
@@ -369,6 +396,7 @@ var _ = Describe("Main", func() {
 					fakeEnforcer(imageRepos, clusterRepos)
 					trust = &fakenotary.FakeNotary{} // Wipe out the stubbed good notary response that fakeEnforcer sets up
 					trust.GetNotaryRepoReturns(nil, fmt.Errorf("FAKE_NO_SIGNED_IMAGE_ERROR"))
+					trust.CheckAuthRequiredStub = trust.DefaultAuthEndpointStub
 					updateController()
 					req := newFakeRequest("us.icr.io/hello")
 					wh.HandleAdmissionRequest(w, req)
@@ -396,6 +424,7 @@ var _ = Describe("Main", func() {
 					fakeEnforcer(imageRepos, clusterRepos)
 					trust = &fakenotary.FakeNotary{}
 					trust.GetNotaryRepoReturns(nil, fmt.Errorf("401"))
+					trust.CheckAuthRequiredStub = trust.DefaultAuthEndpointStub
 					fakeGetRepo()
 					updateController()
 					req := newFakeRequestMultipleValidSecrets("us.icr.io/hello")
@@ -468,6 +497,30 @@ var _ = Describe("Main", func() {
 					fakeEnforcer(imageRepos, clusterRepos)
 					updateController()
 					req := newFakeRequestMulitpleSecrets("us.icr.io/hello")
+					wh.HandleAdmissionRequest(w, req)
+					parseResponse()
+					Expect(string(resp.Response.Patch)).To(ContainSubstring("us.icr.io/hello@sha256:31323334353637383930"))
+					Expect(resp.Response.Allowed).To(BeTrue())
+				})
+			})
+
+			Context("if `trust is enabled`, there is a signed image, and notary doesn't require authentication", func() {
+				It("should mutate and allow the image", func() {
+					imageRepos := `"repositories": [
+							{
+								"name": "us.icr.io/*",
+								"policy": {
+									"trust": {
+										"enabled": true
+									}
+								}
+							}
+						]`
+					clusterRepos := `"repositories": []`
+					fakeEnforcer(imageRepos, clusterRepos)
+					trust.CheckAuthRequiredStub = trust.NoAuthRequiredStub
+					updateController()
+					req := newFakeRequest("us.icr.io/hello")
 					wh.HandleAdmissionRequest(w, req)
 					parseResponse()
 					Expect(string(resp.Response.Patch)).To(ContainSubstring("us.icr.io/hello@sha256:31323334353637383930"))
@@ -560,6 +613,7 @@ var _ = Describe("Main", func() {
 					fakeEnforcer(imageRepos, clusterRepos)
 					trust = &fakenotary.FakeNotary{} // Wipe out the stubbed good notary response that fakeEnforcer sets up
 					trust.GetNotaryRepoReturns(nil, store.ErrServerUnavailable{})
+					trust.CheckAuthRequiredStub = trust.DefaultAuthEndpointStub
 					updateController()
 					req := newFakeRequestMultiContainer("us.icr.io/hello", "us.icr.io/goodbye")
 					wh.HandleAdmissionRequest(w, req)
@@ -588,6 +642,7 @@ var _ = Describe("Main", func() {
 					fakeEnforcer(imageRepos, clusterRepos)
 					trust = &fakenotary.FakeNotary{} // Wipe out the stubbed good notary response that fakeEnforcer sets up
 					trust.GetNotaryRepoReturns(nil, store.ErrServerUnavailable{})
+					trust.CheckAuthRequiredStub = trust.DefaultAuthEndpointStub
 					updateController()
 					req := newFakeRequestMultiContainer("us.icr.io/hello", "us.icr.io/goodbye")
 					wh.HandleAdmissionRequest(w, req)
@@ -616,6 +671,7 @@ var _ = Describe("Main", func() {
 					trust = &fakenotary.FakeNotary{} // Wipe out the stubbed good notary response that fakeEnforcer sets up
 					trust.GetNotaryRepoReturns(nil, fmt.Errorf("FAKE_NO_SIGNED_IMAGE_ERROR"))
 					trust.GetNotaryRepoReturns(nil, fmt.Errorf("FAKE_NO_SIGNED_IMAGE_ERROR"))
+					trust.CheckAuthRequiredStub = trust.DefaultAuthEndpointStub
 					updateController()
 					req := newFakeRequestMultiContainer("us.icr.io/hello", "us.icr.io/goodbye")
 					wh.HandleAdmissionRequest(w, req)
@@ -647,6 +703,7 @@ var _ = Describe("Main", func() {
 					trust = &fakenotary.FakeNotary{} // Wipe out the stubbed good notary response that fakeEnforcer sets up
 					trust.GetNotaryRepoReturns(nil, fmt.Errorf("FAKE_NO_SIGNED_IMAGE_ERROR"))
 					trust.GetNotaryRepoReturns(nil, fmt.Errorf("FAKE_NO_SIGNED_IMAGE_ERROR"))
+					trust.CheckAuthRequiredStub = trust.DefaultAuthEndpointStub
 					updateController()
 					req := newFakeRequestMultiContainer("us.icr.io/hello", "us.icr.io/goodbye")
 					wh.HandleAdmissionRequest(w, req)
@@ -684,6 +741,7 @@ var _ = Describe("Main", func() {
 					fakeEnforcer(imageRepos, clusterRepos)
 					trust = &fakenotary.FakeNotary{} // Wipe out the stubbed good notary response that fakeEnforcer sets up
 					trust.GetNotaryRepoReturns(nil, fmt.Errorf("FAKE_NO_SIGNED_IMAGE_ERROR"))
+					trust.CheckAuthRequiredStub = trust.DefaultAuthEndpointStub
 					updateController()
 					req := newFakeRequestMultiContainer("us.icr.io/hello", "icr.io/goodbye")
 					wh.HandleAdmissionRequest(w, req)
@@ -720,6 +778,7 @@ var _ = Describe("Main", func() {
 					trust = &fakenotary.FakeNotary{} // Wipe out the stubbed good notary response that fakeEnforcer sets up
 					trust.GetNotaryRepoReturns(nil, fmt.Errorf("some error"))
 					trust.GetNotaryRepoReturns(nil, fmt.Errorf("some error"))
+					trust.CheckAuthRequiredStub = trust.DefaultAuthEndpointStub
 					updateController()
 					req := newFakeRequestMultiContainerMultiSecret("us.icr.io/hello", "icr.io/goodbye")
 					wh.HandleAdmissionRequest(w, req)
