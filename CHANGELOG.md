@@ -13,6 +13,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 # v-next
 ##
 
+# v0.12.4
+##
+* Rebuild 
+* Resolves CVE-2022-0778
+
 # v0.12.3
 ##
 * Rebuild 
