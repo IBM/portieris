@@ -49,7 +49,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Set sane priorityClass ([352](https://github.com/IBM/portieris/issues/352))
 * Build using ubi go toolset (golang 1.15.14), and run in ubi-minimal ([351](https://github.com/IBM/portieris/issues/351))
 * Support ObjectSelectorAdmissionSkip ([349](https://github.com/IBM/portieris/issues/349))
-* Require TLS1.2 on webhook
+* Require TLS1.2 on webhook 
 
 # v0.11.0
 ## 2021-06-16
