@@ -30,6 +30,12 @@ webHooks:
 # If not running on IBM Cloud Container Service set to false
 IBMContainerService: true
 
+# Set to false if default image policy for kube-system namespace is not needed
+KubeSystemImagePolicy: true
+
+# Set to false if default cluster image policy is not needed
+DefaultClusterImagePolicy: true
+
 # If managing portieris-certs secret externally
 SkipSecretCreation: false
 
@@ -83,7 +89,7 @@ affinity:
 # enable this option!
 AllowAdmissionSkip: false
 
-ObjectSelectorAdmissionSkip: 
+ObjectSelectorAdmissionSkip:
     # matchLabels:
     #   app: xxx
     # matchExpressions:
