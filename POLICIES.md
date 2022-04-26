@@ -64,7 +64,7 @@ To ensure that the policy is enforced, you must update the API version to:
 
 ### Image mutation option
 
-You can also set a mutate image, `mutateImage: bool`, behavior preference for each policy. The default value is `true`, which is also the original behavior and means that, on successful admission, the container's image property is mutated to ensure that the immutable digest form of the image is used. If the value is `false`, the original image reference is retained with the 
+You can also set a mutate image, `mutateImage: bool`, behavior preference for each policy. The default value is `true`, which is also the original behavior and means that, on successful admission, the container's image property is mutated to ensure that the immutable digest form of the image is used. If the value is `false`, the original image reference is retained with the consequences
 that are described in the [readme file](README.md#image-mutation-option).
 
 **Example**
