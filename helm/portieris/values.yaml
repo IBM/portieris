@@ -112,6 +112,6 @@ priorityClass: system-cluster-critical
 
 # Specifying a Disruption Budget for portieris pod
 # https://kubernetes.io/docs/tasks/run-application/configure-pdb/
-pdb:
+podDisruptionBudget:
   enabled: true
   minAvailable: 1
