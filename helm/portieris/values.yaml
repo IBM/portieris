@@ -30,17 +30,17 @@ webHooks:
 # If not running on IBM Cloud Container Service set to false
 IBMContainerService: true
 
-# Set to false if default image policy for kube-system namespace is not needed
-KubeSystemImagePolicy: true
-
-# Set to false if default cluster image policy is not needed
-DefaultClusterImagePolicy: true
-
 # If managing portieris-certs secret externally
 SkipSecretCreation: false
 
 # If using cert-manager to handle secrets
 UseCertManager: false
+
+# If enabled, pass the generated self-signed certificate via values.yml.
+UseTLSCertsViaValues:
+  enabled: false
+  tlsCert: ""
+  tlsKey: ""
 
 # Resoures defined to assist scheduling
 # request is typical x10, limit is typical x100
@@ -109,3 +109,9 @@ useHostNetwork: false
 
 # Set podPriorityClass of the portieris deployment. This will tell kube api to schedule the pods as high priority and stop timing issues where applications try to start before the webhook is available
 priorityClass: system-cluster-critical
+
+# Specifying a Disruption Budget for portieris pod
+# https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+pdb:
+  enabled: true
+  minAvailable: 1
