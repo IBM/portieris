@@ -11,7 +11,7 @@ spec:
     # This policy prevents Portieris from denying its own updates. Do not remove this policy or portieris may not function correctly.
     - name: "{{ .Values.image.host | default "docker.io/ibmcom"  }}/{{ .Values.image.image }}"
 ---
-{{ if .Values.KubeSystemImagePolicy }}
+{{ if .Values.IBMContainerService }}
 apiVersion: portieris.cloud.ibm.com/v1
 kind: ImagePolicy
 metadata:
@@ -67,7 +67,7 @@ spec:
 ---
 {{ end }}
 
-{{ if .Values.DefaultClusterImagePolicy }}
+{{ if .Values.IBMContainerService }}
 apiVersion: portieris.cloud.ibm.com/v1
 kind: ClusterImagePolicy
 metadata:
