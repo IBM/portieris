@@ -37,9 +37,11 @@ SkipSecretCreation: false
 # If using cert-manager to handle secrets
 UseCertManager: false
 
-# If enabled, pass the generated self-signed certificate via values.yml.
-UseTLSCertsViaValues:
-  enabled: true
+## Use generated certs from values file.
+## Ref: https://github.com/IBM/portieris/blob/main/helm/portieris/gencerts
+##
+UseGeneratedCerts:
+  enabled: false
   tlsCert: ""
   tlsKey: ""
 
