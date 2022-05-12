@@ -45,7 +45,7 @@ helm install --create-namespace -n portieris .
 If you're deploying onto a generic cluster, Portieris automatically creates a policy that allows all images without verification. This policy prevents Portieris from stopping you deploying to your cluster. Update this policy to something more restrictive.
 
 ```
-helm install --create-namespace -n portieris . --set IBMContainerService=false --debug
+helm install --create-namespace -n portieris . --set PolicySet=None --debug
 ```
 
 For installation instructions, see [Installing Portieris](https://github.com/IBM/portieris/blob/master/README.md#installing-portieris).
