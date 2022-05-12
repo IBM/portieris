@@ -11,7 +11,7 @@ spec:
     # This policy prevents Portieris from denying its own updates. Do not remove this policy or portieris may not function correctly.
     - name: "{{ .Values.image.host | default "docker.io/ibmcom"  }}/{{ .Values.image.image }}"
 ---
-{{ if .Values.IBMContainerService }}
+{{- if (eq .Values.PolicySet "IKS") }}
 apiVersion: portieris.cloud.ibm.com/v1
 kind: ImagePolicy
 metadata:
@@ -25,7 +25,6 @@ spec:
     # This permissive policy allows all images to be deployed into this namespace.
     # IMPORTANT: Review this policy and replace it with one that meets your requirements.
     - name: "*"
-    {{ if .Values.IBMContainerService }}
     # These policies allow all IBM Cloud Container Service images to deploy in this namespace.
     # IMPORTANT: When you create your own policy in this namespace, be sure to retain these policies. If you do not, the cluster might not update or function properly.
     - name: "registry*.bluemix.net/armada/*"
@@ -37,11 +36,10 @@ spec:
     - name: "icr.io/armada/*"
     - name: "icr.io/armada-worker/*"
     - name: "icr.io/armada-master/*"
-    {{ end }}
 ---
 {{ end }}
 
-{{ if .Values.IBMContainerService }}
+{{- if (eq .Values.PolicySet "IKS") }}
 apiVersion: portieris.cloud.ibm.com/v1
 kind: ImagePolicy
 metadata:
@@ -67,7 +65,7 @@ spec:
 ---
 {{ end }}
 
-{{ if .Values.IBMContainerService }}
+{{- if (eq .Values.PolicySet "IKS") }}
 apiVersion: portieris.cloud.ibm.com/v1
 kind: ClusterImagePolicy
 metadata:
