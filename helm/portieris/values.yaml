@@ -42,8 +42,8 @@ UseCertManager: false
 ##
 UseGeneratedCerts:
   enabled: false
-  tlsCert: ""
-  tlsKey: ""
+  tlsCert: |-
+  tlsKey: |-
 
 # Resoures defined to assist scheduling
 # request is typical x10, limit is typical x100
