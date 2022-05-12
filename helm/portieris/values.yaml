@@ -27,8 +27,9 @@ securityContext:
 webHooks:
   failurePolicy: Fail
 
-# If not running on IBM Cloud Container Service set to false
-IBMContainerService: true
+# Define policySet to install the default policies
+# Possible values: IKS | None
+PolicySet: None
 
 # If managing portieris-certs secret externally
 SkipSecretCreation: false
@@ -38,7 +39,7 @@ UseCertManager: false
 
 # If enabled, pass the generated self-signed certificate via values.yml.
 UseTLSCertsViaValues:
-  enabled: false
+  enabled: true
   tlsCert: ""
   tlsKey: ""
 
