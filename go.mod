@@ -2,6 +2,13 @@ module github.com/IBM/portieris
 
 go 1.17
 
+replace (
+	k8s.io/api => k8s.io/api v0.24.0
+	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.24.0
+	k8s.io/apimachinery => k8s.io/apimachinery v0.24.0
+	k8s.io/client-go => k8s.io/client-go v0.24.0
+)
+
 require (
 	github.com/IBM/go-sdk-core/v4 v4.10.0
 	github.com/containers/image/v5 v5.21.1
@@ -17,7 +24,7 @@ require (
 	golang.org/x/crypto v0.0.0-20220518034528-6f7dac969898
 	gopkg.in/yaml.v3 v3.0.0-20220512140231-539c8e751b99
 	k8s.io/api v0.24.0
-	k8s.io/apiextensions-apiserver v0.24.0
+	k8s.io/apiextensions-apiserver v0.0.0-00010101000000-000000000000
 	k8s.io/apimachinery v0.24.0
 	k8s.io/client-go v0.24.0
 )
