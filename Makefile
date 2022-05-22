@@ -15,7 +15,7 @@ push:
 	docker push $(HUB)/portieris:$(TAG)
 
 test-deps:
-	@go install golang.org/x/lint/golint
+	go install golang.org/x/lint/golint@latest
 
 alltests: test-deps fmt lint vet copyright-check test
 
