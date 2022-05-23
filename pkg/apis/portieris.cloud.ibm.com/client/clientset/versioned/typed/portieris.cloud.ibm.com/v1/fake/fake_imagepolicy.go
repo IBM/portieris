@@ -105,7 +105,7 @@ func (c *FakeImagePolicies) Update(ctx context.Context, imagePolicy *portieriscl
 // Delete takes name of the imagePolicy and deletes it. Returns an error if one occurs.
 func (c *FakeImagePolicies) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(imagepoliciesResource, c.ns, name), &portieriscloudibmcomv1.ImagePolicy{})
+		Invokes(testing.NewDeleteActionWithOptions(imagepoliciesResource, c.ns, name, opts), &portieriscloudibmcomv1.ImagePolicy{})
 
 	return err
 }

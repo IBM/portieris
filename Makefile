@@ -15,7 +15,7 @@ push:
 	docker push $(HUB)/portieris:$(TAG)
 
 test-deps:
-	@go get golang.org/x/lint/golint
+	go install golang.org/x/lint/golint@latest
 
 alltests: test-deps fmt lint vet copyright-check test
 
@@ -97,9 +97,9 @@ e2e.clean: helm.clean
 .PHONY: code-generator regenerate
 
 code-generator:
-	git clone https://github.com/kubernetes/code-generator.git --branch release-1.21 $(GOPATH)/src/k8s.io/code-generator
+	go install k8s.io/code-generator@v0.24.0
 
 regenerate:
-	$(GOPATH)/src/k8s.io/code-generator/generate-groups.sh all github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/client github.com/IBM/portieris/pkg/apis portieris.cloud.ibm.com:v1
+	bash $(GOPATH)/pkg/mod/k8s.io/code-generator@v0.24.0/generate-groups.sh all github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/client github.com/IBM/portieris/pkg/apis portieris.cloud.ibm.com:v1
 
 
