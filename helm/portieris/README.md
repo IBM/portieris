@@ -37,12 +37,12 @@ This installation uses the default certificates. To avoid using the default cert
 If you're deploying onto an IBM Cloud cluster, Portieris automatically creates policies that deploy the various Kubernetes components and includes a policy rule that allows all images without verification. Change the policy that allows everything because it is insecure, but keep the IBM Cloud specific policies.
 
 ```
-helm install --create-namespace -n portieris .
+helm install --create-namespace -n portieris --set PolicySet=IKS .
 ```
 
 ### Other Kubernetes clusters
 
-If you're deploying onto a generic cluster, Portieris automatically creates a policy that allows all images without verification. This policy prevents Portieris from stopping you deploying to your cluster. Update this policy to something more restrictive.
+If you're deploying onto a generic cluster, Portieris dont create any default policies, that allows all images without verification. This policy prevents Portieris from stopping you deploying to your cluster. Update this policy to something more restrictive.
 
 ```
 helm install --create-namespace -n portieris . --set PolicySet=None --debug
