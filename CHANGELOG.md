@@ -16,6 +16,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 # v0.13.0
 *  Build with go-tooolset:1.17
 *  code-generator:1.24 / generated code
+*  Helm chart improvements: Fixes ([142](https://github.com/IBM/portieris/issues/142)), options to define podDisruptionBudget and options to use generated certificates directly from values.yml ([#379](https://github.com/IBM/portieris/pull/379))
 
 # v0.12.4
 ##
