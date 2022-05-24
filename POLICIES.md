@@ -1,8 +1,8 @@
 ---
 
 copyright:
-  years: 2020, 2021
-lastupdated: "2021-08-09"
+  years: 2020, 2022
+lastupdated: "2022-04-26"
 
 ---
 
@@ -64,7 +64,7 @@ To ensure that the policy is enforced, you must update the API version to:
 
 ### Image mutation option
 
-You can also set a mutate image, `mutateImage: bool`, behavior preference for each policy. The default value is `true`, which is also the original behavior and means that, on successful admission, the container's image property is mutated to ensure that the immutable digest form of the image is used. If the value is `false`, the original image reference is retained with the consequences described in [README](README.md#image-mutation-option).
+You can also set a mutate image, `mutateImage: bool`, behavior preference for each policy. The default value is `true`, which is also the original behavior and means that, on successful admission, the container's image property is mutated to ensure that the immutable digest form of the image is used. If the value is `false`, the original image reference is retained with the consequences that are described in the [readme file](README.md#image-mutation-option).
 
 **Example**
 
@@ -88,7 +88,7 @@ spec:
 
 Portieris supports sourcing trust data from the following registries without additional configuration in the image policy:
 
-* IBM Cloud&trade; Container Registry
+* IBM Cloud&reg; Container Registry
 * Quay.io
 * Docker Hub
 
@@ -138,9 +138,9 @@ To configure the policy to verify that an image is signed by a particular signer
    
 ### `simple` (Red Hat simple signing)
 
-The policy requirements are similar to those defined for the configuration files that are consulted when you're using the Red Hat&reg; tools [policy requirements](https://github.com/containers/image/blob/master/docs/containers-policy.json.5.md#policy-requirements). However, the main difference is that the public key in a `signedBy` requirement is defined in a `keySecret` attribute, the value is the name of an in-scope Kubernetes secret that contains a public key block. The value of `keyType`, `keyPath`, and `keyData`, see [policy requirements](https://github.com/containers/image/blob/master/docs/containers-policy.json.5.md#policy-requirements), can't be provided. If multiple keys are present in the key ring, the requirement is satisfied if the signature is signed by any one of them.
+The policy requirements are similar to those requirements defined for the configuration files that are consulted when you're using the Red Hat&reg; tools [policy requirements](https://github.com/containers/image/blob/master/docs/containers-policy.json.5.md#policy-requirements). However, the main difference is that the public key in a `signedBy` requirement is defined in a `keySecret` attribute, the value is the name of an in-scope Kubernetes secret that contains a public key block. The value of `keyType`, `keyPath`, and `keyData`, see [policy requirements](https://github.com/containers/image/blob/master/docs/containers-policy.json.5.md#policy-requirements), can't be provided. If multiple keys are present in the key ring, the requirement is satisfied if the signature is signed by any one of them.
 
-To export one or more public keys identified by `<finger-print>`, to a keyring, from GNU Privacy Guard (GPG) and create a KeySecret from it, you can use the following script.
+To export one, or more, public keys that are identified by `<finger-print>`, to a key ring, from GNU Privacy Guard (GPG) and create a KeySecret from it, you can use the following script.
 
 ```bash
 gpg --export --armour <finger-print> [<finger-print>] > my.pubkey
@@ -153,7 +153,7 @@ When you create the secret, ensure that you're creating the key with a value of 
 kubectl create secret generic my-pubkey --from-file=key=<your_pub_key_file>
 ```
 
-The following example requires that images from `icr.io` are signed by the identity with its public key in `my-pubkey`. If multiple public keys are present in `my-pubkey` the image is required to be signed by any one of them. 
+The following example requires that images from `icr.io` are signed by the identity with its public key in `my-pubkey`. If multiple public keys are present in `my-pubkey`, the image is required to be signed by any one of them. 
 
 ```yaml
 apiVersion: portieris.cloud.ibm.com/v1
@@ -170,7 +170,7 @@ spec:
             keySecret: my-pubkey
 ```
 
-The following example requires that images from `icr.io` are signed by the identity with public key in `my-pubkey` AND the the identity with public key in `your-pubkey`
+The following example requires that images from `icr.io` are signed by the identity with public key in `my-pubkey` and the identity with public key in `your-pubkey`.
 
 ```yaml
 apiVersion: portieris.cloud.ibm.com/v1
@@ -209,7 +209,7 @@ spec:
                 dockerRepository: "icr.io/ibm/db2/db2manager"
 ```
 
-The following example allows many images with a common origin that have moved with their original signature, for example, by mirroring, in this case from `icr.io/db2` to `registry.myco.com:5000/mymirror/ibmdb2`.
+The following example allows many images with a common origin that moved with their original signature, for example, by mirroring, in this case from `icr.io/db2` to `registry.myco.com:5000/mymirror/ibmdb2`.
 
 ```yaml
 apiVersion: portieris.cloud.ibm.com/v1
@@ -274,7 +274,7 @@ spec:
 
 For each `container` in the pod that is being considered for admission, a [vulnerability status](https://cloud.ibm.com/apidocs/container-registry/va#imagestatusquerypath) report is retrieved for the `image` that is specified by the container.
 
-The optional `account` parameter specifies the IBM Cloud&reg; account from where exemptions are retreived for images that match the policy repository name.
+The optional `account` parameter specifies the IBM Cloud&reg; account from where exemptions are retrieved for images that match the policy repository name.
 
 If the report returns an overall status of `OK`, `WARN`, or `UNSUPPORTED` the pod is allowed. In the event of any other status, or any error condition, the pod is denied.
 
@@ -293,20 +293,20 @@ The following table explains the `.yaml` properties that you must set in your Ku
 | Field | Description |
 |-------|-------------|
 | `kind` | For a cluster-wide policy, specify the `kind` as `ClusterImagePolicy`. For a Kubernetes namespace policy, specify as `ImagePolicy`. |
-|`metadata/name` | Name the custom resource definition. |
-| `spec/repositories/name` | Specify the repositories to allow images from. Wildcards (`*`) are allowed in repository names. Repositories are denied unless a matching entry in `repositories` allows it or applies further verification. An empty `repositories` list blocks deployment of all images. To allow all images without verification of any policies, set the name to `*` and omit the policy subsections. |
-| `../../../policy` | Complete the subsections for `trust` and `va` enforcement. If you omit the policy subsections, it is equivalent to specifying `enabled: false` for each. |
-| `../../../../trust/enabled` | Set as `true` to allow only images that are [signed for content trust](https://cloud.ibm.com/docs/Registry?topic=Registry-registry_trustedcontent) to be deployed. Set as `false` to ignore whether images are signed. |
-| `../../../../trust/signerSecrets/name` | If you want to allow only images that are signed by particular users, specify the Kubernetes secret with the signer name. Omit this field or leave it empty to verify that images are signed without enforcing particular signers. For more information, see [Specifying trusted content signers in custom policies](#specifying-trusted-content-signers-in-custom-policies). |
-| `../../../../va/enabled` | Set as `true` to allow only images that pass the [Vulnerability Advisor](https://cloud.ibm.com/docs/Registry?topic=va-va_index) scan. Set as `false` to ignore the Vulnerability Advisor scan. |
+|`//metadata/name` | Name the custom resource definition. |
+| `//spec/repositories/name[@*]` | Specify the repositories to allow images from. Wildcards (`*`) are allowed in repository names. Repositories are denied unless a matching entry in `repositories` allows it or applies further verification. An empty `repositories` list blocks deployment of all images. To allow all images without verification of any policies, set the name to `*` and omit the policy subsections. |
+| `//spec/repositories/name[@*]/policy` | Complete the subsections for `trust` and `va` enforcement. If you omit the policy subsections, it is equivalent to specifying `enabled: false` for each. |
+| `//spec/repositories/name[@*]/policy/trust/enabled` | Set as `true` to allow only images that are [signed for content trust](https://cloud.ibm.com/docs/Registry?topic=Registry-registry_trustedcontent) to be deployed. Set as `false` to ignore whether images are signed. |
+| `//spec/repositories/name[@*]/policy/trust/signerSecrets/name` | If you want to allow only images that are signed by particular users, specify the Kubernetes secret with the signer name. Omit this field or leave it empty to verify that images are signed without enforcing particular signers. For more information, see [Specifying trusted content signers in custom policies](#specifying-trusted-content-signers-in-custom-policies). |
+| `//spec/repositories/name[@*]/policy/va/enabled` | Set as `true` to allow only images that pass the [Vulnerability Advisor](https://cloud.ibm.com/docs/Registry?topic=va-va_index) scan. Set as `false` to ignore the Vulnerability Advisor scan. |
 
 **Table 1**. Understanding the `.yaml` properties for the Kubernetes custom resource definition.
 
 | Field | Description |
 |-------|-------------|
-| `spec/repositories/name/policy/simple/requirements/type/insecureAcceptAnything` | This option accepts any image where signature validation isn't required. For more information, see [insecureAcceptAnything](https://github.com/containers/image/blob/main/docs/containers-policy.json.5.md#insecureacceptanything). |
-| `../../../../../../../reject` | This option rejects all images and signatures. For more information, see [reject](https://github.com/containers/image/blob/main/docs/containers-policy.json.5.md#reject).|
-| `../../../../../../../signedBy` | This option ensures that the image is signed with an expected identity and key. Valid options for this field are: `matchExact`, `matchRepoDigestOrExact` (This one doesn't show in the [.yaml](https://github.com/IBM/portieris/blob/master/helm/portieris/crds/crds.yaml) file - should it?), `matchRepository`, `exactReference` (This is `matchExactReference`in the yaml file - is that right?), `exactRepository` (This is `matchExactRepository`in the yaml file - is that right?), `remapIdentity`. For more information about these options, see [signedBy](https://github.com/containers/image/blob/main/docs/containers-policy.json.5.md#signedby).|
+| `//spec/repositories/name[@*]/policy/simple/requirements/type/insecureAcceptAnything` | This option accepts any image where signature validation isn't required. For more information, see [insecureAcceptAnything](https://github.com/containers/image/blob/main/docs/containers-policy.json.5.md#insecureacceptanything). |
+| `//spec/repositories/name[@*]/policy/simple/requirements/type/reject` | This option rejects all images and signatures. For more information, see [reject](https://github.com/containers/image/blob/main/docs/containers-policy.json.5.md#reject). |
+| `//spec/repositories/name[@*]/policy/simple/requirements/type/signedBy` | This option ensures that the image is signed with an expected identity and key. Valid options for this field are: `matchExact`, `matchRepoDigestOrExact`, `matchRepository`, `exactReference`, `exactRepository`, and `remapIdentity`. For more information about these options, see [signedBy](https://github.com/containers/image/blob/main/docs/containers-policy.json.5.md#signedby).|
 
 **Table 2**. Understanding the `.yaml` components for the Kubernetes custom resource definition for `simple`.
 

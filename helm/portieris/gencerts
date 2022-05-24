@@ -35,8 +35,8 @@ openssl req -x509 -new -nodes -key "$CERT_DIR"/caKey.pem -days 100000 -out "$CER
 
 # Create a server certiticate
 openssl genrsa -out "$CERT_DIR"/tls.key 2048
-# Note the CN is the DNS name of the service of the webhook.
-openssl req -new -key "$CERT_DIR"/tls.key -out "$CERT_DIR"/server.csr -config "$CERT_DIR"/server.conf
-openssl x509 -req -in "$CERT_DIR"/server.csr -CA "$CERT_DIR"/ca.crt -CAkey "$CERT_DIR"/caKey.pem -CAcreateserial -out "$CERT_DIR"/tls.crt -days 100000 -extensions v3_req -extfile "$CERT_DIR"/server.conf
+# Note the SAN is the DNS name of the service of the webhook. CN also set but no longer trusted!
+openssl req -new -nodes -key "$CERT_DIR"/tls.key -out "$CERT_DIR"/server.csr -config "$CERT_DIR"/server.conf
+openssl x509 -req -sha256 -in "$CERT_DIR"/server.csr -CA "$CERT_DIR"/ca.crt -CAkey "$CERT_DIR"/caKey.pem -CAcreateserial -out "$CERT_DIR"/tls.crt -days 100000 -extensions v3_req -extfile "$CERT_DIR"/server.conf
 
 rm "$CERT_DIR"/caKey.pem "$CERT_DIR"/server.conf "$CERT_DIR"/server.csr

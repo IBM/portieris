@@ -13,6 +13,22 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 # v-next
 ##
 
+# v0.13.0
+*  Build with go-tooolset:1.17
+*  code-generator:1.24 / generated code
+
+# v0.12.4
+##
+* Rebuild 
+* Resolves CVE-2022-0778
+
+# v0.12.3
+##
+* Rebuild 
+* Resolves CVE-2021-3999
+* Resolves CVE-2022-23218
+* Resolves CVE-2022-23219
+
 # v0.12.2
 ##
 * Resolves CVE-2021-3712
