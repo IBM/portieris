@@ -13,6 +13,6 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: icr.io/cise/nginx:signed
+        image: de.icr.io/testing-authn/nginx:signed
         ports:
         - containerPort: 80

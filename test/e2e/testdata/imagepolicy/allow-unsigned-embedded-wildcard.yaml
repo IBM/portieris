@@ -4,7 +4,7 @@ metadata:
   name: allow-unsigned-embedded-wildcard
 spec:
    repositories:
-    - name: "icr.io/*/nginx"
+    - name: "de.icr.io/*/nginx"
       policy:
         trust:
           enabled: false

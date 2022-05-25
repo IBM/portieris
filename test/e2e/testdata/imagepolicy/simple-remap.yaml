@@ -4,7 +4,7 @@ metadata:
   name: simple-remap
 spec:
    repositories:
-    - name: "icr.io/cise/*"
+    - name: "de.icr.io/testing-authn/*"
       policy:
          simple:
            requirements:
@@ -12,5 +12,5 @@ spec:
              keySecret: simple1pubkey
              signedIdentity:
                 type: "remapIdentity"
-                prefix: "icr.io/cise/remap"
+                prefix: "de.icr.io/testing-authn/remap"
                 signedPrefix: "icr.io/cise"
