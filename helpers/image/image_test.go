@@ -158,8 +158,7 @@ func TestReference(t *testing.T) {
 				NameWithoutTag:  "us.icr.io/namespace/name",
 				String:          "us.icr.io/namespace/name",
 				RegistryURL:     "https://us.icr.io",
-				ContentTrustErr: false,
-				ContentTrustURL: "https://us.icr.io:4443",
+				ContentTrustErr: true,
 			},
 		},
 		{
@@ -192,8 +191,7 @@ func TestReference(t *testing.T) {
 				NameWithoutTag:  "us.icr.io/namespace/name",
 				String:          "us.icr.io/namespace/name",
 				RegistryURL:     "https://us.icr.io",
-				ContentTrustErr: false,
-				ContentTrustURL: "https://us.icr.io:4443",
+				ContentTrustErr: true,
 			},
 		},
 		{
@@ -209,8 +207,7 @@ func TestReference(t *testing.T) {
 				NameWithoutTag:  "stg.icr.io/namespace/name",
 				String:          "stg.icr.io/namespace/name",
 				RegistryURL:     "https://stg.icr.io",
-				ContentTrustErr: false,
-				ContentTrustURL: "https://stg.icr.io:4443",
+				ContentTrustErr: true,
 			},
 		},
 		{
@@ -226,8 +223,7 @@ func TestReference(t *testing.T) {
 				NameWithoutTag:  "de.icr.io:8080/namespace/name",
 				String:          "de.icr.io:8080/namespace/name",
 				RegistryURL:     "https://de.icr.io:8080",
-				ContentTrustErr: false,
-				ContentTrustURL: "https://de.icr.io:4443",
+				ContentTrustErr: true,
 			},
 		},
 	}
