@@ -4,10 +4,11 @@ metadata:
   name: pinned-multi
 spec:
    repositories:
-    - name: "icr.io/cise/nginx"
+    - name: "de.icr.io/testing-authn/nginx"
       policy:
         trust:
           enabled: true
+          trustServer: "https://notary.de.icr.io"
           signerSecrets:
           - name: signer1pubkey
           - name: signer2pubkey

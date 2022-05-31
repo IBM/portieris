@@ -17,6 +17,6 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: icr.io/cise/remap/nginx:simple
+        image: de.icr.io/testing-authn/remap/nginx:simple
         ports:
         - containerPort: 80

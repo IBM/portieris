@@ -38,8 +38,8 @@ func generateNamespace(name string) *corev1.Namespace {
 // https://github.com/IBM/portieris/issues/34 to remove the need for this
 var IBMCloudSecretNames = []string{"all-icr-io", "default-icr-io"}
 
-// IBMGlobalRegistry is the default location of the test images that are used in the end-to-end tests.
-var IBMGlobalRegistry = "icr.io"
+// IBMTestRegistry is the default location of the test images that are used in the end-to-end tests.
+var IBMTestRegistry = "de.icr.io"
 
 // CreateNamespace creates a namespace.
 func (f *Framework) CreateNamespace(name string) (*corev1.Namespace, error) {
@@ -80,9 +80,6 @@ func (f *Framework) CreateNamespaceWithIPS(name string) (*corev1.Namespace, erro
 	var imagePullSecret *v1.Secret
 	for _, secretName := range IBMCloudSecretNames {
 		imagePullSecret, err = f.KubeClient.CoreV1().Secrets("default").Get(context.TODO(), secretName, metav1.GetOptions{})
-		if err == nil {
-			break
-		}
 	}
 	if imagePullSecret == nil {
 		return nil, fmt.Errorf("error getting imagePullSecret: %v", err)
@@ -97,11 +94,11 @@ func (f *Framework) CreateNamespaceWithIPS(name string) (*corev1.Namespace, erro
 	badPullSecret := imagePullSecret.DeepCopy()
 	badPullSecret.Name = "bad-" + badPullSecret.GetName()
 	clientWrapper := pk.NewKubeClientsetWrapper(f.KubeClient)
-	goodUser, _, err := clientWrapper.GetSecretToken(namespace.Name, imagePullSecret.GetName(), IBMGlobalRegistry)
+	goodUser, _, err := clientWrapper.GetSecretToken(namespace.Name, imagePullSecret.GetName(), IBMTestRegistry)
 	if err == nil {
 		badAuths := pk.Auths{
 			Registries: pk.RegistriesStruct{
-				IBMGlobalRegistry: pk.RegistryCredentials{
+				IBMTestRegistry: pk.RegistryCredentials{
 					Username: goodUser,
 					Password: "iamnotanapikey",
 					Email:    "a@b.c",
