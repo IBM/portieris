@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2022 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,10 +14,6 @@
 
 package trustmap
 
-import (
-	"strings"
-)
-
 // TrustServerFn A simple type alias to represent a function that takes image and suffix and returns trust url
 type TrustServerFn func(string, string) string
 
@@ -28,22 +24,8 @@ func Identity(value string) TrustServerFn {
 	}
 }
 
-// IBMRegional IBM Sponsored Trust server, depends on the regional part of the docker image hostname.
-func IBMRegional(registryHostname string, imageHostname string) string {
-	trustSuffix := "bluemix.net:4443"
-	return "https://" + strings.TrimSuffix(imageHostname, registryHostname) + trustSuffix
-}
-
-// ICRRegional IBM Sponsored Trust server, depends on the regional part of the docker image hostname.
-func ICRRegional(registryHostname string, imageHostname string) string {
-	trustSuffix := "icr.io:4443"
-	return "https://" + strings.TrimSuffix(imageHostname, registryHostname) + trustSuffix
-}
-
 // TrustServerMap Easy way to link known registries to their sponsored trust servers
 var TrustServerMap = map[string]TrustServerFn{
-	"docker.io":   Identity("https://notary.docker.io"),
-	"quay.io":     Identity("https://quay.io:443"),
-	"bluemix.net": IBMRegional,
-	"icr.io":      ICRRegional,
+	"docker.io": Identity("https://notary.docker.io"),
+	"quay.io":   Identity("https://quay.io:443"),
 }

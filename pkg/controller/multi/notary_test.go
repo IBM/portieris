@@ -116,7 +116,7 @@ var _ = Describe("Main", func() {
 			if imageRepos != "" {
 				imagePolicyPayload = bytes.NewBufferString(fmt.Sprintf(`
 				{
-					"apiVersion": "admissionpolicy.ibm.com/v1beta1",
+					"apiVersion": "portieris.cloud.ibm.com/v1",
 					"kind": "ImagePolicy",
 					"metadata": {
 						"name": "namespace-policy"
@@ -134,7 +134,7 @@ var _ = Describe("Main", func() {
 			if clusterRepos != "" {
 				clusterImagePolicyPayload = bytes.NewBufferString(fmt.Sprintf(`
 				{
-					"apiVersion": "admissionpolicy.ibm.com/v1beta1",
+					"apiVersion": "portieris.cloud.ibm.com/v1",
 					"kind": "ClusterImagePolicy",
 					"metadata": {
 						"name": "cluster-policy"
@@ -268,7 +268,8 @@ var _ = Describe("Main", func() {
 							"name": "no-secret.icr.io/*",
 							"policy": {
 								"trust": {
-									"enabled": true
+									"enabled": true,
+									"trustServer": "https://notary.icr.io"
 								}
 							}
 						}
@@ -291,7 +292,8 @@ var _ = Describe("Main", func() {
 							"name": "no-secret.icr.io/*",
 							"policy": {
 								"trust": {
-									"enabled": true
+									"enabled": true,
+									"trustServer": "https://notary.icr.io"
 								}
 							}
 						}
@@ -315,7 +317,8 @@ var _ = Describe("Main", func() {
 							"name": "us.icr.io/*",
 							"policy": {
 								"trust": {
-									"enabled": true
+									"enabled": true,
+									"trustServer": "https://notary.icr.io"
 								}
 							}
 						}
@@ -338,7 +341,8 @@ var _ = Describe("Main", func() {
 							"name": "us.icr.io/*",
 							"policy": {
 								"trust": {
-									"enabled": true
+									"enabled": true,
+									"trustServer": "https://notary.icr.io"
 								}
 							}
 						}
@@ -362,7 +366,8 @@ var _ = Describe("Main", func() {
 							"name": "us.icr.io/*",
 							"policy": {
 								"trust": {
-									"enabled": true
+									"enabled": true,
+									"trustServer": "https://notary.icr.io"
 								}
 							}
 						}
@@ -386,7 +391,8 @@ var _ = Describe("Main", func() {
 							"name": "us.icr.io/*",
 							"policy": {
 								"trust": {
-									"enabled": true
+									"enabled": true,
+									"trustServer": "https://notary.icr.io"
 								}
 							}
 						}
@@ -414,7 +420,8 @@ var _ = Describe("Main", func() {
 							"name": "us.icr.io/*",
 							"policy": {
 								"trust": {
-									"enabled": true
+									"enabled": true,
+									"trustServer": "https://notary.icr.io"
 								}
 							}
 						}
@@ -442,7 +449,8 @@ var _ = Describe("Main", func() {
 								"name": "us.icr.io/*",
 								"policy": {
 									"trust": {
-										"enabled": true
+										"enabled": true,
+										"trustServer": "https://notary.icr.io"
 									}
 								}
 							}
@@ -465,7 +473,8 @@ var _ = Describe("Main", func() {
 								"name": "us.icr.io/*",
 								"policy": {
 									"trust": {
-										"enabled": true
+										"enabled": true,
+										"trustServer": "https://notary.icr.io"
 									}
 								}
 							}
@@ -488,7 +497,8 @@ var _ = Describe("Main", func() {
 								"name": "us.icr.io/*",
 								"policy": {
 									"trust": {
-										"enabled": true
+										"enabled": true,
+										"trustServer": "https://notary.icr.io"
 									}
 								}
 							}
@@ -511,7 +521,8 @@ var _ = Describe("Main", func() {
 								"name": "us.icr.io/*",
 								"policy": {
 									"trust": {
-										"enabled": true
+										"enabled": true,
+										"trustServer": "https://notary.icr.io"
 									}
 								}
 							}
@@ -535,7 +546,8 @@ var _ = Describe("Main", func() {
 								"name": "us.icr.io/*",
 								"policy": {
 									"trust": {
-										"enabled": true
+										"enabled": true,
+										"trustServer": "https://notary.icr.io"
 									}
 								}
 							}
@@ -558,7 +570,8 @@ var _ = Describe("Main", func() {
 								"name": "us.icr.io/*",
 								"policy": {
 									"trust": {
-										"enabled": true
+										"enabled": true,
+										"trustServer": "https://notary.icr.io"
 									}
 								}
 							}
@@ -581,7 +594,8 @@ var _ = Describe("Main", func() {
 								"name": "us.icr.io/*",
 								"policy": {
 									"trust": {
-										"enabled": true
+										"enabled": true,
+										"trustServer": "https://notary.icr.io"
 									}
 								}
 							}
@@ -604,7 +618,8 @@ var _ = Describe("Main", func() {
 								"name": "us.icr.io/*",
 								"policy": {
 									"trust": {
-										"enabled": true
+										"enabled": true,
+										"trustServer": "https://us.icr.io:4443"
 									}
 								}
 							}
@@ -661,7 +676,8 @@ var _ = Describe("Main", func() {
 								"name": "us.icr.io/*",
 								"policy": {
 									"trust": {
-										"enabled": true
+										"enabled": true,
+										"trustServer": "https://us.icr.io:4443"
 									}
 								}
 							}
@@ -732,7 +748,8 @@ var _ = Describe("Main", func() {
 							"name": "us.icr.io/*",
 							"policy": {
 								"trust": {
-									"enabled": true
+									"enabled": true,
+									"trustServer": "https://us.icr.io:4443"
 								}
 							}
 						}
@@ -759,7 +776,8 @@ var _ = Describe("Main", func() {
 							"name": "us.icr.io/hello",
 							"policy": {
 								"trust": {
-									"enabled": true
+									"enabled": true,
+									"trustServer": "https://us.icr.io:4443"
 								}
 							}
 						},
@@ -829,7 +847,8 @@ var _ = Describe("Main", func() {
 								"name": "us.icr.io/*",
 								"policy": {
 									"trust": {
-										"enabled": true
+										"enabled": true,
+										"trustServer": "https://us.icr.io"
 									}
 								}
 							}
