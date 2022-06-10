@@ -20,7 +20,11 @@ webhooks:
         namespace: {{ .Release.Namespace }}
         path: "/admit"
       {{ if not .Values.UseCertManager }}
+      {{ if .Values.UseGeneratedCerts.enabled }}
+      caBundle: {{ required "A valid .Values.UseGeneratedCerts.caCert entry required!" .Values.UseGeneratedCerts.caCert | b64enc | quote }}
+      {{ else }}
       caBundle: {{ .Files.Get "certs/ca.crt" | b64enc }}
+      {{ end }}
       {{ end }}
     rules: []
     sideEffects: None
@@ -49,7 +53,11 @@ webhooks:
         namespace: {{ .Release.Namespace }}
         path: "/admit"
       {{ if not .Values.UseCertManager }}
+      {{ if .Values.UseGeneratedCerts.enabled }}
+      caBundle: {{ required "A valid .Values.UseGeneratedCerts.caCert entry required!" .Values.UseGeneratedCerts.caCert | b64enc | quote }}
+      {{ else }}
       caBundle: {{ .Files.Get "certs/ca.crt" | b64enc }}
+      {{ end }}
       {{ end }}
     rules:
       - operations: [ "CREATE", "UPDATE" ]
