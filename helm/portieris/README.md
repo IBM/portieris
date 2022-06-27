@@ -26,11 +26,33 @@ This chart does the following tasks:
 
 ## Installing the chart
 
-### Regenerate certificates
+### Define certificates
 
-This installation uses the default certificates. To avoid using the default certificates, check out the source project at the release level and run the `./gencerts` script.
+You will need the following:
+* A CA certificate
+* A server certificate, signed by the CA
+* A private key for the server certificate
 
-**Important** If you don't run the `./gencerts` script, you will deploy with certificates that are publicly accessible on GitHub.
+Note: If you want, you can use the `gencerts` script to generate these automatically for you.
+
+Next, you will need to add the contents of these three files to your values.json. Under `UseGeneratedCerts` you will add them to `tlsCert`, `tlsKey`, and `caCert` respectively. Also be sure to set `enabled` to true. The resulting section of the values file should look something like this:
+```
+UseGeneratedCerts:
+  enabled: true
+  tlsCert: |
+    -----BEGIN CERTIFICATE-----
+    ...certificate data...
+    -----END CERTIFICATE-----
+  tlsKey: |
+    -----BEGIN CERTIFICATE-----
+    ...key data...
+    -----END CERTIFICATE-----
+  caCert: |
+    -----BEGIN CERTIFICATE-----
+    ...certificate data...
+    -----END CERTIFICATE-----
+```
+Include every line of the certificate/key files, making sure you use proper indentation before each line so as to produce a valid YAML.
 
 ### IBM Cloud Kubernetes Service
 
