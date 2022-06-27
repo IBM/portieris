@@ -9,8 +9,4 @@ spec:
         trust:
           enabled: true
           trustServer: "https://notary.de.icr.io"
-    - name: "stg.icr.io/testing-authn/nginx"
-      policy:
-        trust:
-          enabled: true
-          trustServer: "https://notary.stg.icr.io"
+

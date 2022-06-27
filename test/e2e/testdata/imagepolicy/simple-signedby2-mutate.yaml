@@ -4,7 +4,7 @@ metadata:
   name: simple-signedby2-mutate
 spec:
    repositories:
-    - name: "de.icr.io/testing-authn/*"
+    - name: "icr.io/cise/*"
       policy:
          mutateImage: true
          simple:
