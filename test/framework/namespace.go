@@ -1,4 +1,4 @@
-// Copyright 2018, 2021 Portieris Authors.
+// Copyright 2018, 2022 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -80,6 +80,9 @@ func (f *Framework) CreateNamespaceWithIPS(name string) (*corev1.Namespace, erro
 	var imagePullSecret *v1.Secret
 	for _, secretName := range IBMCloudSecretNames {
 		imagePullSecret, err = f.KubeClient.CoreV1().Secrets("default").Get(context.TODO(), secretName, metav1.GetOptions{})
+		if err == nil {
+			break
+		}
 	}
 	if imagePullSecret == nil {
 		return nil, fmt.Errorf("error getting imagePullSecret: %v", err)
