@@ -105,6 +105,9 @@ func (v *Verifier) VerifyByPolicy(namespace string, img *image.Reference, creden
 			if strings.Contains(err.Error(), "401") {
 				continue
 			}
+			if strings.Contains(err.Error(), "403") {
+				continue
+			}
 
 			if _, ok := err.(store.ErrServerUnavailable); ok {
 				glog.Errorf("Trust server unavailable: %v", err)
