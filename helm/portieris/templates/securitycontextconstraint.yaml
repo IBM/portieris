@@ -18,8 +18,6 @@ allowedCapabilities: []
 defaultAddCapabilities: []
 fsGroup:
   type: RunAsAny
-groups:
-- system:cluster-admins
 priority: 10
 readOnlyRootFilesystem: false
 requiredDropCapabilities:
