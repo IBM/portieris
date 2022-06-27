@@ -118,3 +118,6 @@ priorityClass: system-cluster-critical
 podDisruptionBudget:
   enabled: true
   minAvailable: 1
+
+# Service selector includes release in addition to app
+selectByRelease: true
