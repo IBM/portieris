@@ -77,13 +77,12 @@ func (f *Framework) CreateNamespaceWithIPS(name string) (*corev1.Namespace, erro
 	if err != nil {
 		return nil, fmt.Errorf("error creating namespace: %v", err)
 	}
-	var imagePullSecret *v1.Secret
-	for _, secretName := range IBMCloudSecretNames {
-		imagePullSecret, err = f.KubeClient.CoreV1().Secrets("default").Get(context.TODO(), secretName, metav1.GetOptions{})
+	imagePullSecret, err := f.getIBMCloudPullSecret()
+	if err != nil {
+		return nil, err
 	}
-	if imagePullSecret == nil {
-		return nil, fmt.Errorf("error getting imagePullSecret: %v", err)
-	}
+
+	// create copy
 	imagePullSecret.Namespace = namespace.Name
 	imagePullSecret.ResourceVersion = ""
 	if _, err := f.KubeClient.CoreV1().Secrets(namespace.Name).Create(context.TODO(), imagePullSecret, metav1.CreateOptions{}); err != nil {
@@ -122,6 +121,19 @@ func (f *Framework) CreateNamespaceWithIPS(name string) (*corev1.Namespace, erro
 		return nil, fmt.Errorf("error adding imagePullSecret to ServiceAccount: %v", err)
 	}
 	return namespace, nil
+}
+
+// Get the first found ImagePullSecret
+func (f *Framework) getIBMCloudPullSecret() (*v1.Secret, error) {
+	var err error
+	for _, secretName := range IBMCloudSecretNames {
+		var imagePullSecret *v1.Secret
+		imagePullSecret, err = f.KubeClient.CoreV1().Secrets("default").Get(context.TODO(), secretName, metav1.GetOptions{})
+		if err == nil {
+			return imagePullSecret, nil
+		}
+	}
+	return nil, fmt.Errorf("error getting imagePullSecret: %v", err)
 }
 
 // DeleteNamespace deletes the specified namespace.
