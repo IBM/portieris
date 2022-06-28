@@ -14,9 +14,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ##
 
 # v0.13.0
-*  Build with go-tooolset:1.17
-*  code-generator:1.24 / generated code
-*  Helm chart improvements: Fixes ([142](https://github.com/IBM/portieris/issues/142)), options to define podDisruptionBudget and options to use generated certificates directly from values.yml ([#379](https://github.com/IBM/portieris/pull/379))
+*  Build with go-tooolset:1.17.10 resolving CVE-2022-29526 CVE-2022-23772 CVE-2022-24921
+*  code-generator:1.24 + regenerate code
+*  Helm chart improvements: Fixes ([142](https://github.com/IBM/portieris/issues/142))
+*  options to define podDisruptionBudget and options to use generated certificates directly from values.yml ([#379](https://github.com/IBM/portieris/pull/379))
 *  resolve ([388](https://github.com/IBM/portieris/issues/388)), remove cluster-admins group from SCC
 
 # v0.12.4
