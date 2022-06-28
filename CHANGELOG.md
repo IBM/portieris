@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ##
 
 # v0.13.0
+*  resolved ([51])(https://github.com/IBM/portieris/issues/51) following the oAuth spec
 *  Build with go-tooolset:1.17.10 resolving CVE-2022-29526 CVE-2022-23772 CVE-2022-24921
 *  code-generator:1.24 + regenerate code
 *  Helm chart improvements: Fixes ([142](https://github.com/IBM/portieris/issues/142))
