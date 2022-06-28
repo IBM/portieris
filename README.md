@@ -67,13 +67,8 @@ Portieris is installed by using a Helm chart. Before you begin, ensure that you 
      tar xzvf portieris-0.9.4.tgz
      ```
      
-  3. Run:
+  3. Generate your CA certificate as well as a certificate/key pair for your webhook server, signed by the CA you created. Add these to the `values.yaml` file under `UseGeneratedCerts`. Be sure to also set `enabled` to true. For more detailed instructions, see the README under `helm/portieris`.
   
-     ```
-     sh ./portieris/gencerts
-     ```
-     
-     The `gencerts` script generates new SSL certificates and keys for Portieris. Portieris presents this certificate to the Kubernetes API server when the API server makes admission requests. If you don't generate new certificates, an attacker could imitate Portieris in your cluster.
   4. Run:
   
      ```
