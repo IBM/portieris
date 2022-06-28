@@ -21,4 +21,6 @@ spec:
       name: metrics
   selector:
     app: {{ template "portieris.name" . }}
+  {{- if .Values.selectByRelease }}
     release: {{ .Release.Name }}
+  {{ end }}
