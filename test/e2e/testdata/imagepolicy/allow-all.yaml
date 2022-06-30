@@ -5,4 +5,4 @@ metadata:
 spec:
    repositories:
     - name: "*"
-      policy:
+      policy: {}

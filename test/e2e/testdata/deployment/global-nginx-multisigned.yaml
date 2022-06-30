@@ -17,6 +17,6 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: icr.io/cise/nginx:multisigned
+        image: de.icr.io/testing-authn/nginx:multisigned
         ports:
         - containerPort: 80

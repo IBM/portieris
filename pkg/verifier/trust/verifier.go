@@ -1,4 +1,4 @@
-// Copyright 2018, 2021 Portieris Authors.
+// Copyright 2018, 2022 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -90,7 +90,7 @@ func (v *Verifier) VerifyByPolicy(namespace string, img *image.Reference, creden
 
 		digest, err := v.getDigest(notaryURL, img.NameWithoutTag(), notaryToken, img.GetTag(), signers)
 		if err != nil {
-			if strings.Contains(err.Error(), "401") {
+			if strings.Contains(err.Error(), "401") || strings.Contains(err.Error(), "403") {
 				continue
 			}
 

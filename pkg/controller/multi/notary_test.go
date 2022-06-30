@@ -1,4 +1,4 @@
-// Copyright 2018, 2021 Portieris Authors.
+// Copyright 2018, 2022 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -396,6 +396,33 @@ var _ = Describe("Main", func() {
 					fakeEnforcer(imageRepos, clusterRepos)
 					trust = &fakenotary.FakeNotary{}
 					trust.GetNotaryRepoReturns(nil, fmt.Errorf("401"))
+					fakeGetRepo()
+					updateController()
+					req := newFakeRequestMultipleValidSecrets("us.icr.io/hello")
+					wh.HandleAdmissionRequest(w, req)
+					parseResponse()
+					Expect(resp.Response.Allowed).To(BeTrue())
+					Expect(string(resp.Response.Patch)).To(ContainSubstring("us.icr.io/hello@sha256:31323334353637383930"))
+				})
+			})
+
+			Context("if `trust is enabled` but the first secret is not authorised", func() {
+				It("should mutate and allow the image", func() {
+					imageRepos := `"repositories": [
+						{
+							"name": "us.icr.io/*",
+							"policy": {
+								"trust": {
+									"enabled": true
+								}
+							}
+						}
+					]`
+
+					clusterRepos := `"repositories": []`
+					fakeEnforcer(imageRepos, clusterRepos)
+					trust = &fakenotary.FakeNotary{}
+					trust.GetNotaryRepoReturns(nil, fmt.Errorf("403"))
 					fakeGetRepo()
 					updateController()
 					req := newFakeRequestMultipleValidSecrets("us.icr.io/hello")

@@ -13,6 +13,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 # v-next
 ##
 
+# v0.12.5
+* Build with go-tooolset:1.17.10 resolving CVE-2022-29526 CVE-2022-23772 CVE-2022-24921
+* Ensure trust secrets are tried sequentially if some are not authorised
+
 # v0.12.4
 ##
 * Rebuild 

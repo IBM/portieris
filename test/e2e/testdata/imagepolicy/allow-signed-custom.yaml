@@ -4,8 +4,8 @@ metadata:
   name: allow-signed
 spec:
    repositories:
-    - name: "icr.io/cise/nginx"
+    - name: "de.icr.io/testing-authn/nginx"
       policy:
         trust:
           enabled: true
-          trustServer: "https://us.icr.io:4443"
+          trustServer: "https://notary.de.icr.io"
