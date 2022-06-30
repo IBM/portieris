@@ -4,10 +4,10 @@ metadata:
   name: global-nginx-signed
   labels:
     app: global-nginx-signed
-    test: true
+    test: "true"
 spec:
   containers:
   - name: nginx
-    image: icr.io/cise/nginx:signed
+    image: de.icr.io/testing-authn/nginx:signed
     ports:
     - containerPort: 80

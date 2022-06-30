@@ -1,4 +1,4 @@
-// Copyright 2018, 2021 Portieris Authors.
+// Copyright 2018, 2022 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@ package utils
 
 import (
 	"testing"
-
-	uuid "github.com/satori/go.uuid"
 
 	policyv1 "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/v1"
 	"github.com/IBM/portieris/test/framework"
@@ -44,7 +42,7 @@ func DeleteThenReturnClusterImagePolicy(t *testing.T, fw *framework.Framework, c
 }
 
 func CreateClusterImagePolicyAndNamespace(t *testing.T, fw *framework.Framework, manifestPath string) (*policyv1.ClusterImagePolicy, *corev1.Namespace) {
-	ns := uuid.NewV4().String()
+	ns := framework.MakeTestUUID()
 	clusterImagePolicy, err := fw.LoadClusterImagePolicyManifest(manifestPath)
 	if err != nil {
 		t.Errorf("error loading %q ClusterImagePolicy manifest: %v", clusterImagePolicy.Name, err)

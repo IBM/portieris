@@ -4,7 +4,7 @@ metadata:
   name: allow-unsigned-embedded-trailing-wildcard
 spec:
    repositories:
-    - name: "icr.io/*/*"
+    - name: "de.icr.io/*/*"
       policy:
         trust:
           enabled: false
