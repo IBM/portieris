@@ -102,6 +102,12 @@ ObjectSelectorAdmissionSkip:
     #     values:
     #     - xxxx
 
+NamespaceSelectorAdmissionSkip:
+  #- key: kubernetes.io/metadata.name
+  #  operator: NotIn
+  #  values:
+  #    - kube-system
+
 clusterPolicy:
   allowedRepositories:
     # This permissive policy allows all images in namespaces which do not have an ImagePolicy.

@@ -37,9 +37,9 @@ metadata:
   name: image-admission-config
   annotations:
     "helm.sh/hook": post-install,post-upgrade,post-rollback
-  {{ if .Values.UseCertManager }}
+  {{- if .Values.UseCertManager }}
     cert-manager.io/inject-ca-from: {{ .Release.Namespace }}/portieris-certs
-  {{ end }}
+  {{- end }}
   labels:
     app: {{ template "portieris.name" . }}
     chart: {{ template "portieris.chart" . }}
@@ -52,13 +52,13 @@ webhooks:
         name: {{ template "portieris.name" . }}
         namespace: {{ .Release.Namespace }}
         path: "/admit"
-      {{ if not .Values.UseCertManager }}
-      {{ if .Values.UseGeneratedCerts.enabled }}
+      {{- if not .Values.UseCertManager }}
+      {{- if .Values.UseGeneratedCerts.enabled }}
       caBundle: {{ required "A valid .Values.UseGeneratedCerts.caCert entry required!" .Values.UseGeneratedCerts.caCert | b64enc | quote }}
-      {{ else }}
+      {{- else }}
       caBundle: {{ .Files.Get "certs/ca.crt" | b64enc }}
-      {{ end }}
-      {{ end }}
+      {{- end }}
+      {{- end }}
     rules:
       - operations: [ "CREATE", "UPDATE" ]
         apiGroups: ["*"]
@@ -67,15 +67,18 @@ webhooks:
     failurePolicy: {{ .Values.webHooks.failurePolicy }}
     sideEffects: None
     admissionReviewVersions: ["v1"]
-    {{ if .Values.AllowAdmissionSkip }}
+    {{- if or (.Values.AllowAdmissionSkip) (.Values.NamespaceSelectorAdmissionSkip) }}
     namespaceSelector:
       matchExpressions:
+      {{- if .Values.AllowAdmissionSkip}}
       - key: securityenforcement.admission.cloud.ibm.com/namespace
         operator: NotIn
         values:
         - skip
-    {{ end }}
-    {{ if .Values.ObjectSelectorAdmissionSkip }}
+      {{- end }}
+{{ toYaml .Values.NamespaceSelectorAdmissionSkip | indent 8 }}
+    {{- end }}
+    {{- if .Values.ObjectSelectorAdmissionSkip }}
     objectSelector:
 {{ toYaml .Values.ObjectSelectorAdmissionSkip | indent 6 }}
-    {{ end }}
+    {{- end }}
