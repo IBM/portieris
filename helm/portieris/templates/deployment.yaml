@@ -8,6 +8,10 @@ metadata:
     chart: {{ template "portieris.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
+  {{- with .Values.deployemntAnnotations }}
+  annotations:
+      {{- toYaml . | nindent 8 }}
+  {{- end }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
