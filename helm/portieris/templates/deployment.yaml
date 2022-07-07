@@ -10,7 +10,7 @@ metadata:
     heritage: {{ .Release.Service }}
   {{- with .Values.deployemntAnnotations }}
   annotations:
-      {{- toYaml . | nindent 8 }}
+    {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
   replicas: {{ .Values.replicaCount }}
