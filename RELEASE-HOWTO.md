@@ -16,6 +16,12 @@ Each release version number must increase incrementally and comply with [Semanti
 
 Use the following format `vx.x.x`. 
 
+## Determining version number
+
+Versioning should be performed according to the semver spec. Accordingly, the patch version must be used only for non-breaking bug fixes, and new function should be a minor version increase.
+
+Since changes to the Helm chart will change behaviour, any change to the Helm chart must be released in a minor version bump. Patch versions of the container image should be consumable without reviewing the Helm chart for changes.
+
 ## Release process
 
 1. Update **VERSION** in the `Makefile`, `Chart.yaml`, and `values.yaml` files to the release version number. 
