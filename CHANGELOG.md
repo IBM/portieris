@@ -20,6 +20,7 @@ Released YYYY-MM-DD
 Released YYYY-MM-DD
 
 * Upgrade runc to v1.1.2 for vulnerability fix
+* Build with go-toolset:1.17.12 for vulnerability fix
 
 ## v0.13.0
 
