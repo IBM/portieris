@@ -5,6 +5,5 @@ cover.*
 
 bin
 .idea
-.go-version
 
 helm/portieris/certs/*
