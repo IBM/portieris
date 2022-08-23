@@ -35,7 +35,7 @@ Released 2022-06-28
 
 ## v0.12.6
 
-Released 2022-08-22
+Released 2022-08-23
 
 * Build with go-toolset:1.17.12 for vulnerability fix
 
