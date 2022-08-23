@@ -1,8 +1,8 @@
 ---
 
 copyright:
-  years: 2020, 2021
-lastupdated: "2021-10-11"
+  years: 2020-2022
+lastupdated: "2022-08-23"
 
 ---
 
@@ -17,7 +17,7 @@ Released YYYY-MM-DD
 
 ## v0.13.1
 
-Released YYYY-MM-DD
+Released 2022-08-23
 
 * Upgrade runc to v1.1.2 for vulnerability fix
 * Build with go-toolset:1.17.12 for vulnerability fix
@@ -32,6 +32,12 @@ Released 2022-06-28
 * Helm chart improvements: Fixes ([#142](https://github.com/IBM/portieris/issues/142))
 * options to define podDisruptionBudget and options to use generated certificates directly from values.yml ([PR#379](https://github.com/IBM/portieris/pull/379))
 * resolve ([#388](https://github.com/IBM/portieris/issues/388)), remove cluster-admins group from SCC
+
+## v0.12.6
+
+Released 2022-08-23
+
+* Build with go-toolset:1.17.12 for vulnerability fix
 
 ## v0.12.5
 
