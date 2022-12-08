@@ -76,7 +76,9 @@ webhooks:
         values:
         - skip
       {{- end }}
-{{ toYaml .Values.NamespaceSelectorAdmissionSkip | indent 8 }}
+      {{- with .Values.NamespaceSelectorAdmissionSkip }}
+{{ toYaml . | indent 6 }}
+      {{- end }}
     {{- end }}
     {{- if .Values.ObjectSelectorAdmissionSkip }}
     objectSelector:
