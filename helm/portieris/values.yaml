@@ -36,6 +36,10 @@ SkipSecretCreation: false
 
 # If using cert-manager to handle secrets
 UseCertManager: false
+certManagerIssuer:
+  skipCreation: false
+  kind: Issuer
+  name: portieris
 
 ## Use generated certs from values file.
 ## Ref: https://github.com/IBM/portieris/blob/main/helm/portieris/gencerts
