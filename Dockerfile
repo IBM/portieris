@@ -1,6 +1,12 @@
-FROM registry.access.redhat.com/ubi8/go-toolset:1.17.12 as gobuild
-# This first stage of the build is purely to build the Golang binary for Portieris
+# This first stage of the build uses go-toolset to build the portieris binary creates 
+# a simplified operating system image that satisfies vulnerability scanning requirements 
+FROM registry.access.redhat.com/ubi8/go-toolset:1.18.4-20 as installer
 ARG VERSION=undefined
+
+# switch to root user as we need to run yum and rpm to ensure packages are up to date
+USER root
+RUN yum update -y
+
 # Work within the /opt/app-root/src working directory of the UBI go-toolset image
 WORKDIR /opt/app-root/src/github.com/IBM/portieris
 RUN mkdir -p /opt/app-root/src/github.com/IBM/portieris
@@ -11,13 +17,6 @@ RUN CGO_ENABLED=0 GOOS=linux go build \
     -ldflags="-X github.com/IBM/portieris/internal/info.Version=$VERSION" -a \
     -tags containers_image_openpgp -o /opt/app-root/bin/portieris ./cmd/portieris
 
-
-#################################################################################
-# Use another intermediary step to identify and extract the minimum content required for the runtime image.
-# The purpose of this is to keep the image size and attack surface as small as possible,
-#  while providing enough information for vulnerability scanning tools to inspect it.
-FROM registry.access.redhat.com/ubi8/s2i-base:latest as installer
-RUN yum upgrade -y
 # prep target rootfs for scratch container
 WORKDIR /
 RUN mkdir /image && \
@@ -43,7 +42,7 @@ RUN rpm --root /image --initdb \
 # Finally, copy the minimal image contents and the built binary into the scratch image
 FROM scratch
 COPY --from=installer /image/ /
-COPY --from=gobuild /opt/app-root/bin/portieris /portieris
+COPY --from=installer /opt/app-root/bin/portieris /portieris
 # Create /tmp for logs and /run for working directory
 RUN [ "/portieris", "--mkdir",  "/tmp,/run" ]
 WORKDIR /run

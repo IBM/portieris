@@ -15,6 +15,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 Released YYYY-MM-DD
 
+## v0.13.2 
+
+Released 2022-01-17
+
+* Update to go-toolset:1.18.4-20 and ensures go rpm is tracked in final image
+* Update go dependencies
+
 ## v0.13.1
 
 Released 2022-08-23
