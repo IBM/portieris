@@ -16,6 +16,7 @@ COPY . ./
 RUN CGO_ENABLED=0 GOOS=linux go build \
     -ldflags="-X github.com/IBM/portieris/internal/info.Version=$VERSION" -a \
     -tags containers_image_openpgp -o /opt/app-root/bin/portieris ./cmd/portieris
+RUN go version -m -v /opt/app-root/bin/portieris | (grep dep || true) | awk '{print "{\"Path\": \""$2 "\", \"Version\": \"" $3 "\"}"}' > /deps.jsonl
 
 # prep target rootfs for scratch container
 WORKDIR /
@@ -37,6 +38,12 @@ RUN rpm --root /image --initdb \
   && dnf download --destdir / ${PACKAGES} \
   && rpm --root /image -ivh --justdb --nodeps `for i in ${PACKAGES}; do echo $i.rpm; done`
 
+
+# Check dependencies for vulnerabilities
+FROM sonatypecommunity/nancy:alpine
+COPY --from=installer /deps.jsonl /
+RUN cat /deps.jsonl
+RUN cat /deps.jsonl | nancy --skip-update-check --loud sleuth
 
 #################################################################################
 # Finally, copy the minimal image contents and the built binary into the scratch image

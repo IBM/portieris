@@ -21,8 +21,8 @@ require (
 	github.com/prometheus/client_golang v1.12.2
 	github.com/stretchr/testify v1.7.1
 	github.com/theupdateframework/notary v0.7.0
-	golang.org/x/crypto v0.0.0-20220518034528-6f7dac969898
-	gopkg.in/yaml.v3 v3.0.0-20220512140231-539c8e751b99
+	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d
+	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.24.0
 	k8s.io/apiextensions-apiserver v0.0.0-00010101000000-000000000000
 	k8s.io/apimachinery v0.24.0
@@ -60,7 +60,6 @@ require (
 	github.com/go-openapi/swag v0.19.14 // indirect
 	github.com/go-playground/locales v0.13.0 // indirect
 	github.com/go-playground/universal-translator v0.17.0 // indirect
-	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/gnostic v0.5.7-v3refs // indirect
@@ -101,12 +100,12 @@ require (
 	github.com/syndtr/gocapability v0.0.0-20200815063812-42c35b437635 // indirect
 	github.com/ulikunitz/xz v0.5.10 // indirect
 	github.com/vbatts/tar-split v0.11.2 // indirect
-	go.mongodb.org/mongo-driver v1.4.2 // indirect
+	go.mongodb.org/mongo-driver v1.11.1 // indirect
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f // indirect
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8 // indirect
-	golang.org/x/sys v0.0.0-20220422013727-9388b58f7150 // indirect
+	golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f // indirect
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
-	golang.org/x/text v0.3.7 // indirect
+	golang.org/x/text v0.6.0 // indirect
 	golang.org/x/time v0.0.0-20220210224613-90d013bbcef8 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
