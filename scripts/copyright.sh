@@ -27,7 +27,7 @@ $(cat ${GOFILE})" > ${GOFILE}
 done
 
 # Check for multi-line in new files
-GOSRCFILES=($(git diff --name-only origin/master | grep '\.go$'))
+GOSRCFILES=($(git diff --name-only origin/main | grep '\.go$'))
 for GOFILE in "${GOSRCFILES[@]}"; do
   if grep -q "Copyright .* Portieris Authors." $GOFILE; then
       YEAR_LINE=$(grep "Copyright .* Portieris Authors." $GOFILE)
