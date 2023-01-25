@@ -27,7 +27,7 @@ done
 
 # Check for multi-line in new files
 if git fetch origin ; then
-    GOSRCFILES=($(git diff --name-only origin/master | grep '\.go$'))
+    GOSRCFILES=($(git diff --name-only origin/main | grep '\.go$'))
     for GOFILE in "${GOSRCFILES[@]}"; do
     if grep -q "Copyright .* Portieris Authors." $GOFILE; then
         YEAR_LINE=$(grep "Copyright .* Portieris Authors." $GOFILE)
@@ -49,7 +49,7 @@ if git fetch origin ; then
     done
     if [ $CRC -gt 0 ]; then fail "Please run make copyright to add copyright statements and check in the updated file(s).\n"; fi
 else
-    fail "Failed to get branch information for origin/master, cannot perform copyright check. Make sure that you have a remote called origin in your git project."
+    fail "Failed to get branch information for origin/main, cannot perform copyright check. Make sure that you have a remote called origin in your git project."
     CRC=$(($CRC + 1))
 fi
 exit $CRC

@@ -1,4 +1,4 @@
-// Copyright 2018, 2022 Portieris Authors.
+// Copyright 2018, 2023 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,9 +32,12 @@ import (
 
 // GetHTTPClient gets an http client to use for getting an oauth token
 // Takes the following as input:
-//   customFile - Path to custom ca certificate
+//
+//	customFile - Path to custom ca certificate
+//
 // Returns:
-//   *http.Client
+//
+//	*http.Client
 func GetHTTPClient(customFile string) *http.Client {
 	rootCA, err := x509.SystemCertPool()
 	customCA, err := ioutil.ReadFile(customFile)
@@ -73,15 +76,18 @@ func GetHTTPClient(customFile string) *http.Client {
 
 // Request is a helper for getting an OAuth token from the Registry OAuth Service.
 // Takes the following as input:
-//   oauthEndpoint       - URL of the oauth endpoint to be used
-//   username            - Username for the OAuth request, identifies the type of token being passed in. Valid usernames are token (for registry token), iambearer, iamapikey, bearer (UAA bearer (legacy)), iamrefresh
-//   token               - Auth token being used for the request
-//   service             - The service you are retrieving the OAuth token for. Current services are either "notary" or "registry"
-//   scope               - The scope to be requested for the oauth token
+//
+//	oauthEndpoint       - URL of the oauth endpoint to be used
+//	username            - Username for the OAuth request, identifies the type of token being passed in. Valid usernames are token (for registry token), iambearer, iamapikey, bearer (UAA bearer (legacy)), iamrefresh
+//	token               - Auth token being used for the request
+//	service             - The service you are retrieving the OAuth token for. Current services are either "notary" or "registry"
+//	scope               - The scope to be requested for the oauth token
+//
 // Returns:
-//   *auth.TokenResponse - Details of the type is here https://github.ibm.com/alchemy-registry/registry-types/tree/master/auth#type-tokenresponse
-//                         Token is the element you will need to forward to the registry/notary as part of a Bearer Authorization Header
-//   error
+//
+//	*auth.TokenResponse - Details of the type is here https://github.ibm.com/alchemy-registry/registry-types/tree/master/auth#type-tokenresponse
+//	                      Token is the element you will need to forward to the registry/notary as part of a Bearer Authorization Header
+//	error
 func Request(oauthEndpoint string, username string, token string, service string, scope string) (*TokenResponse, error) {
 	if oauthEndpoint == "" || service == "" {
 		errMessage := "unable to fetch oauth realm and service header details"

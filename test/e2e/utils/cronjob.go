@@ -1,4 +1,4 @@
-// Copyright 2018, 2021 Portieris Authors.
+// Copyright 2018, 2023 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,10 +20,10 @@ import (
 
 	"github.com/IBM/portieris/test/framework"
 	"github.com/stretchr/testify/assert"
-	batchv1beta1 "k8s.io/api/batch/v1beta1"
+	batchv1 "k8s.io/api/batch/v1"
 )
 
-func buildCronJob(t *testing.T, fw *framework.Framework, manifestLocation, namespace string, expectCreateFail bool) *batchv1beta1.CronJob {
+func buildCronJob(t *testing.T, fw *framework.Framework, manifestLocation, namespace string, expectCreateFail bool) *batchv1.CronJob {
 	manifest, err := fw.LoadCronJobManifest(manifestLocation)
 	if err != nil {
 		t.Fatalf("Error loading manifest: %v", err)

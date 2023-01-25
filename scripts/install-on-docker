@@ -1,0 +1,19 @@
+#!/bin/sh 
+
+
+# make a secret we can use to pull the candidate image
+kubectl create secret docker-registry ${PULLSECRET} --docker-username iamapikey --docker-password "${PORTIERIS_PULL_APIKEY}" --docker-server ${REG}
+# make a secret that e2e tests can use to pull test images, do notary and get va results
+# e2e tests copy this to the test namespaces
+kubectl create secret docker-registry all-icr-io --docker-username iamapikey --docker-password "${PORTIERIS_TESTIMAGE_APIKEY}" --docker-server de.icr.io 
+
+kubectl create ns portieris
+kubectl get secret ${PULLSECRET} -o yaml | sed 's/namespace: default/namespace: portieris/' | kubectl create -f - 
+kubectl cluster-info
+set -x
+helm install -n portieris portieris portieris-${VERSION}.tgz --set image.host=${HUB} --set image.tag=${TAG} --set image.pullSecret=${PULLSECRET}  --set IBMContainerService=false
+set +x 
+
+sleep 15
+kubectl get pods -n portieris 
+

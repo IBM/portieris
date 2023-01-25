@@ -1,0 +1,6 @@
+#!/bin/sh 
+
+helm delete -n portieris portieris 
+kubectl delete namespace portieris 
+kubectl delete secret portieris-test
+kubectl delete secret all-icr-io 
