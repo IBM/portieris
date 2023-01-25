@@ -1,4 +1,4 @@
-GOFILES=$(shell find . -type f -name '*.go' -not -path "./code-generator/*"i -not -path "./pkg/apis/*")
+GOFILES=$(shell find . -type f -name '*.go' -not -path "./code-generator/*" -not -path "./pkg/apis/*")
 GOPACKAGES=$(shell go list ./... | grep -v test/ | grep -v pkg/apis/)
 
 VERSION=v0.13.2
