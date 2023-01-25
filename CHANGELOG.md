@@ -17,7 +17,7 @@ Released YYYY-MM-DD
 
 ## v0.13.2 
 
-Released 2022-01-17
+Released 2022-01-25
 
 * Update to go-toolset:1.18.4-20 and ensures go rpm is tracked in final image
 * Update go dependencies

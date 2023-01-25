@@ -51,7 +51,7 @@ var keyValidGPG = "mQENBF15FJUBCAC+RDRL14lFAeVUAQrsg7XU3tLEb6Goy+XADZL1VLOgjDNqb
 	"Exdgp01NoEQx1UPfy/Y9gJ5aGaUUBDG7i6twpeTo9XFyJihrU5tFfrzT6iuGggxF\n" +
 	"fJoCgxVAKzXJnGTulcClquAOmMCFKqxbkOTIUy0uATSGF4pIvGu0Edi0GzvfCKST"
 
-//	"=Q8Ys" (armour checksum)
+// "=Q8Ys" (armour checksum)
 var keyValidB64 = "ZG8geW91IGtub3cgbWUK"
 var keyInvalid = "******"
 

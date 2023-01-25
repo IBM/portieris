@@ -1,9 +1,7 @@
 code-generator
 cover.*
-
 *.tgz
-
 bin
 .idea
-
 helm/portieris/certs/*
+scripts/myenv.sh
