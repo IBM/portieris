@@ -1,7 +1,7 @@
 # This first stage of the build uses go-toolset to build the portieris binary creates 
 # a simplified operating system image that satisfies vulnerability scanning requirements 
-FROM registry.access.redhat.com/ubi8/go-toolset:1.18.4-20 as installer
-ARG VERSION=undefined
+FROM registry.access.redhat.com/ubi8/go-toolset:1.18.9-8 as installer
+ARG PORTIERIS_VERSION=undefined
 
 # switch to root user as we need to run yum and rpm to ensure packages are up to date
 USER root
@@ -14,7 +14,7 @@ RUN mkdir -p /opt/app-root/src/github.com/IBM/portieris
 RUN mkdir -p /opt/app-root/bin
 COPY . ./
 RUN CGO_ENABLED=0 GOOS=linux go build \
-    -ldflags="-X github.com/IBM/portieris/internal/info.Version=$VERSION" -a \
+    -ldflags="-X github.com/IBM/portieris/internal/info.Version=$PORTIERIS_VERSION" -a \
     -tags containers_image_openpgp -o /opt/app-root/bin/portieris ./cmd/portieris
 RUN go version -m -v /opt/app-root/bin/portieris | (grep dep || true) | awk '{print "{\"Path\": \""$2 "\", \"Version\": \"" $3 "\"}"}' > /deps.jsonl
 

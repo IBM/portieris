@@ -5,3 +5,5 @@ bin
 .idea
 helm/portieris/certs/*
 scripts/myenv.sh
+portieris
+deps.jsonl

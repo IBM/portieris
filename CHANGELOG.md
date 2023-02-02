@@ -1,8 +1,8 @@
 ---
 
 copyright:
-  years: 2020-2022
-lastupdated: "2022-08-23"
+  years: 2020-2023
+lastupdated: "2023-02-02"
 
 ---
 
@@ -15,9 +15,17 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 Released YYYY-MM-DD
 
+## v0.13.3 
+
+Released 2023-02-02
+
+* Contributed helm value options: skipCreate certificate issuer (aid seamless upgrade) and optional annotations.
+* Update to go-toolset:1.18.9-8
+* Fixes problem with portieris version in logs showing the golang version 
+
 ## v0.13.2 
 
-Released 2022-01-25
+Released 2023-01-25
 
 * Update to go-toolset:1.18.4-20 and ensures go rpm is tracked in final image
 * Update go dependencies

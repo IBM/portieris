@@ -1,14 +1,28 @@
 GOFILES=$(shell find . -type f -name '*.go' -not -path "./code-generator/*" -not -path "./pkg/apis/*")
 GOPACKAGES=$(shell go list ./... | grep -v test/ | grep -v pkg/apis/)
 
-VERSION=v0.13.2
+VERSION=v0.13.3
 TAG=$(VERSION)
 GOTAGS='containers_image_openpgp'
 
-.PHONY: test
+.PHONY: test nancy push test-deps alltests copyright-check copyright fmt detect-secrets image
+
+portieris:
+	CGO_ENABLED=0 go build \
+	-ldflags="-X github.com/IBM/portieris/internal/info.Version=$(VERSION)" -a \
+	-tags containers_image_openpgp -o portieris ./cmd/portieris
+
+deps.jsonl: portieris
+	go version -m -v portieris | (grep dep || true) | awk '{print "{\"Path\": \""$$2 "\", \"Version\": \"" $$3 "\"}"}' > deps.jsonl
+
+nancy: deps.jsonl
+	cat deps.jsonl | nancy --skip-update-check --loud sleuth
+ 
+detect-secrets:
+	detect-secrets audit .secrets.baseline
 
 image: 
-	docker build --build-arg VERSION=$(VERSION) -t portieris:$(TAG) .
+	docker build --build-arg PORTIERIS_VERSION=$(VERSION) -t portieris:$(TAG) .
 
 push:
 	docker tag portieris:$(TAG) $(HUB)/portieris:$(TAG)
