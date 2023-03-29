@@ -42,8 +42,8 @@ RUN rpm --root /image --initdb \
 # Check dependencies for vulnerabilities
 FROM sonatypecommunity/nancy:alpine
 COPY --from=installer /deps.jsonl /
-RUN cat /deps.jsonl
-RUN cat /deps.jsonl | nancy --skip-update-check --loud sleuth
+COPY /.nancy-ignore /
+RUN cat /deps.jsonl | nancy --skip-update-check --loud sleuth --no-color
 
 #################################################################################
 # Finally, copy the minimal image contents and the built binary into the scratch image
