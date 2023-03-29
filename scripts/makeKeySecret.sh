@@ -9,6 +9,10 @@ echo 'where <key-id> can be obtained from `gpg -k --key-id-format=long`'
 fi
 shift
 
+if [ "$*" == "" ]; then
+echo exporting all public keys
+fi 
+
 cat <<EOF > ${NAME}.yaml
 apiVersion: v1
 kind: Secret
