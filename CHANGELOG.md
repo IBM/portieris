@@ -13,7 +13,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v-next
 
-Released YYYY-MM-DD
+## v0.13.4 
+
+Released 2023-03-29
+
+* Update to go-toolset:1.18.9-13
+* Resolves CVE-2022-4304 CVE-2022-4450 CVE-2023-0215 CVE-2023-0286 with openssl
+* Resolves CVE-2023-27561 with runc v1.1.15
 
 ## v0.13.3 
 
