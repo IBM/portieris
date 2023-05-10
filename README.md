@@ -1,11 +1,3 @@
----
-
-copyright:
-  years: 2018, 2021
-lastupdated: "2021-08-26"
-
----
-
 ![Portieris logo](./logos/text_and_logo.svg)
 
 [![Travis badge](https://api.travis-ci.org/IBM/portieris.svg?branch=master)](https://travis-ci.org/IBM/portieris)
