@@ -13,6 +13,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v-next
 
+## v0.13.5
+
+Released 2023-04-11
+
+* Remove vulnerable dependency dgrijalva/jwt-go
+
 ## v0.13.4 
 
 Released 2023-03-29
