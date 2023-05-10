@@ -1,6 +1,6 @@
 ![Portieris logo](./logos/text_and_logo.svg)
 
-[![Travis badge](https://api.travis-ci.org/IBM/portieris.svg?branch=master)](https://travis-ci.org/IBM/portieris)
+[![Go](https://github.com/IBM/portieris/actions/workflows/go-portieris.yaml/badge.svg)](https://github.com/IBM/portieris/actions/workflows/go-portieris.yaml)
 
 Portieris is a Kubernetes admission controller for the enforcement of image security policies. You can create image security policies for each Kubernetes namespace or at the cluster level, and enforce different rules for different images.
 
