@@ -12,7 +12,7 @@ replace (
 require (
 	github.com/IBM/go-sdk-core/v5 v5.13.1
 	github.com/containers/image/v5 v5.21.1
-	github.com/docker/distribution v2.8.1+incompatible
+	github.com/docker/distribution v2.8.2+incompatible
 	github.com/gofrs/uuid v4.2.0+incompatible
 	github.com/golang/glog v1.0.0
 	github.com/gorilla/mux v1.8.0
