@@ -3,7 +3,7 @@ export PORTIERIS_PULL_APIKEY=
 export PORTIERIS_TESTIMAGE_APIKEY=
 # charts to test
 export VERSION=v0.13.2
-# image tag to test e.g. prep-v0.13.2-77 
+# image tag to test e.g. prep-v0.13.2
 export TAG=
 # uuid of the account holding the VA exemption
 export E2E_ACCOUNT_HEADER=
