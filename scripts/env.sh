@@ -1,6 +1,6 @@
 # probably set these to the same user APIKEY
-PORTIERIS_PULL_APIKEY=
-PORTIERIS_TESTIMAGE_APIKEY=
+export PORTIERIS_PULL_APIKEY=
+export PORTIERIS_TESTIMAGE_APIKEY=
 # charts to test
 export VERSION=v0.13.2
 # image tag to test e.g. prep-v0.13.2-77 
