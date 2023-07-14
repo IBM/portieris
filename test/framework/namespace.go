@@ -22,7 +22,6 @@ import (
 
 	pk "github.com/IBM/portieris/pkg/kubernetes"
 	corev1 "k8s.io/api/core/v1"
-	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 )
@@ -124,10 +123,10 @@ func (f *Framework) CreateNamespaceWithIPS(name string) (*corev1.Namespace, erro
 }
 
 // Get the first found ImagePullSecret
-func (f *Framework) getIBMCloudPullSecret() (*v1.Secret, error) {
+func (f *Framework) getIBMCloudPullSecret() (*corev1.Secret, error) {
 	var err error
 	for _, secretName := range IBMCloudSecretNames {
-		var imagePullSecret *v1.Secret
+		var imagePullSecret *corev1.Secret
 		imagePullSecret, err = f.KubeClient.CoreV1().Secrets("default").Get(context.TODO(), secretName, metav1.GetOptions{})
 		if err == nil {
 			return imagePullSecret, nil
