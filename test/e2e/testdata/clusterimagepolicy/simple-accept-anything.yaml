@@ -1,0 +1,11 @@
+apiVersion: portieris.cloud.ibm.com/v1
+kind: ClusterImagePolicy
+metadata:
+  name: simple-accept-anything
+spec:
+   repositories:
+    - name: "*"
+      policy:
+         simple:
+           requirements:
+           - type: "insecureAcceptAnything"

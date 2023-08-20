@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: de.icr.io/testing-authn/nginx:signed
+        image: icr.io/portieris-authn/nginx:signed
         ports:
         - containerPort: 80

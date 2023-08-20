@@ -1,12 +1,15 @@
 apiVersion: portieris.cloud.ibm.com/v1
 kind: ClusterImagePolicy
 metadata:
-  name: allow-signed
+  name: simple-signedby1
 spec:
    repositories:
-    - name: "de.icr.io/testing-authn/nginx"
+    - name: "icr.io/cise/*"
       policy:
-        simple:
+         simpleStore:
+            url: "https://foo.com/x"
+            auth: storesecret 
+         simple:
            requirements:
            - type: "signedBy"
              keySecret: simple1pubkey
