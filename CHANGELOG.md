@@ -15,7 +15,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v0.13.6
 
-* consume ubi8/go-toolset:1.19.10-3 
+Released 2023-08-21
+
+* consume ubi8/go-toolset:1.19.10-10
+* Remediates CVE-2022-41724 CVE-2022-41725 CVE-2023-24540 CVE-2023-29402 CVE-2023-29403 CVE-2023-29404 CVE-2023-29405
+* refactor tests since IBM has removed notary service
+* do not test vulnerability policy since IBM has deprecated the API
 
 ## v0.13.5
 
