@@ -1,0 +1,16 @@
+apiVersion: portieris.cloud.ibm.com/v1
+kind: ClusterImagePolicy
+metadata:
+  name: simple-remap
+spec:
+   repositories:
+    - name: "icr.io/cise/*"
+      policy:
+         simple:
+           requirements:
+           - type: "signedBy"
+             keySecret: simple1pubkey
+             signedIdentity:
+                type: "remapIdentity"
+                prefix: "icr.io/cise/remap"
+                signedPrefix: "icr.io/cise"

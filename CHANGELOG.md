@@ -13,6 +13,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v-next
 
+## v0.13.6
+
+* consume ubi8/go-toolset:1.19.10-3 
+
 ## v0.13.5
 
 Released 2023-04-11

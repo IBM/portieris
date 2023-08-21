@@ -1,4 +1,4 @@
-// Copyright 2018, 2021 Portieris Authors.
+// Copyright 2018, 2023 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,12 +26,14 @@ func Test_JobTypesSuccess(t *testing.T) {
 	t.Run("Policy enforced on Deployment", func(t *testing.T) {
 		t.Parallel()
 		namespace := utils.CreateImagePolicyInstalledNamespace(t, framework, "./testdata/imagepolicy/allow-signed.yaml", "")
+		utils.CreateSecret(t, framework, "./testdata/secret/sh.pubkey.yaml", namespace.Name)
 		utils.TestDeploymentRunnable(t, framework, "./testdata/deployment/global-nginx-signed.yaml", namespace.Name)
 		utils.CleanUpImagePolicyTest(t, framework, namespace.Name)
 	})
 	t.Run("Policy enforced on DaemonSet", func(t *testing.T) {
 		t.Parallel()
 		namespace := utils.CreateImagePolicyInstalledNamespace(t, framework, "./testdata/imagepolicy/allow-signed.yaml", "")
+		utils.CreateSecret(t, framework, "./testdata/secret/sh.pubkey.yaml", namespace.Name)
 		utils.TestDaemonSetRunnable(t, framework, "./testdata/daemonset/global-nginx-signed.yaml", namespace.Name)
 		utils.CleanUpImagePolicyTest(t, framework, namespace.Name)
 	})
@@ -39,6 +41,7 @@ func Test_JobTypesSuccess(t *testing.T) {
 	t.Run("Policy enforced on ReplicaSet", func(t *testing.T) {
 		t.Parallel()
 		namespace := utils.CreateImagePolicyInstalledNamespace(t, framework, "./testdata/imagepolicy/allow-signed.yaml", "")
+		utils.CreateSecret(t, framework, "./testdata/secret/sh.pubkey.yaml", namespace.Name)
 		utils.TestReplicaSetRunnable(t, framework, "./testdata/replicaset/global-nginx-signed.yaml", namespace.Name)
 		utils.CleanUpImagePolicyTest(t, framework, namespace.Name)
 	})
@@ -46,6 +49,7 @@ func Test_JobTypesSuccess(t *testing.T) {
 	t.Run("Policy enforced on ReplicationController", func(t *testing.T) {
 		t.Parallel()
 		namespace := utils.CreateImagePolicyInstalledNamespace(t, framework, "./testdata/imagepolicy/allow-signed.yaml", "")
+		utils.CreateSecret(t, framework, "./testdata/secret/sh.pubkey.yaml", namespace.Name)
 		utils.TestReplicationControllerRunnable(t, framework, "./testdata/replicationcontroller/global-nginx-signed.yaml", namespace.Name)
 		utils.CleanUpImagePolicyTest(t, framework, namespace.Name)
 	})
@@ -53,6 +57,7 @@ func Test_JobTypesSuccess(t *testing.T) {
 	t.Run("Policy enforced on Pod", func(t *testing.T) {
 		t.Parallel()
 		namespace := utils.CreateImagePolicyInstalledNamespace(t, framework, "./testdata/imagepolicy/allow-signed.yaml", "")
+		utils.CreateSecret(t, framework, "./testdata/secret/sh.pubkey.yaml", namespace.Name)
 		utils.TestPodRunnable(t, framework, "./testdata/pod/global-nginx-signed.yaml", namespace.Name)
 		utils.CleanUpImagePolicyTest(t, framework, namespace.Name)
 	})
@@ -60,6 +65,7 @@ func Test_JobTypesSuccess(t *testing.T) {
 	t.Run("Policy enforced on StatefulSet", func(t *testing.T) {
 		t.Parallel()
 		namespace := utils.CreateImagePolicyInstalledNamespace(t, framework, "./testdata/imagepolicy/allow-signed.yaml", "")
+		utils.CreateSecret(t, framework, "./testdata/secret/sh.pubkey.yaml", namespace.Name)
 		utils.TestStatefulSetRunnable(t, framework, "./testdata/statefulset/global-nginx-signed.yaml", namespace.Name)
 		utils.CleanUpImagePolicyTest(t, framework, namespace.Name)
 	})
@@ -67,6 +73,7 @@ func Test_JobTypesSuccess(t *testing.T) {
 	t.Run("Policy enforced on Job", func(t *testing.T) {
 		t.Parallel()
 		namespace := utils.CreateImagePolicyInstalledNamespace(t, framework, "./testdata/imagepolicy/allow-signed.yaml", "")
+		utils.CreateSecret(t, framework, "./testdata/secret/sh.pubkey.yaml", namespace.Name)
 		utils.TestJobRunnable(t, framework, "./testdata/job/global-nginx-signed.yaml", namespace.Name)
 		utils.CleanUpImagePolicyTest(t, framework, namespace.Name)
 	})
@@ -74,6 +81,7 @@ func Test_JobTypesSuccess(t *testing.T) {
 	t.Run("Policy enforced on CronJob", func(t *testing.T) {
 		t.Parallel()
 		namespace := utils.CreateImagePolicyInstalledNamespace(t, framework, "./testdata/imagepolicy/allow-signed.yaml", "")
+		utils.CreateSecret(t, framework, "./testdata/secret/sh.pubkey.yaml", namespace.Name)
 		utils.TestCronJobRunnable(t, framework, "./testdata/cronjob/global-nginx-signed.yaml", namespace.Name)
 		utils.CleanUpImagePolicyTest(t, framework, namespace.Name)
 	})
@@ -254,6 +262,7 @@ func Test_OperationsSucces(t *testing.T) {
 		t.Parallel()
 		// Create a namespace and policy to allow all.
 		namespace := utils.CreateImagePolicyInstalledNamespace(t, framework, "./testdata/imagepolicy/allow-all.yaml", "")
+		utils.CreateSecret(t, framework, "./testdata/secret/sh.pubkey.yaml", namespace.Name)
 		// Start the deployment.
 		deploymentName := utils.TestStartDeployNoDelete(t, framework, "./testdata/deployment/global-nginx-unsigned.yaml", namespace.Name)
 		// Change the policy to deny.
@@ -283,6 +292,7 @@ func Test_OperationsSucces(t *testing.T) {
 		 }`
 		// Create a namespace and policy to allow all.
 		namespace := utils.CreateImagePolicyInstalledNamespace(t, framework, "./testdata/imagepolicy/allow-signed.yaml", "")
+		utils.CreateSecret(t, framework, "./testdata/secret/sh.pubkey.yaml", namespace.Name)
 		// Start the deployment.
 		deploymentName := utils.TestStartDeployNoDelete(t, framework, "./testdata/deployment/global-nginx-signed.yaml", namespace.Name)
 		// Change the policy to deny.
@@ -295,6 +305,7 @@ func Test_OperationsSucces(t *testing.T) {
 		t.Parallel()
 		// Create a namespace and policy to allow all.
 		namespace := utils.CreateImagePolicyInstalledNamespace(t, framework, "./testdata/imagepolicy/allow-signed.yaml", "")
+		utils.CreateSecret(t, framework, "./testdata/secret/sh.pubkey.yaml", namespace.Name)
 		// Start the deployment.
 		_ = utils.TestStartDeployNoDelete(t, framework, "./testdata/deployment/global-nginx-signed.yaml", namespace.Name)
 		// Change the policy to deny.

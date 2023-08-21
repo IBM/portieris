@@ -1,12 +1,13 @@
+# allow simple sign from icr.io/portieris-authn
 apiVersion: portieris.cloud.ibm.com/v1
 kind: ImagePolicy
 metadata:
   name: allow-signed
 spec:
    repositories:
-    - name: "de.icr.io/testing-authn/nginx"
+    - name: "icr.io/portieris-authn/nginx"
       policy:
-        trust:
-          enabled: true
-          trustServer: "https://notary.de.icr.io"
-
+        simple:
+           requirements:
+           - type: "signedBy"
+             keySecret: simple1pubkey

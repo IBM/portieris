@@ -4,7 +4,7 @@ metadata:
   name: allow-unsigned-trailing-wildcard
 spec:
    repositories:
-    - name: "de.icr.io/testing-authn/*"
+    - name: "icr.io/portieris-authn/*"
       policy:
         trust:
           enabled: false

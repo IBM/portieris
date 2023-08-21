@@ -1,4 +1,4 @@
-// Copyright 2020, 2022 Portieris Authors.
+// Copyright 2020, 2023 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -86,9 +86,9 @@ func UpdateImagePolicy(t *testing.T, fw *framework.Framework, manifestPath, name
 		t.Fatalf("error loading %q ImagePolicy manifest: %v", imagePolicy.Name, err)
 	}
 	if err := fw.DeleteImagePolicy(oldPolicy, namespace); err != nil {
-		t.Fatalf("error updating %q ImagePolicy: %v", imagePolicy.Name, err)
+		t.Fatalf("error deleting %q ImagePolicy: %v", imagePolicy.Name, err)
 	}
 	if err := fw.CreateImagePolicy(namespace, imagePolicy); err != nil {
-		t.Fatalf("error updating %q ImagePolicy: %v", imagePolicy.Name, err)
+		t.Fatalf("error creating %q ImagePolicy: %v", imagePolicy.Name, err)
 	}
 }

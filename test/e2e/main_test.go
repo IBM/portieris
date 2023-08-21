@@ -1,4 +1,4 @@
-// Copyright 2018,2021 Portieris Authors.
+// Copyright 2018, 2023 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ var (
 
 	noInstall bool
 
-	testTrustImagePolicy, testTrustClusterImagePolicy, testArmada, testVAImagePolicy, testVAClusterImagePolicy, testWildcardImagePolicy, testGeneric, testSimpleImagePolicy, testVulnerability bool
+	testTrustImagePolicy, testTrustClusterImagePolicy, testArmada, testVAImagePolicy, testWildcardImagePolicy, testGeneric, testSimpleImagePolicy, testSimpleClusterImagePolicy bool
 )
 
 const (
@@ -47,12 +47,10 @@ func TestMain(m *testing.M) {
 	flag.BoolVar(&testTrustImagePolicy, "trust-image-policy", false, "runs trust tests for image policies")
 	flag.BoolVar(&testTrustClusterImagePolicy, "trust-cluster-image-policy", false, "runs trust tests for cluster image policies")
 	flag.BoolVar(&testArmada, "armada", false, "runs tests for Armada based installation")
-	flag.BoolVar(&testVAImagePolicy, "va-image-policy", false, "runs va tests for image policies")
-	flag.BoolVar(&testVAClusterImagePolicy, "va-cluster-image-policy", false, "runs va tests for cluster image policies")
 	flag.BoolVar(&testWildcardImagePolicy, "wildcards-image-policy", false, "runs tests for wildcards in image policies")
 	flag.BoolVar(&testGeneric, "generic", false, "runs generic enforment tests")
 	flag.BoolVar(&testSimpleImagePolicy, "simple-image-policy", false, "runs tests for simple signing policies")
-	flag.BoolVar(&testVulnerability, "vulnerability", false, "runs tests for vulnerability enforcement")
+	flag.BoolVar(&testSimpleClusterImagePolicy, "simple-cluster-image-policy", false, "runs tests for simple signing policies")
 
 	flag.Parse()
 

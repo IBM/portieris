@@ -1,7 +1,7 @@
 GOFILES=$(shell find . -type f -name '*.go' -not -path "./code-generator/*" -not -path "./pkg/apis/*")
 GOPACKAGES=$(shell go list ./... | grep -v test/ | grep -v pkg/apis/)
 
-VERSION=v0.13.5
+VERSION=v0.13.6
 TAG=$(VERSION)
 GOTAGS='containers_image_openpgp'
 
@@ -75,7 +75,7 @@ e2e.local: helm.install.local e2e.quick
 
 e2e.local.ics: helm.install.local e2e.quick.ics
 
-e2e.quick: e2e.quick.trust.imagepolicy e2e.quick.trust.clusterimagepolicy e2e.quick.wildcards e2e.quick.generic e2e.quick.simple.imagepolicy e2e.quick.vulnerability
+e2e.quick: e2e.quick.trust.imagepolicy e2e.quick.trust.clusterimagepolicy e2e.quick.wildcards e2e.quick.generic e2e.quick.simple.imagepolicy e2e.quick.simple.clusterimagepolicy
 e2e.quick.ics: e2e.quick.trust.imagepolicy e2e.quick.trust.clusterimagepolicy e2e.quick.armada e2e.quick.wildcards e2e.quick.generic e2e.quick.simple.imagepolicy
 	-kubectl delete namespace $$(kubectl get namespaces | grep '[0-9a-f]*-[0-9a-f]*-[0-9a-f]*-[0-9a-f]*-[0-9a-f]*' | awk '{ print $$1 }' )
 
@@ -99,14 +99,15 @@ e2e.quick.generic:
 	go test -v ./test/e2e --no-install --generic
 	-kubectl delete namespace $$(kubectl get namespaces | grep '[0-9a-f]*-[0-9a-f]*-[0-9a-f]*-[0-9a-f]*-[0-9a-f]*' | awk '{ print $$1 }' )
 
+e2e.quick.simple.clusterimagepolicy:
+	go test -v ./test/e2e --no-install --simple-cluster-image-policy
+	-kubectl delete namespace secretnamespace
+	-kubectl delete namespace $$(kubectl get namespaces | grep '[0-9a-f]*-[0-9a-f]*-[0-9a-f]*-[0-9a-f]*-[0-9a-f]*' | awk '{ print $$1 }' )
+
 e2e.quick.simple.imagepolicy:
 	-kubectl delete namespace secretnamespace
 	go test -v ./test/e2e --no-install --simple-image-policy
 	-kubectl delete namespace secretnamespace
-	-kubectl delete namespace $$(kubectl get namespaces | grep '[0-9a-f]*-[0-9a-f]*-[0-9a-f]*-[0-9a-f]*-[0-9a-f]*' | awk '{ print $$1 }' )
-
-e2e.quick.vulnerability:
-	go test -v ./test/e2e --no-install --vulnerability
 	-kubectl delete namespace $$(kubectl get namespaces | grep '[0-9a-f]*-[0-9a-f]*-[0-9a-f]*-[0-9a-f]*-[0-9a-f]*' | awk '{ print $$1 }' )
 
 e2e.clean: helm.clean
