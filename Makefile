@@ -5,7 +5,7 @@ VERSION=v0.13.7
 TAG=$(VERSION)
 GOTAGS='containers_image_openpgp'
 
-.PHONY: test nancy push test-deps alltests copyright-check copyright fmt detect-secrets image
+.PHONY: test nancy test-deps alltests copyright-check copyright fmt detect-secrets image image.oci-archive image.amd64 image.s390x
 
 portieris:
 	CGO_ENABLED=0 go build \
@@ -21,12 +21,16 @@ nancy: deps.jsonl
 detect-secrets:
 	detect-secrets audit .secrets.baseline
 
-image: 
-	docker build --build-arg PORTIERIS_VERSION=$(VERSION) -t portieris:$(TAG) .
+image: image.amd64
 
-push:
-	docker tag portieris:$(TAG) $(HUB)/portieris:$(TAG)
-	docker push $(HUB)/portieris:$(TAG)
+image.oci-archive:
+	docker buildx build -o type=oci,dest=./portieris.tar --platform linux/amd64,linux/s390x --build-arg PORTIERIS_VERSION=$(VERSION) -t portieris:$(TAG) .
+
+image.amd64: 
+	docker buildx build --load --platform linux/amd64 --build-arg PORTIERIS_VERSION=$(VERSION) -t portieris-amd64-linux:$(TAG) .
+
+image.s390x: 
+	docker buildx build --load --platform linux/s390x --build-arg PORTIERIS_VERSION=$(VERSION) -t portieris-s390x-linux:$(TAG) .
 
 test-deps:
 	go install golang.org/x/lint/golint@latest
