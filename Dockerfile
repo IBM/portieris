@@ -1,6 +1,6 @@
-# This first stage of the build uses go-toolset to build the portieris binary creates 
-# a simplified operating system image that satisfies vulnerability scanning requirements 
-FROM --platform=$BUILDPLATFORM registry.access.redhat.com/ubi8/go-toolset:1.19.10-16 as builder
+# This first stage of the build uses go-toolset to build the portieris binary creates
+# a simplified operating system image that satisfies vulnerability scanning requirements
+FROM --platform=$BUILDPLATFORM registry.access.redhat.com/ubi8/go-toolset:1.19.10-16.1696540524 as builder
 ARG PORTIERIS_VERSION=undefined
 
 # switch to root user as we need to run yum and rpm to ensure packages are up to date
