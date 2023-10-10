@@ -13,6 +13,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v-next
 
+## v0.13.8
+
+Released 2023-10-10
+
+* Remediates CVE-2023-4527 CVE-2023-4806 CVE-2023-4813 CVE-2023-4911 in glibc
 ## v0.13.7
 
 Released 2023-09-11
@@ -34,7 +39,7 @@ Released 2023-04-11
 
 * Remove vulnerable dependency dgrijalva/jwt-go
 
-## v0.13.4 
+## v0.13.4
 
 Released 2023-03-29
 
@@ -42,15 +47,15 @@ Released 2023-03-29
 * Resolves CVE-2022-4304 CVE-2022-4450 CVE-2023-0215 CVE-2023-0286 with openssl
 * Resolves CVE-2023-27561 with runc v1.1.15
 
-## v0.13.3 
+## v0.13.3
 
 Released 2023-02-02
 
 * Contributed helm value options: skipCreate certificate issuer (aid seamless upgrade) and optional annotations.
 * Update to go-toolset:1.18.9-8
-* Fixes problem with portieris version in logs showing the golang version 
+* Fixes problem with portieris version in logs showing the golang version
 
-## v0.13.2 
+## v0.13.2
 
 Released 2023-01-25
 

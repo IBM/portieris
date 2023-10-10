@@ -1,7 +1,7 @@
 GOFILES=$(shell find . -type f -name '*.go' -not -path "./code-generator/*" -not -path "./pkg/apis/*")
 GOPACKAGES=$(shell go list ./... | grep -v test/ | grep -v pkg/apis/)
 
-VERSION=v0.13.7
+VERSION=v0.13.8
 TAG=$(VERSION)
 GOTAGS='containers_image_openpgp'
 
@@ -17,7 +17,7 @@ deps.jsonl: portieris
 
 nancy: deps.jsonl
 	cat deps.jsonl | nancy --skip-update-check --loud sleuth
- 
+
 detect-secrets:
 	detect-secrets audit .secrets.baseline
 
@@ -26,10 +26,10 @@ image: image.amd64
 image.oci-archive:
 	docker buildx build -o type=oci,dest=./portieris.tar --platform linux/amd64,linux/s390x --build-arg PORTIERIS_VERSION=$(VERSION) -t portieris:$(TAG) .
 
-image.amd64: 
+image.amd64:
 	docker buildx build --load --platform linux/amd64 --build-arg PORTIERIS_VERSION=$(VERSION) -t portieris-amd64-linux:$(TAG) .
 
-image.s390x: 
+image.s390x:
 	docker buildx build --load --platform linux/s390x --build-arg PORTIERIS_VERSION=$(VERSION) -t portieris-s390x-linux:$(TAG) .
 
 test-deps:
@@ -62,7 +62,7 @@ helm.package:
 
 helm.install.local: helm.package
 	-kubectl create ns portieris
-	-kubectl get secret $(PULLSECRET) -o yaml | sed 's/namespace: default/namespace: portieris/' | kubectl create -f - 
+	-kubectl get secret $(PULLSECRET) -o yaml | sed 's/namespace: default/namespace: portieris/' | kubectl create -f -
 	helm install -n portieris portieris $$(pwd)/portieris-$(VERSION).tgz --set image.host=$(HUB) --set image.tag=$(TAG) --set image.pullSecret=$(PULLSECRET)
 
 helm.install: helm.package
