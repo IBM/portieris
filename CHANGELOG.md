@@ -13,6 +13,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v-next
 
+* Remediate CVE-2023-44487 CVE-2023-29406 CVE-2023-39325 with go-toolset:1.19.13-2.1698062273
+
 ## v0.13.8
 
 Released 2023-10-10
