@@ -2,7 +2,7 @@
 
 copyright:
   years: 2020-2023
-lastupdated: "2023-02-02"
+lastupdated: "2023-11-07"
 
 ---
 
@@ -13,6 +13,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v-next
 
+## v0.13.10
+
+Released 2023-11-07
+
+* Set nonroot user on image iconfig to supress container policy checkers.
+* Have nancy run from Dockerfile again.
+* Remediate CVE.
 ## v0.13.9
 
 Released 2023-11-01

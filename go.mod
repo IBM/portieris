@@ -12,16 +12,16 @@ replace (
 require (
 	github.com/IBM/go-sdk-core/v5 v5.13.1
 	github.com/containers/image/v5 v5.21.1
-	github.com/docker/distribution v2.8.1+incompatible
+	github.com/docker/distribution v2.8.3+incompatible
 	github.com/gofrs/uuid v4.2.0+incompatible
-	github.com/golang/glog v1.0.0
+	github.com/golang/glog v1.1.2
 	github.com/gorilla/mux v1.8.0
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.27.1
 	github.com/prometheus/client_golang v1.12.2
 	github.com/stretchr/testify v1.8.1
 	github.com/theupdateframework/notary v0.7.0
-	golang.org/x/crypto v0.13.0
+	golang.org/x/crypto v0.14.0
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.24.0
 	k8s.io/apiextensions-apiserver v0.0.0-00010101000000-000000000000
@@ -41,7 +41,8 @@ require (
 	github.com/containers/ocicrypt v1.1.4-0.20220428134531-566b808bdf6f // indirect
 	github.com/containers/storage v1.40.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/docker/docker v20.10.24+incompatible // indirect
+	github.com/distribution/reference v0.5.0 // indirect
+	github.com/docker/docker v24.0.7+incompatible // indirect
 	github.com/docker/docker-credential-helpers v0.6.4 // indirect
 	github.com/docker/go v1.5.1-1.0.20160303222718-d30aec9fd63c // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
@@ -97,17 +98,17 @@ require (
 	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/prometheus/common v0.32.1 // indirect
 	github.com/prometheus/procfs v0.7.3 // indirect
-	github.com/sirupsen/logrus v1.9.0 // indirect
+	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/syndtr/gocapability v0.0.0-20200815063812-42c35b437635 // indirect
 	github.com/ulikunitz/xz v0.5.10 // indirect
 	github.com/vbatts/tar-split v0.11.2 // indirect
 	go.mongodb.org/mongo-driver v1.11.2 // indirect
-	golang.org/x/net v0.15.0 // indirect
+	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8 // indirect
-	golang.org/x/sys v0.12.0 // indirect
-	golang.org/x/term v0.12.0 // indirect
+	golang.org/x/sys v0.13.0 // indirect
+	golang.org/x/term v0.13.0 // indirect
 	golang.org/x/text v0.13.0 // indirect
 	golang.org/x/time v0.0.0-20220210224613-90d013bbcef8 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
