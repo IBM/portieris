@@ -1,7 +1,7 @@
 GOFILES=$(shell find . -type f -name '*.go' -not -path "./code-generator/*" -not -path "./pkg/apis/*")
 GOPACKAGES=$(shell go list ./... | grep -v test/ | grep -v pkg/apis/)
 
-VERSION=v0.13.10
+VERSION=v0.13.11
 TAG=$(VERSION)
 GOTAGS='containers_image_openpgp'
 
@@ -105,7 +105,6 @@ e2e.quick.generic:
 
 e2e.quick.simple.clusterimagepolicy:
 	go test -v ./test/e2e --no-install --simple-cluster-image-policy
-	-kubectl delete namespace secretnamespace
 	-kubectl delete namespace $$(kubectl get namespaces | grep '[0-9a-f]*-[0-9a-f]*-[0-9a-f]*-[0-9a-f]*-[0-9a-f]*' | awk '{ print $$1 }' )
 
 e2e.quick.simple.imagepolicy:

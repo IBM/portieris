@@ -13,6 +13,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v-next
 
+## v0.13.11
+
+Released 2024-01-09
+
+* Update go-toolset:1.20.10-3
+* Rebuild/Package updates to remediate CVE-2023-3446 CVE-2023-3817 CVE-2023-5678
+* golang.org/x/crypto update for CVE-2023-48795 
+
 ## v0.13.10
 
 Released 2023-11-07
@@ -20,6 +28,7 @@ Released 2023-11-07
 * Set nonroot user on image iconfig to supress container policy checkers.
 * Have nancy run from Dockerfile again.
 * Remediate CVE.
+
 ## v0.13.9
 
 Released 2023-11-01
