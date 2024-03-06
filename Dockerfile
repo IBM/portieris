@@ -1,6 +1,6 @@
 # This first stage of the build uses go-toolset to build the portieris binary creates
 # a simplified operating system image that satisfies vulnerability scanning requirements
-FROM --platform=$BUILDPLATFORM registry.access.redhat.com/ubi8/go-toolset:1.20.10-3 as builder
+FROM --platform=$BUILDPLATFORM registry.access.redhat.com/ubi8/go-toolset:1.20.12-2 as builder
 ARG PORTIERIS_VERSION=undefined
 
 # switch to root user as we need to run yum and rpm to ensure packages are up to date
@@ -60,7 +60,7 @@ FROM scratch
 COPY --from=installer /image/ /
 COPY --from=builder /opt/app-root/bin/portieris /portieris
 # buildkit skips stages which dont contribute to the final image
-COPY --from=nancy /nancy-checked /nancy-checked 
+COPY --from=nancy /nancy-checked /nancy-checked
 # Create /tmp for logs and /run for working directory
 RUN [ "/portieris", "--mkdir",  "/tmp,/run" ]
 WORKDIR /run

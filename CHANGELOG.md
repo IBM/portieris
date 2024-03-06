@@ -13,13 +13,21 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v-next
 
+## v0.13.12
+
+Released 2024-03-06
+
+* Update go-toolset:1.20.12-2
+* golang/github.com/opencontainers/runc update for CVE-2024-21626
+* Add arm64 image. This makes developing and testing on a M1/2 mac easier
+
 ## v0.13.11
 
 Released 2024-01-09
 
 * Update go-toolset:1.20.10-3
 * Rebuild/Package updates to remediate CVE-2023-3446 CVE-2023-3817 CVE-2023-5678
-* golang.org/x/crypto update for CVE-2023-48795 
+* golang.org/x/crypto update for CVE-2023-48795
 
 ## v0.13.10
 
