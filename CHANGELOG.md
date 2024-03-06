@@ -19,6 +19,7 @@ Released 2024-03-06
 
 * Update go-toolset:1.20.12-2
 * golang/github.com/opencontainers/runc update for CVE-2024-21626
+* Add arm64 image. This makes developing and testing on a M1/2 mac easier
 
 ## v0.13.11
 
