@@ -18,6 +18,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 Released 2024-03-06
 
 * Update go-toolset:1.20.12-2
+* golang/github.com/opencontainers/runc update for CVE-2024-21626
 
 ## v0.13.11
 
