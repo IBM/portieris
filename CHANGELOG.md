@@ -13,6 +13,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v-next
 
+## v0.13.13
+
+* start with go=toolset:1.20.12 also for the installer (consistency)
+Note: the build pulls dynamic updates to the builder image currently gets go-toolset:1.20.12-3 which resolves CVE-2024-1394
+
 ## v0.13.12
 
 Released 2024-03-06
