@@ -80,7 +80,7 @@ affinity:
             operator: In
             values:
             - portieris
-        topologyKey: "kubernetes.io/hostname"
+        topologyKey: kubernetes.io/hostname
       weight: 50
     - podAffinityTerm:
         labelSelector:
@@ -89,7 +89,7 @@ affinity:
             operator: In
             values:
             - portieris
-        topologyKey: "failure-domain.beta.kubernetes.io/zone"
+        topologyKey: topology.kubernetes.io/zone
       weight: 50
 
 # Allow an annotation to be used to skip the webhook. This is required for Portieris to be able to
