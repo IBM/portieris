@@ -13,6 +13,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v-next
 
+## v0.13.14
+
+* k8s.io/apimachinery update for CVE-2023-44487
+
 ## v0.13.13
 
 * start with go=toolset:1.20.12 also for the installer (consistency)
