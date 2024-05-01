@@ -13,6 +13,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v-next
 
+## v0.13.14
+
+* github.com/docker/docker update for CVE-2024-29018
+* golang.org/x/net update for CVE-2023-45288
+
 ## v0.13.13
 
 * start with go=toolset:1.20.12 also for the installer (consistency)
