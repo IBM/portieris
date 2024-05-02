@@ -1,7 +1,7 @@
 GOFILES=$(shell find . -type f -name '*.go' -not -path "./code-generator/*" -not -path "./pkg/apis/*")
 GOPACKAGES=$(shell go list ./... | grep -v test/ | grep -v pkg/apis/)
 
-VERSION=v0.13.13
+VERSION=v0.13.14
 TAG=$(VERSION)
 GOTAGS='containers_image_openpgp'
 
@@ -125,5 +125,3 @@ code-generator:
 
 regenerate:
 	bash $(GOPATH)/pkg/mod/k8s.io/code-generator@v0.24.0/generate-groups.sh all github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/client github.com/IBM/portieris/pkg/apis portieris.cloud.ibm.com:v1
-
-
