@@ -1,8 +1,8 @@
 ---
 
 copyright:
-  years: 2020-2023
-lastupdated: "2023-11-07"
+  years: 2020-2024
+lastupdated: "2024-05-14"
 
 ---
 
@@ -12,6 +12,13 @@ Notable changes recorded here.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v-next
+
+
+## v0.13.15
+
+Released: 2024-05-14
+
+* Remediates CVE-2024-2961 in glibc
 
 ## v0.13.14
 

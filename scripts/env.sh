@@ -2,8 +2,8 @@
 export PORTIERIS_PULL_APIKEY=
 export PORTIERIS_TESTIMAGE_APIKEY=
 # charts to test
-export VERSION=v0.13.14
-# image tag to test e.g. prep-v0.13.14
+export VERSION=v0.13.15
+# image tag to test e.g. prep-v0.13.15
 export TAG=
 
 # name of the secret used to pull portieris made from $REG and $PORTIERIS_PULL_APIKEY
