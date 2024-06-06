@@ -20,6 +20,7 @@ Released: 2024-06-06
 
 * Remediates CVE-2023-45288, CVE-2023-45289, CVE-2023-45290, CVE-2024-24783 and CVE-2024-24784 in go-toolset
 * Remediates CVE-2024-2961 in glibc
+* Remediates CVE-2024-3727 in github.com/containers/image
 
 ## v0.13.15
 
