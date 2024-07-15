@@ -1,6 +1,6 @@
 # This first stage of the build uses go-toolset to build the portieris binary creates
 # a simplified operating system image that satisfies vulnerability scanning requirements
-FROM --platform=$BUILDPLATFORM registry.access.redhat.com/ubi8/go-toolset:1.20.12 as builder
+FROM --platform=$BUILDPLATFORM registry.access.redhat.com/ubi8/go-toolset:1.21.11 AS builder
 ARG PORTIERIS_VERSION=undefined
 
 # switch to root user as we need to run yum and rpm to ensure packages are up to date
@@ -22,7 +22,7 @@ RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build \
     -tags containers_image_openpgp -o /opt/app-root/bin/portieris ./cmd/portieris
 RUN go version -m -v /opt/app-root/bin/portieris | (grep dep || true) | awk '{print "{\"Path\": \""$2 "\", \"Version\": \"" $3 "\"}"}' > /deps.jsonl
 
-FROM registry.access.redhat.com/ubi8/go-toolset:1.20.12 as installer
+FROM registry.access.redhat.com/ubi8/go-toolset:1.21.11 AS installer
 ARG TARGETOS TARGETARCH
 USER root
 RUN yum update -y
@@ -48,7 +48,7 @@ RUN rpm --root /image --initdb \
 
 
 # Check dependencies for vulnerabilities
-FROM --platform=$BUILDPLATFORM sonatypecommunity/nancy:alpine as nancy
+FROM --platform=$BUILDPLATFORM sonatypecommunity/nancy:alpine AS nancy
 COPY --from=builder /deps.jsonl /
 COPY /.nancy-ignore /
 RUN cat /deps.jsonl | nancy --skip-update-check --loud sleuth --no-color
