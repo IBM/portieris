@@ -9,26 +9,23 @@ on:
 jobs:
   test:
     name: alltests
-    runs-on: [self-hosted,go]
+    runs-on: [ubuntu-latest]
     steps:
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
+      with:
+        path: go/src/github.com/IBM/portieris
 
     - name: Setup correct Go version
       uses: actions/setup-go@v2
       with:
-        go-version: '1.20.12'
+        go-version: '1.21.11'
         check-latest: true
 
     - name: alltests
       run: |
-        rm -rf /root/go/src/github.com/IBM
-        mkdir -p /root/go/src/github.com/IBM/
-        mv /tmp/github-runner-your-repo/portieris/portieris /root/go/src/github.com/IBM/
-        cd /root/go/src/github.com/IBM/portieris/
-        export PATH=$PATH:/usr/local/go/bin/
-        export GOPATH=$HOME/go
-        export PATH=$PATH:$HOME/go/bin/
+        export GOPATH=$GITHUB_WORKSPACE/go
+        export PATH=$PATH:$GITHUB_WORKSPACE/go/bin/
         export TERM=ansi
+        cd $GITHUB_WORKSPACE/go/src/github.com/IBM/portieris
         make alltests
-        mv /root/go/src/github.com/IBM/portieris/ /tmp/github-runner-your-repo/portieris/
