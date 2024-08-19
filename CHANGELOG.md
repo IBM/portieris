@@ -13,12 +13,18 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v-next
 
+## v0.13.18
+
+Released: 2024-08-20
+
+* Remediates CVE-2024-41110 in github.com/docker/docker
+
 ## v0.13.17
 
 Released: 2024-07-15
 
 * Remediates NIST-CVE-2024-6104 in github.com/hashicorp/go-retryablehttp
-* Remediates CVE-2024-24789, CVE-2024-24790 using go-toolset:1.21.11 
+* Remediates CVE-2024-24789, CVE-2024-24790 using go-toolset:1.21.11
 
 
 ## v0.13.16
