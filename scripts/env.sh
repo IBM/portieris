@@ -2,7 +2,7 @@
 export PORTIERIS_PULL_APIKEY=
 export PORTIERIS_TESTIMAGE_APIKEY=
 # charts to test
-export VERSION=v0.13.19
+export VERSION=
 # image tag to test e.g. prep-v0.13.19
 export TAG=
 
