@@ -13,6 +13,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v-next
 
+## v0.13.20
+Released: 2024-10-11
+
+* Remediates CVE-2024-9355 in golang
+
 ## v0.13.19
 Released: 2024-09-30
 
