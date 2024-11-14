@@ -13,6 +13,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v-next
 
+## v0.13.22
+Released: 2024-11-19
+
+* Update Go to 1.22
+
 ## v0.13.21
 Released: 2024-11-14
 
