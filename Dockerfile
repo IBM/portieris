@@ -22,7 +22,7 @@ RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build \
     -tags containers_image_openpgp -o /opt/app-root/bin/portieris ./cmd/portieris
 RUN go version -m -v /opt/app-root/bin/portieris | (grep dep || true) | awk '{print "{\"Path\": \""$2 "\", \"Version\": \"" $3 "\"}"}' > /deps.jsonl
 
-FROM registry.access.redhat.com/ubi8/go-toolset:1.21.13 AS installer
+FROM registry.access.redhat.com/ubi8/go-toolset:1.22.7 AS installer
 ARG TARGETOS TARGETARCH
 USER root
 RUN yum update -y
