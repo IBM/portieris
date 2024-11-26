@@ -17,6 +17,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 Released: 2024-11-19
 
 * Update Go to 1.22
+* Remediates CVE-2024-9676, CVE-2023-44487
 
 ## v0.13.21
 Released: 2024-11-14
