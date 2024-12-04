@@ -14,9 +14,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## v-next
 
 ## v0.13.22
-Released: 2024-11-19
+Released: 2024-12-04
 
-* Update Go to 1.22
+* Build and run with ubi9 based image.
+* Update to go-toolset:v1.22.7
 * Remediates CVE-2024-9676, CVE-2023-44487
 
 ## v0.13.21
