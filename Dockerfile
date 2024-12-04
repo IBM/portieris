@@ -44,7 +44,7 @@ RUN tar cf /tmp/files.tar -T /tmp/files-${TARGETARCH}.txt && tar xf /tmp/files.t
 RUN rpm --root /image --initdb \
   && PACKAGES=$(rpm -qf $(cat /tmp/files-${TARGETARCH}.txt) | grep -v "is not owned by any package" | sort -u) \
   && echo dnf install -y 'dnf-command(download)' \
-  && echo dnf download --destdir / ${PACKAGES} \
+  && dnf download --destdir / ${PACKAGES} \
   && rpm --root /image -ivh --justdb --nodeps `for i in ${PACKAGES}; do echo $i.rpm; done`
 
 
