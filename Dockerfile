@@ -40,7 +40,7 @@ RUN mkdir /image && \
 # content was required from UBI for the Portieris binary to function.
 COPY files-${TARGETARCH}.txt /tmp
 RUN tar cf /tmp/files.tar -T /tmp/files-${TARGETARCH}.txt && tar xf /tmp/files.tar -C /image/ \
-  && strip --strip-unneeded /image/usr/lib64/*[0-9].so
+  && strip --strip-unneeded /image/usr/lib64/lib*.so
 RUN rpm --root /image --initdb \
   && PACKAGES=$(rpm -qf $(cat /tmp/files-${TARGETARCH}.txt) | grep -v "is not owned by any package" | sort -u) \
   && echo dnf install -y 'dnf-command(download)' \
