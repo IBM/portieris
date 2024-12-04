@@ -1,6 +1,6 @@
 # This first stage of the build uses go-toolset to build the portieris binary creates
 # a simplified operating system image that satisfies vulnerability scanning requirements
-ARG BASE_IMAGE=registry.access.redhat.com/ubi8/go-toolset:1.22.7
+ARG BASE_IMAGE=registry.access.redhat.com/ubi9/go-toolset:1.22.7
 FROM --platform=$BUILDPLATFORM $BASE_IMAGE AS builder
 ARG PORTIERIS_VERSION=undefined
 
