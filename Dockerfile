@@ -1,6 +1,7 @@
 # This first stage of the build uses go-toolset to build the portieris binary creates
 # a simplified operating system image that satisfies vulnerability scanning requirements
-FROM --platform=$BUILDPLATFORM registry.access.redhat.com/ubi8/go-toolset:1.22.7 AS builder
+ARG BASE_IMAGE=registry.access.redhat.com/ubi9/go-toolset:1.22.7
+FROM --platform=$BUILDPLATFORM $BASE_IMAGE AS builder
 ARG PORTIERIS_VERSION=undefined
 
 # switch to root user as we need to run yum and rpm to ensure packages are up to date
@@ -22,7 +23,7 @@ RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build \
     -tags containers_image_openpgp -o /opt/app-root/bin/portieris ./cmd/portieris
 RUN go version -m -v /opt/app-root/bin/portieris | (grep dep || true) | awk '{print "{\"Path\": \""$2 "\", \"Version\": \"" $3 "\"}"}' > /deps.jsonl
 
-FROM registry.access.redhat.com/ubi8/go-toolset:1.21.13 AS installer
+FROM $BASE_IMAGE AS installer
 ARG TARGETOS TARGETARCH
 USER root
 RUN yum update -y
@@ -39,7 +40,7 @@ RUN mkdir /image && \
 # content was required from UBI for the Portieris binary to function.
 COPY files-${TARGETARCH}.txt /tmp
 RUN tar cf /tmp/files.tar -T /tmp/files-${TARGETARCH}.txt && tar xf /tmp/files.tar -C /image/ \
-  && strip --strip-unneeded /image/usr/lib64/*[0-9].so
+  && strip --strip-unneeded /image/usr/lib64/lib*.so.*
 RUN rpm --root /image --initdb \
   && PACKAGES=$(rpm -qf $(cat /tmp/files-${TARGETARCH}.txt) | grep -v "is not owned by any package" | sort -u) \
   && echo dnf install -y 'dnf-command(download)' \
