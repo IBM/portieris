@@ -13,6 +13,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v-next
 
+## v0.13.23
+Released: 2025-01-02
+
+* Update to go-toolset:v1.22.9
+* Update to golang.org/x/crypto:v0.31.0 for CVE-2024-45337
+* Update to golang.org/x/net:v0.33.0 for CVE-2024-45338
+
 ## v0.13.22
 Released: 2024-12-04
 

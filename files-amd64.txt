@@ -1,5 +1,4 @@
 etc/pki
-root/buildinfo
 usr/lib64/libc.so.6
 usr/lib64/libssl.so
 usr/lib64/libssl.so.3.2.2
