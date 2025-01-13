@@ -5,7 +5,7 @@
 replicaCount: 3
 
 # Annotations to add to the Portieris deployment. Optional.
-deployemntAnnotations: {}
+deploymentAnnotations: {}
   # secret.reloader.stakater.com/reload: "portieris-certs"
 # Annotations to add to the Portieris deployment's pod template. Optional.
 podAnnotations: {}
