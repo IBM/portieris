@@ -14,7 +14,7 @@ require (
 	github.com/containers/image/v5 v5.30.1
 	github.com/docker/distribution v2.8.3+incompatible
 	github.com/gofrs/uuid v4.2.0+incompatible
-	github.com/golang/glog v1.2.0
+	github.com/golang/glog v1.2.4
 	github.com/gorilla/mux v1.8.1
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.29.0
