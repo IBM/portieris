@@ -1,6 +1,6 @@
 apiVersion: v1
 name: portieris
-version: v0.13.23
+version: v0.13.24
 description: Admission Controller webhook for enforcing image trust in your cluster
 maintainers:
   - name: Stuart Hayton
@@ -9,5 +9,3 @@ maintainers:
     email: jack.baines@uk.ibm.com
   - name: Michael Hough
     email: michaelh@uk.ibm.com
-  - name: Aaron Collins
-    email: aaron.collins1@ibm.com

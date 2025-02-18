@@ -13,6 +13,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v-next
 
+## v0.13.24
+Released: 2025-02-13
+
+* Update to github.com/golang/glog:v1.24.0 for CVE-2024-45339
+
 ## v0.13.23
 Released: 2025-01-02
 
