@@ -12,8 +12,8 @@ replace (
 require (
 	github.com/IBM/go-sdk-core/v5 v5.13.1
 	github.com/containers/image/v5 v5.34.1
+	github.com/distribution/distribution v2.8.3+incompatible
 	github.com/distribution/reference v0.6.0
-	github.com/docker/distribution v2.8.3+incompatible
 	github.com/gofrs/uuid v4.2.0+incompatible
 	github.com/golang/glog v1.2.4
 	github.com/gorilla/mux v1.8.1
@@ -40,6 +40,7 @@ require (
 	github.com/containers/storage v1.57.1 // indirect
 	github.com/cyberphone/json-canonicalization v0.0.0-20231217050601-ba74d44ecf5f // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
+	github.com/docker/distribution v2.8.3+incompatible // indirect
 	github.com/docker/docker v27.5.1+incompatible // indirect
 	github.com/docker/docker-credential-helpers v0.8.2 // indirect
 	github.com/docker/go v1.5.1-1.0.20160303222718-d30aec9fd63c // indirect

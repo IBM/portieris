@@ -1,4 +1,4 @@
-// Copyright 2018, 2022 Portieris Authors.
+// Copyright 2018, 2025 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import (
 	httphelper "github.com/IBM/portieris/helpers/http"
 	"github.com/IBM/portieris/helpers/image"
 	"github.com/IBM/portieris/internal/info"
-	"github.com/docker/distribution/registry/client/transport"
+	"github.com/distribution/distribution/registry/client/transport"
 	notaryclient "github.com/theupdateframework/notary/client"
 	"github.com/theupdateframework/notary/trustpinning"
 	"github.com/theupdateframework/notary/tuf/data"
