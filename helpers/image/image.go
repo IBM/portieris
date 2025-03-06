@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2025 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import (
 	"strings"
 
 	"github.com/IBM/portieris/helpers/trustmap"
-	"github.com/docker/distribution/reference"
+	"github.com/distribution/reference"
 )
 
 // Reference .
