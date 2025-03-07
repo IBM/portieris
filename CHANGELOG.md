@@ -1,8 +1,8 @@
 ---
 
 copyright:
-  years: 2020-2024
-lastupdated: "2024-05-14"
+  years: 2020-2025
+lastupdated: "2025-03-07"
 
 ---
 
@@ -12,6 +12,11 @@ Notable changes recorded here.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v-next
+
+## v0.13.25
+Released: 2025-03-07
+
+* Update to github.com/go-jose/go-jose:4.0.5 for CVE-2025-27144
 
 ## v0.13.24
 Released: 2025-02-19
