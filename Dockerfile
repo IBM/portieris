@@ -7,12 +7,8 @@ FROM $BASE_IMAGE AS builder
 ARG PORTIERIS_VERSION=undefined
 ARG TARGETOS TARGETARCH
 
-# update packages (needs root)
-USER root
-RUN dnf update -y \
- && dnf reinstall tzdata -y
-
 # prep target rootfs for scratch container
+USER root
 WORKDIR /
 RUN mkdir /image \
  && ln -s usr/bin /image/bin \
@@ -26,10 +22,9 @@ RUN mkdir /image \
 COPY files-${TARGETARCH}.txt /tmp
 RUN tar cf /tmp/files.tar -T /tmp/files-${TARGETARCH}.txt && tar xf /tmp/files.tar -C /image/ \
  && rpm --root /image --initdb \
- && PACKAGES=$(rpm -qf $(cat /tmp/files-${TARGETARCH}.txt) | grep -v "is not owned by any package" | sort -u) \
- && dnf install -y 'dnf-command(download)' \
- && dnf download --destdir / ${PACKAGES} \
- && rpm --root /image -ivh --justdb --nodeps `for i in ${PACKAGES}; do echo $i.rpm; done`
+ && PACKAGES=$(rpm -qf $(cat /tmp/files-${TARGETARCH}.txt) --queryformat "%{NAME}\n" | grep -v "is not owned by any package" | sort -u) \
+ && dnf download --destdir /rpmcache ${PACKAGES} \
+ && rpm --root /image -ivh --justdb --nodeps /rpmcache/*.rpm
 
 # setup workdir and build binary
 WORKDIR /go/github.com/IBM/portieris

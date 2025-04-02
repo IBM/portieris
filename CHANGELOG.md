@@ -2,7 +2,7 @@
 
 copyright:
   years: 2020-2025
-lastupdated: "2025-03-07"
+lastupdated: "2025-04-02"
 
 ---
 
@@ -12,6 +12,13 @@ Notable changes recorded here.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v-next
+
+## v0.13.26
+Released: 2025-04-03
+
+* Update golang.org/x/net:v0.38.0 for CVE-2024-45336
+* Update Go version to 1.24.1 for CVE-2024-45341,CVE-2025-22866
+* Update to `ubi9` for base
 
 ## v0.13.25
 Released: 2025-03-07
