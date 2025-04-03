@@ -2,6 +2,7 @@ module github.com/IBM/portieris
 
 go 1.23.0
 
+// toolchain statement is used to directly control the version of Go we build with
 toolchain go1.24.1
 
 replace (
