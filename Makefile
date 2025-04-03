@@ -25,7 +25,7 @@ detect-secrets:
 image: image.amd64
 
 image.oci-archive:
-	GOPROXY=$(GOPROXY) docker buildx build --secret id=GOPROXY -o type=oci,dest=./portieris.tar --platform linux/amd64,linux/s390x,linux/arm64 --build-arg PORTIERIS_VERSION=$(VERSION) -t portieris:$(TAG) .
+	GOPROXY=$(GOPROXY) docker buildx build --secret id=GOPROXY -o type=oci,dest=./portieris.tar --platform linux/amd64 --build-arg PORTIERIS_VERSION=$(VERSION) -t portieris:$(TAG) .
 
 image.amd64:
 	GOPROXY=$(GOPROXY) docker buildx build --secret id=GOPROXY --load --platform linux/amd64 --build-arg PORTIERIS_VERSION=$(VERSION) -t portieris-amd64-linux:$(TAG) .
