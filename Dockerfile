@@ -1,7 +1,10 @@
 # syntax=docker/dockerfile:1
 
-# This first stage of the build uses go-toolset to build the portieris binary creates
-# a simplified operating system image that satisfies vulnerability scanning requirements
+# This first stage of the build uses go-toolset from RHEL.
+# We specify a higher version # than available, meaning that the  `toolchain` statement in `go.mod`
+# will replace go-toolset with the specified version of go. The specified version is then used
+# to build the portieris binary. go-toolset is used to create a simplified operating system image
+# that satisfies vulnerability scanning requirements
 ARG BASE_IMAGE=registry.access.redhat.com/ubi9/go-toolset:1.22.9
 FROM $BASE_IMAGE AS builder
 ARG PORTIERIS_VERSION=undefined
