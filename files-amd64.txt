@@ -8,4 +8,3 @@ usr/lib64/libm.so.6
 etc/ssl/certs
 etc/redhat-release
 usr/share/zoneinfo
-usr/lib/golang/api/README

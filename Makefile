@@ -1,9 +1,10 @@
 GOFILES=$(shell find . -type f -name '*.go' -not -path "./code-generator/*" -not -path "./pkg/apis/*")
 GOPACKAGES=$(shell go list ./... | grep -v test/ | grep -v pkg/apis/)
 
-VERSION=v0.13.25
+VERSION=v0.13.26
 TAG=$(VERSION)
 GOTAGS='containers_image_openpgp'
+GOPROXY?=direct
 
 .PHONY: test nancy test-deps alltests copyright-check copyright fmt detect-secrets image image.oci-archive image.amd64 image.s390x image.arm64
 
@@ -24,16 +25,16 @@ detect-secrets:
 image: image.amd64
 
 image.oci-archive:
-	docker buildx build -o type=oci,dest=./portieris.tar --platform linux/amd64,linux/s390x,linux/arm64 --build-arg PORTIERIS_VERSION=$(VERSION) -t portieris:$(TAG) .
+	GOPROXY=$(GOPROXY) docker buildx build --secret id=GOPROXY -o type=oci,dest=./portieris.tar --platform linux/amd64 --build-arg PORTIERIS_VERSION=$(VERSION) -t portieris:$(TAG) .
 
 image.amd64:
-	docker buildx build --load --platform linux/amd64 --build-arg PORTIERIS_VERSION=$(VERSION) -t portieris-amd64-linux:$(TAG) .
+	GOPROXY=$(GOPROXY) docker buildx build --secret id=GOPROXY --load --platform linux/amd64 --build-arg PORTIERIS_VERSION=$(VERSION) -t portieris-amd64-linux:$(TAG) .
 
 image.arm64:
-	docker buildx build --load --platform linux/arm64 --build-arg PORTIERIS_VERSION=$(VERSION) -t portieris-arm64-linux:$(TAG) .
+	GOPROXY=$(GOPROXY) docker buildx build --secret id=GOPROXY --load --platform linux/arm64 --build-arg PORTIERIS_VERSION=$(VERSION) -t portieris-arm64-linux:$(TAG) .
 
 image.s390x:
-	docker buildx build --load --platform linux/s390x --build-arg PORTIERIS_VERSION=$(VERSION) -t portieris-s390x-linux:$(TAG) .
+	GOPROXY=$(GOPROXY) docker buildx build --secret id=GOPROXY --load --platform linux/s390x --build-arg PORTIERIS_VERSION=$(VERSION) -t portieris-s390x-linux:$(TAG) .
 
 test-deps:
 	go install golang.org/x/lint/golint@latest
