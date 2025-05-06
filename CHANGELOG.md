@@ -2,7 +2,7 @@
 
 copyright:
   years: 2020-2025
-lastupdated: "2025-04-02"
+lastupdated: "2025-05-07"
 
 ---
 
@@ -12,6 +12,11 @@ Notable changes recorded here.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v-next
+
+## v0.13.27
+Released: 2025-05-07
+
+* Update Go to 1.24.2 for CVE-2025-22871, GO-2025-3563
 
 ## v0.13.26
 Released: 2025-04-03
