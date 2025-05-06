@@ -3,7 +3,7 @@ module github.com/IBM/portieris
 go 1.23.0
 
 // toolchain statement is used to directly control the version of Go we build with
-toolchain go1.24.1
+toolchain go1.24.2
 
 replace (
 	k8s.io/api => k8s.io/api v0.29.0
