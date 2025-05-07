@@ -13,6 +13,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v-next
 
+## v0.13.28
+Released: 2025-05-07
+
+* Update base image to go-toolset:1.23.6 for CVE-2025-0395
+
 ## v0.13.27
 Released: 2025-05-07
 
