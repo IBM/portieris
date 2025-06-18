@@ -5,7 +5,7 @@
 # will replace go-toolset with the specified version of go. The specified version is then used
 # to build the portieris binary. go-toolset is used to create a simplified operating system image
 # that satisfies vulnerability scanning requirements
-ARG BASE_IMAGE=registry.access.redhat.com/ubi9/go-toolset:1.23.6
+ARG BASE_IMAGE=registry.access.redhat.com/ubi9/go-toolset:1.23.9
 FROM $BASE_IMAGE AS builder
 ARG PORTIERIS_VERSION=undefined
 ARG TARGETOS TARGETARCH
