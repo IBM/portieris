@@ -14,7 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## v-next
 
 ## v0.13.30
-Release: 2025-06-13
+Release: 2025-08-13
 
 * Update base image for CVE-2025-5702
 
