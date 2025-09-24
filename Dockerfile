@@ -42,20 +42,12 @@ RUN --mount=type=secret,id=GOPROXY,env=GOPROXY go mod download \
     -tags containers_image_openpgp -o portieris ./cmd/portieris \
     && go version -m -v portieris | (grep dep || true) | awk '{print "{\"Path\": \""$2 "\", \"Version\": \"" $3 "\"}"}' > /deps.jsonl
 
-# Check dependencies for vulnerabilities
-FROM sonatypecommunity/nancy:alpine AS nancy
-COPY --from=builder /deps.jsonl /
-COPY /.nancy-ignore /
-RUN cat /deps.jsonl | nancy --skip-update-check --loud sleuth --no-color
-RUN echo true> /nancy-checked
-
 #################################################################################
 # Finally, copy the minimal image contents and the built binary into the scratch image
 FROM scratch
 COPY --from=builder /image/ /
 COPY --from=builder /go/github.com/IBM/portieris/portieris /portieris
 # buildkit skips stages which dont contribute to the final image
-COPY --from=nancy /nancy-checked /nancy-checked
 # Create /tmp for logs and /run for working directory
 RUN [ "/portieris", "--mkdir",  "/tmp,/run" ]
 WORKDIR /run

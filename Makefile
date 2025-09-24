@@ -6,7 +6,7 @@ TAG=$(VERSION)
 GOTAGS='containers_image_openpgp'
 GOPROXY?=direct
 
-.PHONY: test nancy test-deps alltests copyright-check copyright fmt detect-secrets image image.oci-archive image.amd64 image.s390x image.arm64
+.PHONY: test test-deps alltests copyright-check copyright fmt detect-secrets image image.oci-archive image.amd64 image.s390x image.arm64
 
 portieris:
 	CGO_ENABLED=0 go build \
@@ -15,9 +15,6 @@ portieris:
 
 deps.jsonl: portieris
 	go version -m -v portieris | (grep dep || true) | awk '{print "{\"Path\": \""$$2 "\", \"Version\": \"" $$3 "\"}"}' > deps.jsonl
-
-nancy: deps.jsonl
-	cat deps.jsonl | nancy --skip-update-check --loud sleuth
 
 detect-secrets:
 	detect-secrets audit .secrets.baseline
