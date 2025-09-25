@@ -13,6 +13,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v-next
 
+## v0.13.31
+Release: 2025-09-24
+
+* Update docker for CVE-2025-54410
+* Update golang.org/x/oauth2 for CVE-2025-22868
+* Remove Nancy and use a different scanning tool at build time
+
 ## v0.13.30
 Release: 2025-08-13
 
