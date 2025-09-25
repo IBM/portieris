@@ -1,4 +1,4 @@
-// Copyright 2018, 2023 Portieris Authors.
+// Copyright 2018, 2025 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net"
@@ -91,8 +92,8 @@ func GetHTTPClient(customFile string) *http.Client {
 func Request(oauthEndpoint string, username string, token string, service string, scope string) (*TokenResponse, error) {
 	if oauthEndpoint == "" || service == "" {
 		errMessage := "unable to fetch oauth realm and service header details"
-		glog.Errorf(errMessage)
-		return nil, fmt.Errorf(errMessage)
+		glog.Error(errMessage)
+		return nil, errors.New(errMessage)
 	}
 
 	httpClient := GetHTTPClient("/etc/certs/ca.pem")
