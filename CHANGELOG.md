@@ -2,7 +2,7 @@
 
 copyright:
   years: 2020-2025
-lastupdated: "2025-11-12"
+lastupdated: "2025-11-17"
 
 ---
 
@@ -12,6 +12,12 @@ Notable changes recorded here.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v-next
+
+## v0.13.33
+Release: 2025-11-18
+
+* Update go version for CVE-2025-58185, CVE-2025-58189, CVE-2025-61723, CVE-2025-61725, CVE-2025-47912, CVE-2025-61724
+
 
 ## v0.13.32
 Release: 2025-11-12
