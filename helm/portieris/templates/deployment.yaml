@@ -37,6 +37,12 @@ spec:
       {{- if .Values.priorityClass }}
       priorityClassName: {{ .Values.priorityClass }}
       {{- end }}
+      {{- if .Values.image.pullSecrets }}
+      imagePullSecrets: 
+        {{- range .Values.image.pullSecrets }}
+        - name: {{ . }}
+        {{- end }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.host | default "docker.io/ibmcom"  }}/{{ .Values.image.image }}:{{ .Values.image.tag }}"
