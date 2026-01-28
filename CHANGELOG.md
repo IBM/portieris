@@ -13,6 +13,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v-next
 
+## v0.13.35
+Release: 2026-01-28
+
+* Updates dependencies for CVE-2026-22772
+
 ## v0.13.34
 Release: 2025-12-17
 

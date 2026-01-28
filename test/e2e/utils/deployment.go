@@ -1,4 +1,4 @@
-// Copyright 2018, 2021 Portieris Authors.
+// Copyright 2018, 2026 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -182,7 +182,7 @@ func TestCurrentDeployStatus(t *testing.T, fw *framework.Framework, namespace, d
 		t.Errorf("Failed to check status of deployment")
 	}
 	if err := fw.WaitForDeploymentPods(deploymentName, namespace, 2*time.Minute); err != nil {
-		t.Errorf(err.Error())
+		t.Error(err.Error())
 
 	}
 	if !assert.Equal(t, *deployment.Spec.Replicas, deployment.Status.AvailableReplicas, "Deployment failed: available replicas did not match expected replicas") {
