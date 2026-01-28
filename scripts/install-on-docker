@@ -13,6 +13,9 @@ set -x
 helm install -n portieris portieris portieris-${VERSION}.tgz --set image.host=${HUB} --set image.tag=${TAG} --set image.pullSecret=${PULLSECRET}  --set IBMContainerService=false
 set +x
 
+# adjust mutating webhook for 30s timeout as running against local tooling under emulation can be slow
+kubectl patch mutatingwebhookconfigurations image-admission-config --type='json' -p='[{"op": "replace", "path": "/webhooks/0/timeoutSeconds", "value": 30}]'
+
 sleep 15
 kubectl get pods -n portieris
 

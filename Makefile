@@ -85,32 +85,32 @@ e2e.quick.ics: e2e.quick.trust.imagepolicy e2e.quick.trust.clusterimagepolicy e2
 	-kubectl delete namespace $$(kubectl get namespaces | grep '[0-9a-f]*-[0-9a-f]*-[0-9a-f]*-[0-9a-f]*-[0-9a-f]*' | awk '{ print $$1 }' )
 
 e2e.quick.trust.imagepolicy:
-	go test -v ./test/e2e --no-install --trust-image-policy
+	go test -v -p 2 -parallel 2 ./test/e2e --no-install --trust-image-policy
 	-kubectl delete namespace $$(kubectl get namespaces | grep '[0-9a-f]*-[0-9a-f]*-[0-9a-f]*-[0-9a-f]*-[0-9a-f]*' | awk '{ print $$1 }' )
 
 e2e.quick.trust.clusterimagepolicy:
-	go test -v ./test/e2e --no-install --trust-cluster-image-policy
+	go test -v -p 2 -parallel 2 ./test/e2e --no-install --trust-cluster-image-policy
 	-kubectl delete namespace $$(kubectl get namespaces | grep '[0-9a-f]*-[0-9a-f]*-[0-9a-f]*-[0-9a-f]*-[0-9a-f]*' | awk '{ print $$1 }' )
 
 e2e.quick.wildcards:
-	go test -v ./test/e2e --no-install --wildcards-image-policy
+	go test -v -p 1 -parallel 1 ./test/e2e --no-install --wildcards-image-policy
 	-kubectl delete namespace $$(kubectl get namespaces | grep '[0-9a-f]*-[0-9a-f]*-[0-9a-f]*-[0-9a-f]*-[0-9a-f]*' | awk '{ print $$1 }' )
 
 e2e.quick.armada:
-	go test -v ./test/e2e --no-install --armada
+	go test -v -p 2 -parallel 2 ./test/e2e --no-install --armada
 	-kubectl delete namespace $$(kubectl get namespaces | grep '[0-9a-f]*-[0-9a-f]*-[0-9a-f]*-[0-9a-f]*-[0-9a-f]*' | awk '{ print $$1 }' )
 
 e2e.quick.generic:
-	go test -v ./test/e2e --no-install --generic
+	go test -v -p 1 -parallel 1 ./test/e2e --no-install --generic
 	-kubectl delete namespace $$(kubectl get namespaces | grep '[0-9a-f]*-[0-9a-f]*-[0-9a-f]*-[0-9a-f]*-[0-9a-f]*' | awk '{ print $$1 }' )
 
 e2e.quick.simple.clusterimagepolicy:
-	go test -v ./test/e2e --no-install --simple-cluster-image-policy
+	go test -v -p 2 -parallel 2 ./test/e2e --no-install --simple-cluster-image-policy
 	-kubectl delete namespace $$(kubectl get namespaces | grep '[0-9a-f]*-[0-9a-f]*-[0-9a-f]*-[0-9a-f]*-[0-9a-f]*' | awk '{ print $$1 }' )
 
 e2e.quick.simple.imagepolicy:
 	-kubectl delete namespace secretnamespace
-	go test -v ./test/e2e --no-install --simple-image-policy
+	go test -v -p 2 -parallel 2 ./test/e2e --no-install --simple-image-policy
 	-kubectl delete namespace secretnamespace
 	-kubectl delete namespace $$(kubectl get namespaces | grep '[0-9a-f]*-[0-9a-f]*-[0-9a-f]*-[0-9a-f]*-[0-9a-f]*' | awk '{ print $$1 }' )
 
