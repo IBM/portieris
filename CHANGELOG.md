@@ -1,7 +1,7 @@
 ---
 copyright:
-  years: 2020-2025
-lastupdated: "2025-02-25"
+  years: 2020-2026
+lastupdated: "2026-04-08"
 ---
 
 # Change Log
@@ -10,6 +10,18 @@ Notable changes recorded here.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v-next
+
+## v0.13.37
+
+Release: 2026-04-08
+
+- Update base image for CVE-2026-25679 and CVE-2026-27139
+
+## v0.13.36
+
+Release: 2026-02-25
+
+- Updates dependencies for CVE-2025-68121
 
 ## v0.13.35
 
