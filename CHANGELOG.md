@@ -25,12 +25,6 @@ Release: 2026-02-25
 
 ## v0.13.35
 
-Release: 2026-02-25
-
-- Updates dependencies for CVE-2025-68121
-
-## v0.13.35
-
 Release: 2026-01-28
 
 - Updates dependencies for CVE-2026-22772
