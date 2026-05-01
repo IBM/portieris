@@ -14,7 +14,6 @@ replace (
 require (
 	github.com/IBM/go-sdk-core/v5 v5.21.2
 	github.com/containers/image/v5 v5.36.2
-	github.com/distribution/distribution v2.8.3+incompatible
 	github.com/distribution/reference v0.6.0
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/golang/glog v1.2.5
