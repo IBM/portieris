@@ -65,5 +65,3 @@ func (t *headerTransport) cloneRequest(r *http.Request) *http.Request {
 	}
 	return r2
 }
-
-// Made with Bob
