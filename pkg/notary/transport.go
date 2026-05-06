@@ -23,28 +23,22 @@
 // Modifications made by Portieris Authors:
 // - Adapted to work as a standalone implementation without distribution package dependency
 // - Simplified to focus on header modification use case
-// - Maintains all original functionality: request tracking, cancellation support, and proper cleanup
+// - Removed deprecated CancelRequest support and request tracking (unused in this codebase)
 
 package notary
 
 import (
-	"io"
 	"net/http"
-	"sync"
 )
 
 // headerTransport is a custom RoundTripper that adds headers to requests.
-// It maintains request tracking for proper cancellation support and cleanup of resources.
 type headerTransport struct {
 	base    http.RoundTripper
 	headers http.Header
-	mu      sync.Mutex                      // guards modReq
-	modReq  map[*http.Request]*http.Request // original -> modified
 }
 
 // RoundTrip implements the http.RoundTripper interface.
-// It clones the request, adds headers, tracks the request mapping for cancellation,
-// and wraps the response body to clean up the mapping when done.
+// It clones the request, adds headers, and executes the request.
 func (t *headerTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	// Clone the request to avoid modifying the original
 	req2 := t.cloneRequest(req)
@@ -54,40 +48,8 @@ func (t *headerTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 		req2.Header[key] = append(req2.Header[key], values...)
 	}
 
-	// Track the modified request for cancellation support
-	t.setModReq(req, req2)
-
 	// Execute the request
-	res, err := t.base.RoundTrip(req2)
-	if err != nil {
-		t.setModReq(req, nil)
-		return nil, err
-	}
-
-	// Wrap the response body to clean up the request mapping when done
-	res.Body = &onEOFReader{
-		rc: res.Body,
-		fn: func() { t.setModReq(req, nil) },
-	}
-
-	return res, nil
-}
-
-// CancelRequest cancels an in-flight request by closing its connection.
-// This is deprecated in favor of context cancellation, but maintained for compatibility.
-func (t *headerTransport) CancelRequest(req *http.Request) {
-	type canceler interface {
-		CancelRequest(*http.Request)
-	}
-	if cr, ok := t.base.(canceler); ok {
-		t.mu.Lock()
-		modReq := t.modReq[req]
-		delete(t.modReq, req)
-		t.mu.Unlock()
-		if modReq != nil {
-			cr.CancelRequest(modReq)
-		}
-	}
+	return t.base.RoundTrip(req2)
 }
 
 // cloneRequest returns a clone of the provided *http.Request.
@@ -104,44 +66,4 @@ func (t *headerTransport) cloneRequest(r *http.Request) *http.Request {
 	return r2
 }
 
-// setModReq tracks or removes the mapping between original and modified requests
-func (t *headerTransport) setModReq(orig, mod *http.Request) {
-	t.mu.Lock()
-	defer t.mu.Unlock()
-	if t.modReq == nil {
-		t.modReq = make(map[*http.Request]*http.Request)
-	}
-	if mod == nil {
-		delete(t.modReq, orig)
-	} else {
-		t.modReq[orig] = mod
-	}
-}
-
-// onEOFReader wraps a ReadCloser to call a function when EOF is reached or Close is called.
-// This ensures proper cleanup of request tracking.
-type onEOFReader struct {
-	rc io.ReadCloser
-	fn func()
-}
-
-func (r *onEOFReader) Read(p []byte) (n int, err error) {
-	n, err = r.rc.Read(p)
-	if err == io.EOF {
-		r.runFunc()
-	}
-	return
-}
-
-func (r *onEOFReader) Close() error {
-	err := r.rc.Close()
-	r.runFunc()
-	return err
-}
-
-func (r *onEOFReader) runFunc() {
-	if fn := r.fn; fn != nil {
-		fn()
-		r.fn = nil
-	}
-}
+// Made with Bob
