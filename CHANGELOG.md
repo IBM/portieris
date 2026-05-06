@@ -16,9 +16,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 Release: 2026-05-05
 
 - Remove deprecated `distribution/distribution/registry/client/transport` dependency (removed in distribution v3)
-- Implement replacement HTTP transport with full functionality and proper Apache 2.0 attribution
-- Add `docker/docker => moby/moby` replace directive for Docker v29+ compatibility
-- Update copyright years to 2026
+- Implement replacement simplified HTTP transport with attribution
 
 ## v0.13.37
 
