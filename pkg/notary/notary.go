@@ -1,4 +1,4 @@
-// Copyright 2018, 2025 Portieris Authors.
+// Copyright 2018, 2026 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ import (
 	httphelper "github.com/IBM/portieris/helpers/http"
 	"github.com/IBM/portieris/helpers/image"
 	"github.com/IBM/portieris/internal/info"
-	"github.com/distribution/distribution/registry/client/transport"
 	notaryclient "github.com/theupdateframework/notary/client"
 	"github.com/theupdateframework/notary/trustpinning"
 	"github.com/theupdateframework/notary/tuf/data"
@@ -148,22 +147,18 @@ func (c Client) makeHubTransport(notaryToken string) http.RoundTripper {
 		DisableKeepAlives: true,
 	}
 
-	modifiers := []transport.RequestModifier{
-		transport.NewHeaderRequestModifier(http.Header{
-			"User-Agent": []string{"portieris/" + info.Version},
-		}),
+	headers := http.Header{
+		"User-Agent": []string{"portieris/" + info.Version},
 	}
 
 	if notaryToken != "" {
-		modifiers = []transport.RequestModifier{
-			transport.NewHeaderRequestModifier(http.Header{
-				"User-Agent":    []string{"portieris/" + info.Version},
-				"Authorization": []string{fmt.Sprintf("Bearer %s", notaryToken)},
-			}),
-		}
+		headers.Set("Authorization", fmt.Sprintf("Bearer %s", notaryToken))
 	}
 
-	return transport.NewTransport(base, modifiers...)
+	return &headerTransport{
+		base:    base,
+		headers: headers,
+	}
 }
 
 func createTrustDir(trustDir string) error {

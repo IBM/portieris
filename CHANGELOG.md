@@ -1,7 +1,7 @@
 ---
 copyright:
   years: 2020-2026
-lastupdated: "2026-04-08"
+lastupdated: "2026-05-05"
 ---
 
 # Change Log
@@ -10,6 +10,13 @@ Notable changes recorded here.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v-next
+
+## v0.13.38
+
+Release: 2026-05-05
+
+- Remove deprecated `distribution/distribution/registry/client/transport` dependency (removed in distribution v3)
+- Implement replacement simplified HTTP transport with attribution
 
 ## v0.13.37
 
