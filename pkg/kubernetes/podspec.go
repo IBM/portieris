@@ -45,9 +45,6 @@ const (
 // ErrObjectHasParents is returned when the resource being created is the child of another resource
 var ErrObjectHasParents = fmt.Errorf("This object has parents")
 
-// ErrObjectHasZeroReplicas is returned when the resource being created has zero replicas
-var ErrObjectHasZeroReplicas = fmt.Errorf("This object has zero replicas")
-
 var supportedKinds = map[string]struct{}{
 	"Deployment":            {},
 	"Pod":                   {},
@@ -77,9 +74,6 @@ func (w *Wrapper) GetPodSpec(ar *admissionv1.AdmissionRequest) (string, *corev1.
 		if err := w.decodeObject(ar.Object.Raw, &rc); err != nil {
 			return "", nil, err
 		}
-		if rc.Spec.Replicas != nil && *rc.Spec.Replicas == int32(0) {
-			return "", nil, ErrObjectHasZeroReplicas
-		}
 		ps = rc.Spec.Template.Spec
 		w.mutateWithSA(ar.Namespace, &ps)
 		templateString = templateSpecPath
@@ -87,9 +81,6 @@ func (w *Wrapper) GetPodSpec(ar *admissionv1.AdmissionRequest) (string, *corev1.
 		deploy := extensionsv1beta1.Deployment{}
 		if err := w.decodeObject(ar.Object.Raw, &deploy); err != nil {
 			return "", nil, err
-		}
-		if deploy.Spec.Replicas != nil && *deploy.Spec.Replicas == int32(0) {
-			return "", nil, ErrObjectHasZeroReplicas
 		}
 		ps = deploy.Spec.Template.Spec
 		w.mutateWithSA(ar.Namespace, &ps)
@@ -99,9 +90,6 @@ func (w *Wrapper) GetPodSpec(ar *admissionv1.AdmissionRequest) (string, *corev1.
 		if err := w.decodeObject(ar.Object.Raw, &deploy); err != nil {
 			return "", nil, err
 		}
-		if deploy.Spec.Replicas != nil && *deploy.Spec.Replicas == int32(0) {
-			return "", nil, ErrObjectHasZeroReplicas
-		}
 		ps = deploy.Spec.Template.Spec
 		w.mutateWithSA(ar.Namespace, &ps)
 		templateString = templateSpecPath
@@ -109,9 +97,6 @@ func (w *Wrapper) GetPodSpec(ar *admissionv1.AdmissionRequest) (string, *corev1.
 		deploy := appsv1beta2.Deployment{}
 		if err := w.decodeObject(ar.Object.Raw, &deploy); err != nil {
 			return "", nil, err
-		}
-		if deploy.Spec.Replicas != nil && *deploy.Spec.Replicas == int32(0) {
-			return "", nil, ErrObjectHasZeroReplicas
 		}
 		ps = deploy.Spec.Template.Spec
 		w.mutateWithSA(ar.Namespace, &ps)
@@ -121,9 +106,6 @@ func (w *Wrapper) GetPodSpec(ar *admissionv1.AdmissionRequest) (string, *corev1.
 		if err := w.decodeObject(ar.Object.Raw, &deploy); err != nil {
 			return "", nil, err
 		}
-		if deploy.Spec.Replicas != nil && *deploy.Spec.Replicas == int32(0) {
-			return "", nil, ErrObjectHasZeroReplicas
-		}
 		ps = deploy.Spec.Template.Spec
 		w.mutateWithSA(ar.Namespace, &ps)
 		templateString = templateSpecPath
@@ -131,9 +113,6 @@ func (w *Wrapper) GetPodSpec(ar *admissionv1.AdmissionRequest) (string, *corev1.
 		rs := appsv1.ReplicaSet{}
 		if err := w.decodeObject(ar.Object.Raw, &rs); err != nil {
 			return "", nil, err
-		}
-		if rs.Spec.Replicas != nil && *rs.Spec.Replicas == int32(0) {
-			return "", nil, ErrObjectHasZeroReplicas
 		}
 		ps = rs.Spec.Template.Spec
 		w.mutateWithSA(ar.Namespace, &ps)
@@ -143,9 +122,6 @@ func (w *Wrapper) GetPodSpec(ar *admissionv1.AdmissionRequest) (string, *corev1.
 		if err := w.decodeObject(ar.Object.Raw, &rs); err != nil {
 			return "", nil, err
 		}
-		if rs.Spec.Replicas != nil && *rs.Spec.Replicas == int32(0) {
-			return "", nil, ErrObjectHasZeroReplicas
-		}
 		ps = rs.Spec.Template.Spec
 		w.mutateWithSA(ar.Namespace, &ps)
 		templateString = templateSpecPath
@@ -153,9 +129,6 @@ func (w *Wrapper) GetPodSpec(ar *admissionv1.AdmissionRequest) (string, *corev1.
 		rs := appsv1beta2.ReplicaSet{}
 		if err := w.decodeObject(ar.Object.Raw, &rs); err != nil {
 			return "", nil, err
-		}
-		if rs.Spec.Replicas != nil && *rs.Spec.Replicas == int32(0) {
-			return "", nil, ErrObjectHasZeroReplicas
 		}
 		ps = rs.Spec.Template.Spec
 		w.mutateWithSA(ar.Namespace, &ps)
@@ -189,9 +162,6 @@ func (w *Wrapper) GetPodSpec(ar *admissionv1.AdmissionRequest) (string, *corev1.
 		if err := w.decodeObject(ar.Object.Raw, &sts); err != nil {
 			return "", nil, err
 		}
-		if sts.Spec.Replicas != nil && *sts.Spec.Replicas == int32(0) {
-			return "", nil, ErrObjectHasZeroReplicas
-		}
 		ps = sts.Spec.Template.Spec
 		w.mutateWithSA(ar.Namespace, &ps)
 		templateString = templateSpecPath
@@ -200,9 +170,6 @@ func (w *Wrapper) GetPodSpec(ar *admissionv1.AdmissionRequest) (string, *corev1.
 		if err := w.decodeObject(ar.Object.Raw, &sts); err != nil {
 			return "", nil, err
 		}
-		if sts.Spec.Replicas != nil && *sts.Spec.Replicas == int32(0) {
-			return "", nil, ErrObjectHasZeroReplicas
-		}
 		ps = sts.Spec.Template.Spec
 		w.mutateWithSA(ar.Namespace, &ps)
 		templateString = templateSpecPath
@@ -210,9 +177,6 @@ func (w *Wrapper) GetPodSpec(ar *admissionv1.AdmissionRequest) (string, *corev1.
 		sts := appsv1beta2.StatefulSet{}
 		if err := w.decodeObject(ar.Object.Raw, &sts); err != nil {
 			return "", nil, err
-		}
-		if sts.Spec.Replicas != nil && *sts.Spec.Replicas == int32(0) {
-			return "", nil, ErrObjectHasZeroReplicas
 		}
 		ps = sts.Spec.Template.Spec
 		w.mutateWithSA(ar.Namespace, &ps)

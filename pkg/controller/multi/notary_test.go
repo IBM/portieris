@@ -588,7 +588,7 @@ var _ = Describe("Main", func() {
 			})
 
 			Context("if `trust is enabled`, and the request has zero replicas", func() {
-				It("should allow but not mutate the podspec", func() {
+				It("should validate and mutate the podspec", func() {
 					imageRepos := `"repositories": [
 							{
 								"name": "us.icr.io/*",
@@ -606,7 +606,7 @@ var _ = Describe("Main", func() {
 					req := newFakeRequestDeploymentWithZeroReplicas("us.icr.io/hello")
 					wh.HandleAdmissionRequest(w, req)
 					parseResponse()
-					Expect(string(resp.Response.Patch)).NotTo(ContainSubstring("us.icr.io/hello@sha256:31323334353637383930"))
+					Expect(string(resp.Response.Patch)).To(ContainSubstring("us.icr.io/hello@sha256:31323334353637383930"))
 					Expect(resp.Response.Allowed).To(BeTrue())
 				})
 			})

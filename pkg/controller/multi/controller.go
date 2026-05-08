@@ -67,7 +67,7 @@ func (c *Controller) Admit(admissionRequest *admissionv1.AdmissionRequest) *admi
 	switch err {
 	case nil:
 		break
-	case kubernetes.ErrObjectHasParents, kubernetes.ErrObjectHasZeroReplicas:
+	case kubernetes.ErrObjectHasParents:
 		return &admissionv1.AdmissionResponse{
 			Allowed: true,
 		}
