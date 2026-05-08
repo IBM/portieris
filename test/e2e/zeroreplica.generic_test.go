@@ -34,12 +34,30 @@ func Test_ZeroReplicaEnforcement(t *testing.T) {
 		utils.CleanUpImagePolicyTest(t, framework, namespace.Name)
 	})
 
+	t.Run("Policy enforced on Deployment with zero replicas - signed image allowed", func(t *testing.T) {
+		t.Parallel()
+		namespace := utils.CreateImagePolicyInstalledNamespace(t, framework, "./testdata/imagepolicy/allow-signed.yaml", "")
+		utils.CreateSecret(t, framework, "./testdata/secret/sh.pubkey.yaml", namespace.Name)
+		// This should be allowed because the image is signed, even though replicas=0
+		utils.TestDeploymentRunnable(t, framework, "./testdata/deployment/global-nginx-signed-zero-replicas.yaml", namespace.Name)
+		utils.CleanUpImagePolicyTest(t, framework, namespace.Name)
+	})
+
 	t.Run("Policy enforced on ReplicaSet with zero replicas - unsigned image denied", func(t *testing.T) {
 		t.Parallel()
 		namespace := utils.CreateImagePolicyInstalledNamespace(t, framework, "./testdata/imagepolicy/allow-signed.yaml", "")
 		utils.CreateSecret(t, framework, "./testdata/secret/sh.pubkey.yaml", namespace.Name)
 		// This should be denied because the image is unsigned, even though replicas=0
 		utils.TestReplicaSetNotRunnable(t, framework, "./testdata/replicaset/global-nginx-unsigned-zero-replicas.yaml", namespace.Name)
+		utils.CleanUpImagePolicyTest(t, framework, namespace.Name)
+	})
+
+	t.Run("Policy enforced on ReplicaSet with zero replicas - signed image allowed", func(t *testing.T) {
+		t.Parallel()
+		namespace := utils.CreateImagePolicyInstalledNamespace(t, framework, "./testdata/imagepolicy/allow-signed.yaml", "")
+		utils.CreateSecret(t, framework, "./testdata/secret/sh.pubkey.yaml", namespace.Name)
+		// This should be allowed because the image is signed, even though replicas=0
+		utils.TestReplicaSetRunnable(t, framework, "./testdata/replicaset/global-nginx-signed-zero-replicas.yaml", namespace.Name)
 		utils.CleanUpImagePolicyTest(t, framework, namespace.Name)
 	})
 
@@ -52,12 +70,30 @@ func Test_ZeroReplicaEnforcement(t *testing.T) {
 		utils.CleanUpImagePolicyTest(t, framework, namespace.Name)
 	})
 
+	t.Run("Policy enforced on StatefulSet with zero replicas - signed image allowed", func(t *testing.T) {
+		t.Parallel()
+		namespace := utils.CreateImagePolicyInstalledNamespace(t, framework, "./testdata/imagepolicy/allow-signed.yaml", "")
+		utils.CreateSecret(t, framework, "./testdata/secret/sh.pubkey.yaml", namespace.Name)
+		// This should be allowed because the image is signed, even though replicas=0
+		utils.TestStatefulSetRunnable(t, framework, "./testdata/statefulset/global-nginx-signed-zero-replicas.yaml", namespace.Name)
+		utils.CleanUpImagePolicyTest(t, framework, namespace.Name)
+	})
+
 	t.Run("Policy enforced on ReplicationController with zero replicas - unsigned image denied", func(t *testing.T) {
 		t.Parallel()
 		namespace := utils.CreateImagePolicyInstalledNamespace(t, framework, "./testdata/imagepolicy/allow-signed.yaml", "")
 		utils.CreateSecret(t, framework, "./testdata/secret/sh.pubkey.yaml", namespace.Name)
 		// This should be denied because the image is unsigned, even though replicas=0
 		utils.TestReplicationControllerNotRunnable(t, framework, "./testdata/replicationcontroller/global-nginx-unsigned-zero-replicas.yaml", namespace.Name)
+		utils.CleanUpImagePolicyTest(t, framework, namespace.Name)
+	})
+
+	t.Run("Policy enforced on ReplicationController with zero replicas - signed image allowed", func(t *testing.T) {
+		t.Parallel()
+		namespace := utils.CreateImagePolicyInstalledNamespace(t, framework, "./testdata/imagepolicy/allow-signed.yaml", "")
+		utils.CreateSecret(t, framework, "./testdata/secret/sh.pubkey.yaml", namespace.Name)
+		// This should be allowed because the image is signed, even though replicas=0
+		utils.TestReplicationControllerRunnable(t, framework, "./testdata/replicationcontroller/global-nginx-signed-zero-replicas.yaml", namespace.Name)
 		utils.CleanUpImagePolicyTest(t, framework, namespace.Name)
 	})
 }
