@@ -23,7 +23,7 @@ import (
 // Test_ZeroReplicaEnforcement verifies that admission policies are enforced
 // on resources with zero replicas, ensuring they cannot bypass security checks.
 func Test_ZeroReplicaEnforcement(t *testing.T) {
-	utils.CheckIfTesting(t, testGeneric)
+	utils.CheckIfTesting(t, testZeroReplica)
 
 	t.Run("Policy enforced on Deployment with zero replicas - unsigned image denied", func(t *testing.T) {
 		t.Parallel()

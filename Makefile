@@ -80,8 +80,8 @@ e2e.local: helm.install.local e2e.quick
 
 e2e.local.ics: helm.install.local e2e.quick.ics
 
-e2e.quick: e2e.quick.trust.imagepolicy e2e.quick.trust.clusterimagepolicy e2e.quick.wildcards e2e.quick.generic e2e.quick.simple.imagepolicy e2e.quick.simple.clusterimagepolicy
-e2e.quick.ics: e2e.quick.trust.imagepolicy e2e.quick.trust.clusterimagepolicy e2e.quick.armada e2e.quick.wildcards e2e.quick.generic e2e.quick.simple.imagepolicy
+e2e.quick: e2e.quick.trust.imagepolicy e2e.quick.trust.clusterimagepolicy e2e.quick.wildcards e2e.quick.generic e2e.quick.simple.imagepolicy e2e.quick.simple.clusterimagepolicy e2e.quick.zeroreplica
+e2e.quick.ics: e2e.quick.trust.imagepolicy e2e.quick.trust.clusterimagepolicy e2e.quick.armada e2e.quick.wildcards e2e.quick.generic e2e.quick.simple.imagepolicy e2e.quick.zeroreplica
 	-kubectl delete namespace $$(kubectl get namespaces | grep '[0-9a-f]*-[0-9a-f]*-[0-9a-f]*-[0-9a-f]*-[0-9a-f]*' | awk '{ print $$1 }' )
 
 e2e.quick.trust.imagepolicy:
@@ -112,6 +112,10 @@ e2e.quick.simple.imagepolicy:
 	-kubectl delete namespace secretnamespace
 	go test -v -p 2 -parallel 2 ./test/e2e --no-install --simple-image-policy
 	-kubectl delete namespace secretnamespace
+	-kubectl delete namespace $$(kubectl get namespaces | grep '[0-9a-f]*-[0-9a-f]*-[0-9a-f]*-[0-9a-f]*-[0-9a-f]*' | awk '{ print $$1 }' )
+
+e2e.quick.zeroreplica:
+	go test -v -p 2 -parallel 2 ./test/e2e --no-install --zero-replica
 	-kubectl delete namespace $$(kubectl get namespaces | grep '[0-9a-f]*-[0-9a-f]*-[0-9a-f]*-[0-9a-f]*-[0-9a-f]*' | awk '{ print $$1 }' )
 
 e2e.clean: helm.clean
