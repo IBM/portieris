@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: global-nginx-signed-zero
+  labels:
+    app: global-nginx-signed-zero
+    test: "true"
+spec:
+  replicas: 0
+  selector:
+    app: global-nginx-signed-zero
+  template:
+    metadata:
+      labels:
+        app: global-nginx-signed-zero
+    spec:
+      containers:
+      - name: nginx
+        image: icr.io/portieris-authn/nginx:signed
+        ports:
+        - containerPort: 80
+
+# Made with Bob

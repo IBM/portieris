@@ -11,6 +11,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v-next
 
+## v0.14.0
+
+Release: 2026-05-08
+
+- Updates enforcement to validate resources with 0 replicas for https://github.com/IBM/portieris/issues/508
+
 ## v0.13.38
 
 Release: 2026-05-05

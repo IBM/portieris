@@ -1,4 +1,4 @@
-// Copyright 2018, 2021 Portieris Authors.
+// Copyright 2018, 2026 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -91,13 +91,14 @@ func TestWrapper_GetPodSpec(t *testing.T) {
 			want1: nginxSpec,
 		},
 		{
-			name: "Errors for a replicationcontroller with zero replicas",
+			name: "Properly handles a replicationcontroller with zero replicas",
 			ar: ar{
 				Object:    []byte(`{"metadata":{"name":"nginx","namespace":"default"},"spec":{"replicas":0, "template":{"spec":{"containers":[{"name":"nginx","image":"docker.io/nginx"}]}}}}`),
 				Namespace: "",
 				Resource:  metav1.GroupVersionResource{Group: "", Version: "v1", Resource: "replicationcontrollers"},
 			},
-			wantErr: true,
+			want:  "/spec/template/spec",
+			want1: nginxSpec,
 		},
 		{
 			name: "Errors for a malformed replicationcontroller",
@@ -131,13 +132,14 @@ func TestWrapper_GetPodSpec(t *testing.T) {
 			want1: nginxSpec,
 		},
 		{
-			name: "Errors for a deployment with zero replicas",
+			name: "Properly handles a deployment with zero replicas",
 			ar: ar{
 				Object:    []byte(`{"metadata":{"name":"nginx","namespace":"default"},"spec":{"replicas":0, "template":{"spec":{"containers":[{"name":"nginx","image":"docker.io/nginx"}]}}}}`),
 				Namespace: "",
 				Resource:  metav1.GroupVersionResource{Group: "apps", Version: "v1", Resource: "deployments"},
 			},
-			wantErr: true,
+			want:  "/spec/template/spec",
+			want1: nginxSpec,
 		},
 		{
 			name: "Errors for a malformed deployment",
@@ -192,13 +194,14 @@ func TestWrapper_GetPodSpec(t *testing.T) {
 			want1: nginxSpec,
 		},
 		{
-			name: "Errors for a beta2 deployment with zero replicas",
+			name: "Properly handles a beta2 deployment with zero replicas",
 			ar: ar{
 				Object:    []byte(`{"metadata":{"name":"nginx","namespace":"default"},"spec":{"replicas":0, "template":{"spec":{"containers":[{"name":"nginx","image":"docker.io/nginx"}]}}}}`),
 				Namespace: "",
 				Resource:  metav1.GroupVersionResource{Group: "apps", Version: "v1beta2", Resource: "deployments"},
 			},
-			wantErr: true,
+			want:  "/spec/template/spec",
+			want1: nginxSpec,
 		},
 		{
 			name: "Properly handles a beta deployment with null replicas",
@@ -211,13 +214,14 @@ func TestWrapper_GetPodSpec(t *testing.T) {
 			want1: nginxSpec,
 		},
 		{
-			name: "Errors for a beta deployment with zero replicas",
+			name: "Properly handles a beta deployment with zero replicas",
 			ar: ar{
 				Object:    []byte(`{"metadata":{"name":"nginx","namespace":"default"},"spec":{"replicas":0, "template":{"spec":{"containers":[{"name":"nginx","image":"docker.io/nginx"}]}}}}`),
 				Namespace: "",
 				Resource:  metav1.GroupVersionResource{Group: "extensions", Version: "v1beta1", Resource: "deployments"},
 			},
-			wantErr: true,
+			want:  "/spec/template/spec",
+			want1: nginxSpec,
 		},
 		{
 			name: "Errors for a malformed beta deployment",
@@ -262,13 +266,14 @@ func TestWrapper_GetPodSpec(t *testing.T) {
 			want1: nginxSpec,
 		},
 		{
-			name: "Errors foran apps beta1 deployment with zero replicas",
+			name: "Properly handles an apps beta1 deployment with zero replicas",
 			ar: ar{
 				Object:    []byte(`{"metadata":{"name":"nginx","namespace":"default"},"spec":{"replicas":0, "template":{"spec":{"containers":[{"name":"nginx","image":"docker.io/nginx"}]}}}}`),
 				Namespace: "",
 				Resource:  metav1.GroupVersionResource{Group: "apps", Version: "v1beta1", Resource: "deployments"},
 			},
-			wantErr: true,
+			want:  "/spec/template/spec",
+			want1: nginxSpec,
 		},
 		{
 			name: "Properly handles a replicaset",
@@ -291,13 +296,14 @@ func TestWrapper_GetPodSpec(t *testing.T) {
 			want1: nginxSpec,
 		},
 		{
-			name: "Errors for a replicaset with zero replicas",
+			name: "Properly handles a replicaset with zero replicas",
 			ar: ar{
 				Object:    []byte(`{"metadata":{"name":"nginx","namespace":"default"},"spec":{"replicas":0, "template":{"spec":{"containers":[{"name":"nginx","image":"docker.io/nginx"}]}}}}`),
 				Namespace: "",
 				Resource:  metav1.GroupVersionResource{Group: "apps", Version: "v1", Resource: "replicasets"},
 			},
-			wantErr: true,
+			want:  "/spec/template/spec",
+			want1: nginxSpec,
 		},
 		{
 			name: "Errors for a malformed replicaset",
@@ -331,13 +337,14 @@ func TestWrapper_GetPodSpec(t *testing.T) {
 			want1: nginxSpec,
 		},
 		{
-			name: "Errors for a beta replicaset with zero replicas",
+			name: "Properly handles a beta replicaset with zero replicas",
 			ar: ar{
 				Object:    []byte(`{"metadata":{"name":"nginx","namespace":"default"},"spec":{"replicas":0, "template":{"spec":{"containers":[{"name":"nginx","image":"docker.io/nginx"}]}}}}`),
 				Namespace: "",
 				Resource:  metav1.GroupVersionResource{Group: "extensions", Version: "v1beta1", Resource: "replicasets"},
 			},
-			wantErr: true,
+			want:  "/spec/template/spec",
+			want1: nginxSpec,
 		},
 		{
 			name: "Errors for a malformed beta replicaset",
@@ -371,13 +378,14 @@ func TestWrapper_GetPodSpec(t *testing.T) {
 			want1: nginxSpec,
 		},
 		{
-			name: "Errors for an apps/v1beta2 replicaset with zero replicas",
+			name: "Properly handles an apps/v1beta2 replicaset with zero replicas",
 			ar: ar{
 				Object:    []byte(`{"metadata":{"name":"nginx","namespace":"default"},"spec":{"replicas":0, "template":{"spec":{"containers":[{"name":"nginx","image":"docker.io/nginx"}]}}}}`),
 				Namespace: "",
 				Resource:  metav1.GroupVersionResource{Group: "apps", Version: "v1beta2", Resource: "replicasets"},
 			},
-			wantErr: true,
+			want:  "/spec/template/spec",
+			want1: nginxSpec,
 		},
 		{
 			name: "Errors for an apps/v1beta2 malformed replicaset",
@@ -474,13 +482,14 @@ func TestWrapper_GetPodSpec(t *testing.T) {
 			want1: nginxSpec,
 		},
 		{
-			name: "Errors for a statefulset with zero replicas",
+			name: "Properly handles a statefulset with zero replicas",
 			ar: ar{
 				Object:    []byte(`{"metadata":{"name":"nginx","namespace":"default"},"spec":{"replicas":0, "template":{"spec":{"containers":[{"name":"nginx","image":"docker.io/nginx"}]}}}}`),
 				Namespace: "",
 				Resource:  metav1.GroupVersionResource{Group: "apps", Version: "v1", Resource: "statefulsets"},
 			},
-			wantErr: true,
+			want:  "/spec/template/spec",
+			want1: nginxSpec,
 		},
 		{
 			name: "Errors for a malformed statefulset",
@@ -514,13 +523,14 @@ func TestWrapper_GetPodSpec(t *testing.T) {
 			want1: nginxSpec,
 		},
 		{
-			name: "Errors for an apps/v1beta1 statefulset with zero replicas",
+			name: "Properly handles an apps/v1beta1 statefulset with zero replicas",
 			ar: ar{
 				Object:    []byte(`{"metadata":{"name":"nginx","namespace":"default"},"spec":{"replicas":0, "template":{"spec":{"containers":[{"name":"nginx","image":"docker.io/nginx"}]}}}}`),
 				Namespace: "",
 				Resource:  metav1.GroupVersionResource{Group: "apps", Version: "v1beta1", Resource: "statefulsets"},
 			},
-			wantErr: true,
+			want:  "/spec/template/spec",
+			want1: nginxSpec,
 		},
 		{
 			name: "Errors for an apps/v1beta1 malformed statefulset",
@@ -554,13 +564,14 @@ func TestWrapper_GetPodSpec(t *testing.T) {
 			want1: nginxSpec,
 		},
 		{
-			name: "Errors for an apps/v1beta2 statefulset with zero replicas",
+			name: "Properly handles an apps/v1beta2 statefulset with zero replicas",
 			ar: ar{
 				Object:    []byte(`{"metadata":{"name":"nginx","namespace":"default"},"spec":{"replicas":0, "template":{"spec":{"containers":[{"name":"nginx","image":"docker.io/nginx"}]}}}}`),
 				Namespace: "",
 				Resource:  metav1.GroupVersionResource{Group: "apps", Version: "v1beta2", Resource: "statefulsets"},
 			},
-			wantErr: true,
+			want:  "/spec/template/spec",
+			want1: nginxSpec,
 		},
 		{
 			name: "Errors for an apps/v1beta2 malformed statefulset",

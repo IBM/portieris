@@ -1,4 +1,4 @@
-// Copyright 2018, 2021 Portieris Authors.
+// Copyright 2018, 2026 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -67,7 +67,7 @@ func (c *Controller) Admit(admissionRequest *admissionv1.AdmissionRequest) *admi
 	switch err {
 	case nil:
 		break
-	case kubernetes.ErrObjectHasParents, kubernetes.ErrObjectHasZeroReplicas:
+	case kubernetes.ErrObjectHasParents:
 		return &admissionv1.AdmissionResponse{
 			Allowed: true,
 		}
