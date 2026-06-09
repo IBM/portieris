@@ -23,10 +23,10 @@ import (
 	policyv1 "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/v1"
 	"github.com/IBM/portieris/pkg/kubernetes"
 	"github.com/IBM/portieris/pkg/verifier/vulnerability"
-	"github.com/containers/image/v5/signature"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+	"go.podman.io/image/v5/signature"
 )
 
 type mockScannerFactory struct {

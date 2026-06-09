@@ -20,8 +20,8 @@ import (
 	"testing"
 
 	"github.com/IBM/portieris/helpers/credential"
-	"github.com/containers/image/v5/signature"
 	"github.com/stretchr/testify/assert"
+	"go.podman.io/image/v5/signature"
 )
 
 var policyRequirementInsecure = signature.NewPRInsecureAcceptAnything()

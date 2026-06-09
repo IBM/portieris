@@ -20,7 +20,7 @@ import (
 	"github.com/IBM/portieris/helpers/credential"
 	policyv1 "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/v1"
 	"github.com/IBM/portieris/pkg/kubernetes"
-	"github.com/containers/image/v5/signature"
+	"go.podman.io/image/v5/signature"
 )
 
 // Verifier is for verifying simple signing

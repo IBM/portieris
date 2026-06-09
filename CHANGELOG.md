@@ -1,7 +1,7 @@
 ---
 copyright:
   years: 2020-2026
-lastupdated: "2026-05-05"
+lastupdated: "2026-06-09"
 ---
 
 # Change Log
@@ -10,6 +10,11 @@ Notable changes recorded here.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v-next
+
+## v0.14.1
+
+Release: 2026-06-09
+- Update dependencies for CVE-2026-42499, CVE-2026-31790, CVE-2026-33814, CVE-2026-39820, CVE-2026-39836, CVE-2026-41567, CVE-2026-41568, and CVE-2026-42306
 
 ## v0.14.0
 
