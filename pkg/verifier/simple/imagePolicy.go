@@ -1,4 +1,4 @@
-// Copyright 2020, 2021 Portieris Authors.
+// Copyright 2020, 2026 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,12 +24,12 @@ import (
 
 	"github.com/IBM/portieris/helpers/credential"
 	"github.com/IBM/portieris/internal/info"
-	"github.com/containers/image/v5/docker"
-	"github.com/containers/image/v5/image"
-	"github.com/containers/image/v5/manifest"
-	"github.com/containers/image/v5/signature"
-	"github.com/containers/image/v5/types"
 	"github.com/golang/glog"
+	"go.podman.io/image/v5/docker"
+	"go.podman.io/image/v5/image"
+	"go.podman.io/image/v5/manifest"
+	"go.podman.io/image/v5/signature"
+	"go.podman.io/image/v5/types"
 )
 
 // VerifyByPolicy verifies the image according to the supplied policy and returns the verified digest, verify error or processing error
