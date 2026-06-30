@@ -15,6 +15,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 Release: 2026-07-01
 - Dependency updates
+- Fix admission-control bypass via unanchored wildcard matching in image policy evaluation
 
 ## v0.14.1
 

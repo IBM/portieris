@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2026 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +17,49 @@ package wildcard
 import (
 	"strings"
 )
+
+// CompareImageRef matches a policy pattern against an image reference string,
+// enforcing that the host component of the pattern is matched only against the
+// host component of the image reference and never as a substring of the path.
+// This prevents an attacker from hosting a malicious image at
+// attacker.example.com/x.trusted.example.com/myorg/evil and having it match a
+// policy pattern such as *.trusted.example.com/myorg/* by embedding the
+// trusted-registry hostname inside the repository path.
+//
+// If the pattern contains no '/' it is treated as a pure image/tag pattern and
+// falls back to CompareAnyTag (e.g. the bare "*" catch-all policy).
+//
+// For patterns that contain '/', the string is split at the first '/' into a
+// host part and a path part, and each is matched independently via
+// CompareAnyTag so that wildcard semantics within each segment are preserved.
+func CompareImageRef(pattern, imageRef string) bool {
+	slashIdx := strings.Index(pattern, "/")
+	if slashIdx < 0 {
+		// No '/' in pattern — pure tag/image glob or bare "*", use existing logic.
+		return CompareAnyTag(pattern, imageRef)
+	}
+
+	patternHost := pattern[:slashIdx]
+	patternPath := pattern[slashIdx+1:]
+
+	// Split the image reference at its first '/'.
+	// A valid image reference always has a host component when a registry is
+	// specified; if there is no '/' the image ref itself has no host segment,
+	// so it cannot match a host/path policy pattern.
+	refSlashIdx := strings.Index(imageRef, "/")
+	if refSlashIdx < 0 {
+		return false
+	}
+
+	refHost := imageRef[:refSlashIdx]
+	refPath := imageRef[refSlashIdx+1:]
+
+	// Both sides of the split are matched with CompareAnyTag which preserves
+	// wildcard semantics within each segment.
+	// The host match uses Compare (not CompareAnyTag) because a ':*' suffix
+	// is never meaningful for a hostname.
+	return Compare(patternHost, refHost) && CompareAnyTag(patternPath, refPath)
+}
 
 // Wildcard character
 const wildcard = "*"
