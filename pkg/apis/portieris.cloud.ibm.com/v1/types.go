@@ -1,4 +1,4 @@
-// Copyright 2021 Portieris Authors.
+// Copyright 2021, 2026 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -173,7 +173,7 @@ Exact:
 				bestMatchedPolicy = repo.Policy
 				break Exact
 			} else {
-				if wildcard.CompareAnyTag(repositoryName, image) {
+				if wildcard.CompareImageRef(repositoryName, image) {
 					match = true
 					matchQuality = len(repositoryName) - strings.Count(repositoryName, "*")
 				}
@@ -221,7 +221,7 @@ Exact:
 				bestMatchedPolicy = repo.Policy
 				break Exact
 			} else {
-				if wildcard.CompareAnyTag(repositoryName, image) {
+				if wildcard.CompareImageRef(repositoryName, image) {
 					match = true
 					matchQuality = len(repositoryName) - strings.Count(repositoryName, "*")
 				}

@@ -1,4 +1,4 @@
-// Copyright 2018 Portieris Authors.
+// Copyright 2018, 2026 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -116,6 +116,50 @@ var _ = Describe("Main", func() {
 		It("should not match if base in incorrect", func() {
 			match := CompareAnyTag("abcdefgh", "stuvwxyz:latest")
 			Expect(match).To(Equal(false))
+		})
+	})
+
+	Describe("CompareImageRef - host/path boundary enforcement (unanchored wildcard bypass)", func() {
+		Context("legitimate images that must still be admitted", func() {
+			It("should match a subdomain host against *.registry.example.com/myorg/*", func() {
+				Expect(CompareImageRef("*.registry.example.com/myorg/*", "us.registry.example.com/myorg/foo:latest")).To(BeTrue())
+			})
+			It("should match a subdomain host against *.registry.example.com/myrepo/*", func() {
+				Expect(CompareImageRef("*.registry.example.com/myrepo/*", "eu.registry.example.com/myrepo/node:v1")).To(BeTrue())
+			})
+			It("should match registry*.example.com/myorg/* against a legitimate host", func() {
+				Expect(CompareImageRef("registry*.example.com/myorg/*", "registry01.example.com/myorg/worker:v1")).To(BeTrue())
+			})
+			It("should match an exact host pattern registry.example.com/myorg/*", func() {
+				Expect(CompareImageRef("registry.example.com/myorg/*", "registry.example.com/myorg/foo:latest")).To(BeTrue())
+			})
+			It("should match a bare * pattern against any image", func() {
+				Expect(CompareImageRef("*", "attacker.example.com/anything:latest")).To(BeTrue())
+			})
+			It("should match trusted.example.com/* against any image on that host", func() {
+				Expect(CompareImageRef("trusted.example.com/*", "trusted.example.com/myorg/myimage:demo")).To(BeTrue())
+			})
+		})
+
+		Context("attacker images that must be denied", func() {
+			It("should not match *.registry.example.com/myorg/* when host is attacker-controlled (tagged)", func() {
+				Expect(CompareImageRef("*.registry.example.com/myorg/*", "attacker.com/x.registry.example.com/myorg/malware:latest")).To(BeFalse())
+			})
+			It("should not match *.registry.example.com/myorg/* when host is attacker-controlled (untagged)", func() {
+				Expect(CompareImageRef("*.registry.example.com/myorg/*", "attacker.com/x.registry.example.com/myorg/malware")).To(BeFalse())
+			})
+			It("should not match registry*.example.com/myorg/* when host is attacker-controlled", func() {
+				Expect(CompareImageRef("registry*.example.com/myorg/*", "registry.attacker.com/x.example.com/myorg/evil")).To(BeFalse())
+			})
+			It("should not match *.registry.example.com/myrepo/* when trusted literal is in path only", func() {
+				Expect(CompareImageRef("*.registry.example.com/myrepo/*", "evil.io/fake.registry.example.com/myrepo/pwn:latest")).To(BeFalse())
+			})
+			It("should not match registry.example.com/myorg/* when host is different", func() {
+				Expect(CompareImageRef("registry.example.com/myorg/*", "evilreg.io/myorg/foo:latest")).To(BeFalse())
+			})
+			It("should not match trusted.example.com/* when a different host embeds trusted.example.com in its path", func() {
+				Expect(CompareImageRef("trusted.example.com/*", "evil.io/trusted.example.com/myorg/myimage:demo")).To(BeFalse())
+			})
 		})
 	})
 })

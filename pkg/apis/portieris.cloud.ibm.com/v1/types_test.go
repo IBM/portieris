@@ -1,4 +1,4 @@
-// Copyright 2018, 2021 Portieris Authors.
+// Copyright 2018, 2026 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -488,6 +488,99 @@ var _ = Describe("Types", func() {
 				Expect(policy.Trust.Enabled).To(BeNil())
 				Expect(policy.Trust.TrustServer).To(BeEmpty())
 			})
+		})
+	})
+
+	Describe("unanchored wildcard bypass prevention", func() {
+		Context("FindImagePolicy must deny attacker-hosted images that embed trusted registry in path", func() {
+			attackerCases := []struct {
+				pattern string
+				image   string
+			}{
+				{"*.registry.example.com/myorg/*", "attacker.com/x.registry.example.com/myorg/malware"},
+				{"*.registry.example.com/myorg/*", "attacker.com/x.registry.example.com/myorg/malware:latest"},
+				{"*.registry.example.com/myrepo/*", "evil.io/fake.registry.example.com/myrepo/pwn:v1"},
+				{"*.registry.example.com/myrepo/*", "evil.io/fake.registry.example.com/myrepo/pwn:latest"},
+				{"registry*.example.com/myorg/*", "registry.attacker.com/x.example.com/myorg/evil"},
+			}
+			for _, tc := range attackerCases {
+				tc := tc
+				It("should deny "+tc.image+" against pattern "+tc.pattern, func() {
+					apl := ImagePolicyList{
+						Items: []ImagePolicy{
+							{
+								Spec: ImagePolicySpec{
+									Repositories: []Repository{
+										{Name: tc.pattern},
+									},
+								},
+							},
+						},
+					}
+					policy := apl.FindImagePolicy(tc.image)
+					Expect(policy).To(BeNil())
+				})
+			}
+		})
+
+		Context("FindImagePolicy must still admit legitimate images from trusted registries", func() {
+			legitimateCases := []struct {
+				pattern string
+				image   string
+			}{
+				{"*.registry.example.com/myorg/*", "us.registry.example.com/myorg/foo:latest"},
+				{"*.registry.example.com/myrepo/*", "eu.registry.example.com/myrepo/node:v1"},
+				{"*.registry.example.com/myrepo/*", "ap.registry.example.com/myrepo/control:v2"},
+				{"registry*.example.com/myorg/*", "registry01.example.com/myorg/worker:v1"},
+				{"registry.example.com/myorg/*", "registry.example.com/myorg/foo:latest"},
+			}
+			for _, tc := range legitimateCases {
+				tc := tc
+				It("should admit "+tc.image+" against pattern "+tc.pattern, func() {
+					apl := ImagePolicyList{
+						Items: []ImagePolicy{
+							{
+								Spec: ImagePolicySpec{
+									Repositories: []Repository{
+										{Name: tc.pattern},
+									},
+								},
+							},
+						},
+					}
+					policy := apl.FindImagePolicy(tc.image)
+					Expect(policy).ToNot(BeNil())
+				})
+			}
+		})
+
+		Context("FindClusterImagePolicy must deny attacker-hosted images that embed trusted registry in path", func() {
+			attackerCases := []struct {
+				pattern string
+				image   string
+			}{
+				{"*.registry.example.com/myorg/*", "attacker.com/x.registry.example.com/myorg/malware"},
+				{"*.registry.example.com/myorg/*", "attacker.com/x.registry.example.com/myorg/malware:latest"},
+				{"registry*.example.com/myorg/*", "registry.attacker.com/x.example.com/myorg/evil"},
+			}
+			for _, tc := range attackerCases {
+				tc := tc
+				It("should deny "+tc.image+" against pattern "+tc.pattern, func() {
+					apl := ClusterImagePolicyList{
+						Items: []ClusterImagePolicy{
+							{
+								Spec: ImagePolicySpec{
+									Repositories: []Repository{
+										{Name: tc.pattern},
+									},
+								},
+							},
+						},
+					}
+					policy := apl.FindClusterImagePolicy(tc.image)
+					Expect(policy).To(BeNil())
+				})
+			}
 		})
 	})
 })

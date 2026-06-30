@@ -1,7 +1,7 @@
 ---
 copyright:
   years: 2020-2026
-lastupdated: "2026-06-09"
+lastupdated: "2026-07-01"
 ---
 
 # Change Log
@@ -10,6 +10,12 @@ Notable changes recorded here.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v-next
+
+## v0.14.2
+
+Release: 2026-07-01
+- Dependency updates
+- Fix admission-control bypass via unanchored wildcard matching in image policy evaluation
 
 ## v0.14.1
 
