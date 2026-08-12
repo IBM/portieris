@@ -117,6 +117,18 @@ var _ = Describe("Main", func() {
 			match := CompareAnyTag("abcdefgh", "stuvwxyz:latest")
 			Expect(match).To(Equal(false))
 		})
+		It("should match if str has a digest reference (@sha256:...)", func() {
+			match := CompareAnyTag("icr.io/portieris-authn/nginx", "icr.io/portieris-authn/nginx@sha256:abc123")
+			Expect(match).To(Equal(true))
+		})
+		It("should match a wildcard pattern against a digest reference", func() {
+			match := CompareAnyTag("icr.io/portieris-authn/*", "icr.io/portieris-authn/nginx@sha256:abc123")
+			Expect(match).To(Equal(true))
+		})
+		It("should not match a different repo against a digest reference", func() {
+			match := CompareAnyTag("icr.io/other/nginx", "icr.io/portieris-authn/nginx@sha256:abc123")
+			Expect(match).To(Equal(false))
+		})
 	})
 
 	Describe("CompareImageRef - host/path boundary enforcement (unanchored wildcard bypass)", func() {
