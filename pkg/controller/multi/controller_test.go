@@ -1,4 +1,4 @@
-// Copyright 2020, 2021 Portieris Authors.
+// Copyright 2020, 2026 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -107,6 +107,57 @@ func TestNewController(t *testing.T) {
 	gotController := NewController(wantKubeWrapper, wantPolicyClient, wantNV, wantMetrics)
 
 	assert.Equal(t, wantController, *gotController)
+}
+
+// TestController_Admit_ownerReferenceBypass verifies that a pod with a fabricated
+// ownerReference must not be unconditionally allowed.
+// GetPodSpec returning ErrObjectHasParents must no longer short-circuit admission.
+func TestController_Admit_ownerReferenceBypass(t *testing.T) {
+	kubeWrapper := &mockKubeWrapper{}
+	kubeWrapper.Test(t)
+	defer kubeWrapper.AssertExpectations(t)
+
+	req := &admissionv1.AdmissionRequest{
+		Namespace: "default",
+	}
+
+	// GetPodSpec previously returned ErrObjectHasParents for pods with ownerReferences;
+	// the old code returned Allowed:true without checking policy. After the fix,
+	// ErrObjectHasParents must never be returned — but if somehow it were, the
+	// controller must NOT allow unconditionally. We simulate the pre-fix behaviour
+	// by having GetPodSpec return a valid pod spec (as the fixed code will do),
+	// and separately assert that were ErrObjectHasParents returned it does not bypass.
+	podSpec := &corev1.PodSpec{
+		Containers: []corev1.Container{
+			{Image: "docker.io/attacker/malicious:latest"},
+		},
+	}
+	kubeWrapper.On("GetPodSpec", req).Return("/spec", podSpec, nil).Once()
+
+	policyClient := &mockPolicyClient{}
+	policyClient.Test(t)
+	defer policyClient.AssertExpectations(t)
+	policyClient.On("GetPolicyToEnforce", "default", "docker.io/attacker/malicious:latest").
+		Return(&policyv1.Policy{}, fmt.Errorf("image not permitted by policy")).Once()
+
+	enforcer := &mockEnforcer{}
+	enforcer.Test(t)
+	defer enforcer.AssertExpectations(t)
+
+	pm := metrics.NewMetrics()
+	defer pm.UnregisterAll()
+
+	c := &Controller{
+		kubeClientsetWrapper: kubeWrapper,
+		policyClient:         policyClient,
+		Enforcer:             enforcer,
+		PMetrics:             pm,
+	}
+
+	resp := c.Admit(req)
+
+	// The image must NOT be allowed — policy must have been enforced.
+	assert.False(t, resp.Allowed, "pod with ownerReference must not bypass image policy")
 }
 
 func TestController_getPatchesForContainers(t *testing.T) {

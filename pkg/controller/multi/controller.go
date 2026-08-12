@@ -63,15 +63,11 @@ func NewController(kubeWrapper kubernetes.WrapperInterface, policyClient policy.
 func (c *Controller) Admit(admissionRequest *admissionv1.AdmissionRequest) *admissionv1.AdmissionResponse {
 	glog.Infof("Processing admission request for %s on %s", admissionRequest.Operation, admissionRequest.Name)
 
+	// Image policy is always enforced. The previous short-circuit
+	// that returned Allowed:true for pods with a supported ownerReference.Kind has
+	// been removed — it allowed bypass via a fabricated ownerReference.
 	podSpecLocation, ps, err := c.kubeClientsetWrapper.GetPodSpec(admissionRequest)
-	switch err {
-	case nil:
-		break
-	case kubernetes.ErrObjectHasParents:
-		return &admissionv1.AdmissionResponse{
-			Allowed: true,
-		}
-	default:
+	if err != nil {
 		a := &webhook.AdmissionResponder{}
 		a.ToAdmissionResponse(err)
 		return a.Flush()
