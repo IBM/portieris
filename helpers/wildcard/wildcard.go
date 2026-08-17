@@ -119,12 +119,12 @@ func Compare(pattern, str string) bool {
 }
 
 // CompareAnyTag will match a string pattern which may contain wildcard
-// characters against a string str. If the compare fails, a successive compare
-// is made with a ':*' added to pattern (wildcard the addition of a tag to the pattern).
-// The result is a boolean based on the last test.
+// characters against a string str. If the compare fails, successive compares
+// are made with ':*' and '@*' appended to the pattern to handle the case where
+// the image is referenced by tag or by digest (e.g. @sha256:...) respectively.
 func CompareAnyTag(pattern, str string) bool {
 	if !Compare(pattern, str) {
-		return Compare(pattern+":*", str)
+		return Compare(pattern+":*", str) || Compare(pattern+"@*", str)
 	}
 	return true
 }

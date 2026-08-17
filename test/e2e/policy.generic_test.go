@@ -1,4 +1,4 @@
-// Copyright 2018, 2023 Portieris Authors.
+// Copyright 2018, 2026 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ import (
 	"testing"
 
 	"github.com/IBM/portieris/test/e2e/utils"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 )
 
 func Test_JobTypesSuccess(t *testing.T) {
@@ -258,22 +260,6 @@ func Test_JobTypesFail(t *testing.T) {
 func Test_OperationsSucces(t *testing.T) {
 	utils.CheckIfTesting(t, testGeneric)
 
-	t.Run("Policy not enforced on child resource (pod)", func(t *testing.T) {
-		t.Parallel()
-		// Create a namespace and policy to allow all.
-		namespace := utils.CreateImagePolicyInstalledNamespace(t, framework, "./testdata/imagepolicy/allow-all.yaml", "")
-		utils.CreateSecret(t, framework, "./testdata/secret/sh.pubkey.yaml", namespace.Name)
-		// Start the deployment.
-		deploymentName := utils.TestStartDeployNoDelete(t, framework, "./testdata/deployment/global-nginx-unsigned.yaml", namespace.Name)
-		// Change the policy to deny.
-		utils.UpdateImagePolicy(t, framework, "./testdata/imagepolicy/allow-signed.yaml", namespace.Name, "allow-all")
-		// Stop the pod.
-		utils.KillPod(t, framework, namespace.Name)
-		// Check the pod comes back.
-		utils.TestCurrentDeployStatus(t, framework, namespace.Name, deploymentName)
-		utils.CleanUpImagePolicyTest(t, framework, namespace.Name)
-	})
-
 	t.Run("Policy enforced on patch", func(t *testing.T) {
 		t.Parallel()
 
@@ -314,4 +300,44 @@ func Test_OperationsSucces(t *testing.T) {
 		utils.CleanUpImagePolicyTest(t, framework, namespace.Name)
 	})
 
+}
+
+// Test_FabricatedOwnerReferenceBypass verifies that a pod with a fabricated
+// ownerReference is still subject to image policy enforcement.
+// A pod whose ownerReference points to a non-existent resource must be denied
+// by a deny-all policy — not unconditionally allowed.
+func Test_FabricatedOwnerReferenceBypass(t *testing.T) {
+	utils.CheckIfTesting(t, testGeneric)
+
+	t.Run("Unsigned pod with fabricated ownerReference is denied by policy", func(t *testing.T) {
+		t.Parallel()
+		namespace := utils.CreateImagePolicyInstalledNamespace(t, framework, "./testdata/imagepolicy/allow-signed.yaml", "")
+
+		pod, err := framework.LoadPodManifest("./testdata/pod/global-nginx-unsigned.yaml")
+		if err != nil {
+			t.Fatalf("failed to load pod manifest: %v", err)
+		}
+
+		// Fabricate an ownerReference pointing to a non-existent ReplicaSet.
+		// This is the bypass vector: Kubernetes accepts it on CREATE without
+		// verifying existence; Portieris must still enforce policy.
+		pod.Name = "bypass-ownerref-test"
+		pod.OwnerReferences = []metav1.OwnerReference{
+			{
+				APIVersion: "apps/v1",
+				Kind:       "ReplicaSet",
+				Name:       "does-not-exist",
+				UID:        types.UID("aaaa-bbbb-cccc-dddd"),
+			},
+		}
+
+		if err := framework.CreatePod(namespace.Name, pod); err == nil {
+			defer framework.DeletePod(pod.Name, namespace.Name)
+			t.Error("expected pod with fabricated ownerReference to be denied, but it was admitted")
+			utils.DumpEvents(t, framework, namespace.Name)
+			utils.DumpPolicies(t, framework, namespace.Name)
+		}
+
+		utils.CleanUpImagePolicyTest(t, framework, namespace.Name)
+	})
 }

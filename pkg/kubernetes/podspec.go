@@ -42,20 +42,6 @@ const (
 	cronJobSpecPath  = "/spec/jobTemplate/spec/template/spec"
 )
 
-// ErrObjectHasParents is returned when the resource being created is the child of another resource
-var ErrObjectHasParents = fmt.Errorf("This object has parents")
-
-var supportedKinds = map[string]struct{}{
-	"Deployment":            {},
-	"Pod":                   {},
-	"DaemonSet":             {},
-	"ReplicaSet":            {},
-	"ReplicationController": {},
-	"StatefulSet":           {},
-	"CronJob":               {},
-	"Job":                   {},
-}
-
 // GetPodSpec retrieves the podspec from the admission request passed in
 func (w *Wrapper) GetPodSpec(ar *admissionv1.AdmissionRequest) (string, *corev1.PodSpec, error) {
 	ps := corev1.PodSpec{}
@@ -213,17 +199,16 @@ func (w *Wrapper) GetPodSpec(ar *admissionv1.AdmissionRequest) (string, *corev1.
 	return templateString, &ps, nil
 }
 
+// decodeObject deserialises raw bytes into the given object.
+// ownerReferences are intentionally not acted upon here.
+// Previously this function returned ErrObjectHasParents when a pod's ownerReference.Kind
+// matched a supported controller kind, causing Admit() to skip image policy enforcement.
+// An attacker with pod-create permission could fabricate an ownerReference to bypass all
+// policy checks. Image policy is now always enforced regardless of ownerReferences.
 func (w *Wrapper) decodeObject(raw []byte, object object) error {
 	deserializer := codec.UniversalDeserializer()
 	if _, _, err := deserializer.Decode(raw, nil, object); err != nil {
 		return err
-	}
-	ownerRefs := object.GetOwnerReferences()
-	for _, owner := range ownerRefs {
-		if _, ok := supportedKinds[owner.Kind]; ok {
-			return ErrObjectHasParents
-		}
-		glog.Warningf("Resource has an owner with a kind that is not supported: %s, treating this resource as top level", owner.Kind)
 	}
 	return nil
 }

@@ -1,7 +1,7 @@
 ---
 copyright:
   years: 2020-2026
-lastupdated: "2026-07-01"
+lastupdated: "2026-08-12"
 ---
 
 # Change Log
@@ -10,6 +10,11 @@ Notable changes recorded here.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v-next
+
+## v0.14.3
+
+Release: 2026-08-12
+- Fix image policy bypass via fabricated ownerReference (CWE-285, CVSS 7.5)
 
 ## v0.14.2
 
