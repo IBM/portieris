@@ -17,6 +17,7 @@ package kube
 import (
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/IBM/portieris/internal/info"
 	portierisclientset "github.com/IBM/portieris/pkg/apis/portieris.cloud.ibm.com/client/clientset/versioned"
@@ -27,8 +28,9 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-// GetKubeClientConfig creates a kube client config
-func GetKubeClientConfig(kubeconfigFileLoc *string) *rest.Config {
+// GetKubeClientConfig creates a kube client config.
+// If KUBE_API_QPS or KUBE_API_BURST are set, they override the client-go defaults (QPS=5, Burst=10).
+func GetKubeClientConfig(kubeconfigFileLoc *string, qps float32, burst int) *rest.Config {
 	var config *rest.Config
 	var err error
 
@@ -62,6 +64,37 @@ func GetKubeClientConfig(kubeconfigFileLoc *string) *rest.Config {
 	}
 
 	config.UserAgent = "portieris/" + info.Version
+
+	if qps == 0 {
+		if v, parseErr := strconv.ParseFloat(os.Getenv("KUBE_API_QPS"), 32); parseErr == nil && v > 0 {
+			qps = float32(v)
+		}
+	}
+	if burst == 0 {
+		if v, atoiErr := strconv.Atoi(os.Getenv("KUBE_API_BURST")); atoiErr == nil && v > 0 {
+			burst = v
+		}
+	}
+
+	if qps > 0 && burst == 0 {
+		burst = int(qps * 2)
+		glog.Warningf("KUBE_API_BURST not set; derived burst=%d from qps=%.1f (2x ratio)", burst, qps)
+	}
+	if burst > 0 && qps == 0 {
+		qps = float32(burst) / 2
+		glog.Warningf("KUBE_API_QPS not set; derived qps=%.1f from burst=%d (2x ratio)", qps, burst)
+	}
+	config.QPS = qps
+	config.Burst = burst
+
+	logQPS, logBurst := config.QPS, config.Burst
+	if logQPS == 0 {
+		logQPS = 5
+	}
+	if logBurst == 0 {
+		logBurst = 10
+	}
+	glog.Infof("kube client rate limits: qps=%.1f burst=%d", logQPS, logBurst)
 
 	return config
 }
