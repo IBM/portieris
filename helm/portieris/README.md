@@ -84,6 +84,18 @@ You can add your own security policies, scoped to a Kubernetes namespace or the 
 
 For more information about configuring security policies, and an explanation of the security policy resources, see [Portieris policies](https://github.com/IBM/portieris/blob/master/POLICIES.md).
 
+## Kubernetes API client rate limits
+
+You can configure the rate at which Portieris makes requests to the Kubernetes API server using the following values:
+
+```yaml
+kubeClientRateLimits:
+  qps: 50
+  burst: 100
+```
+
+Leave both values unset to use the client-go defaults (`QPS=5`, `Burst=10`). If only one value is set, the other is derived automatically using a 2:1 burst-to-QPS ratio. For busy clusters you can increase these values as needed.
+
 ## Removing the chart
 
 To remove the chart, run the following command.
