@@ -1,7 +1,7 @@
 ---
 copyright:
   years: 2020-2026
-lastupdated: "2026-08-12"
+lastupdated: "2026-09-11"
 ---
 
 # Change Log
@@ -10,6 +10,11 @@ Notable changes recorded here.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v-next
+
+## v0.15.0
+
+Release: 2026-09-11
+- Add configurable Kubernetes API client rate limits via `kubeClientRateLimits.qps` and `kubeClientRateLimits.burst` Helm values (exposed as `KUBE_API_QPS` / `KUBE_API_BURST`). Leave unset to use client-go defaults (QPS=5, Burst=10); if only one is set the other is derived automatically at a 2:1 burst-to-QPS ratio.
 
 ## v0.14.3
 

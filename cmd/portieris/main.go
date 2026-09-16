@@ -1,4 +1,4 @@
-// Copyright 2018,2021 Portieris Authors.
+// Copyright 2018, 2026 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -65,7 +65,8 @@ func main() {
 
 	glog.Info("Starting portieris ", info.Version)
 
-	kubeClientConfig := kube.GetKubeClientConfig(kubeconfig)
+	// Rate limits are read from KUBE_API_QPS / KUBE_API_BURST env vars (injected by Helm)
+	kubeClientConfig := kube.GetKubeClientConfig(kubeconfig, 0, 0)
 	kubeClientset := kube.GetKubeClient(kubeClientConfig)
 	kubeWrapper := kubernetes.NewKubeClientsetWrapper(kubeClientset)
 	policyClient := kube.GetPolicyClient(kubeClientConfig)

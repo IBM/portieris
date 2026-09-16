@@ -15,7 +15,7 @@ image:
   host: icr.io/portieris
   pullSecret:
   image: portieris
-  tag: v0.14.3
+  tag: v0.15.0
   pullPolicy: Always
 
 service:
@@ -52,6 +52,14 @@ UseGeneratedCerts:
   tlsCert: |-
   tlsKey: |-
   caCert: |-
+
+# Kubernetes API client rate limits.
+# Leave unset to use the client-go defaults (QPS=5, Burst=10)
+# If only one is set, the other is derived automatically using a 2:1 burst-to-QPS ratio
+# Example for a busy ROKS cluster would be qps: 50, burst: 100
+kubeClientRateLimits:
+  qps:
+  burst:
 
 # Resoures defined to assist scheduling
 # request is typical x10, limit is typical x100

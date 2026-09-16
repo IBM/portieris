@@ -66,6 +66,14 @@ spec:
             initialDelaySeconds: 10
             timeoutSeconds: 10
           env:
+            {{- if .Values.kubeClientRateLimits.qps }}
+            - name: KUBE_API_QPS
+              value: "{{ .Values.kubeClientRateLimits.qps }}"
+            {{- end }}
+            {{- if .Values.kubeClientRateLimits.burst }}
+            - name: KUBE_API_BURST
+              value: "{{ .Values.kubeClientRateLimits.burst }}"
+            {{- end }}
           resources:
 {{ toYaml .Values.resources | indent 12 }}
     {{- with .Values.nodeSelector }}
