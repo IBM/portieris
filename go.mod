@@ -1,6 +1,6 @@
 module github.com/IBM/portieris
 
-go 1.26.0
+go 1.26.6
 
 replace (
 	k8s.io/api => k8s.io/api v0.34.1
