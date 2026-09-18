@@ -51,21 +51,21 @@ require (
 	github.com/gabriel-vasile/mimetype v1.4.15 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-openapi/errors v0.22.8 // indirect
-	github.com/go-openapi/jsonpointer v0.24.0 // indirect
+	github.com/go-openapi/jsonpointer v1.0.1 // indirect
 	github.com/go-openapi/jsonreference v0.21.6 // indirect
 	github.com/go-openapi/strfmt v0.27.0 // indirect
-	github.com/go-openapi/swag v0.27.0 // indirect
-	github.com/go-openapi/swag/cmdutils v0.27.0 // indirect
-	github.com/go-openapi/swag/conv v0.27.2 // indirect
-	github.com/go-openapi/swag/fileutils v0.27.0 // indirect
-	github.com/go-openapi/swag/jsonutils v0.27.2 // indirect
-	github.com/go-openapi/swag/loading v0.27.0 // indirect
-	github.com/go-openapi/swag/mangling v0.27.0 // indirect
-	github.com/go-openapi/swag/netutils v0.27.0 // indirect
-	github.com/go-openapi/swag/pools v0.27.2 // indirect
-	github.com/go-openapi/swag/stringutils v0.27.0 // indirect
-	github.com/go-openapi/swag/typeutils v0.27.2 // indirect
-	github.com/go-openapi/swag/yamlutils v0.27.2 // indirect
+	github.com/go-openapi/swag v0.29.2 // indirect
+	github.com/go-openapi/swag/cmdutils v0.29.2 // indirect
+	github.com/go-openapi/swag/conv v0.29.2 // indirect
+	github.com/go-openapi/swag/fileutils v0.29.2 // indirect
+	github.com/go-openapi/swag/jsonutils v0.29.2 // indirect
+	github.com/go-openapi/swag/loading v0.29.2 // indirect
+	github.com/go-openapi/swag/mangling v0.29.2 // indirect
+	github.com/go-openapi/swag/netutils v0.29.2 // indirect
+	github.com/go-openapi/swag/pools v0.29.2 // indirect
+	github.com/go-openapi/swag/stringutils v0.29.2 // indirect
+	github.com/go-openapi/swag/typeutils v0.29.2 // indirect
+	github.com/go-openapi/swag/yamlutils v0.29.2 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.30.3 // indirect
