@@ -1,7 +1,7 @@
 ---
 copyright:
   years: 2020-2026
-lastupdated: "2026-09-11"
+lastupdated: "2026-09-18"
 ---
 
 # Change Log
@@ -10,6 +10,11 @@ Notable changes recorded here.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v-next
+
+## v0.15.1
+
+Release: 2026-09-18
+- Upgrade go-openapi/swag dependencies to v0.29.2
 
 ## v0.15.0
 
