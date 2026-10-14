@@ -16,6 +16,7 @@ package multi
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"testing"
 
@@ -158,6 +159,221 @@ func TestController_Admit_ownerReferenceBypass(t *testing.T) {
 
 	// The image must NOT be allowed — policy must have been enforced.
 	assert.False(t, resp.Allowed, "pod with ownerReference must not bypass image policy")
+}
+
+// TestController_admitPod_ephemeralContainerPolicyEnforced verifies that images in
+// spec.ephemeralContainers are evaluated against image policy and denied when the
+// policy rejects them (regression for pods/ephemeralcontainers bypass).
+func TestController_admitPod_ephemeralContainerPolicyEnforced(t *testing.T) {
+	policyClient := &mockPolicyClient{}
+	policyClient.Test(t)
+	defer policyClient.AssertExpectations(t)
+
+	kubeWrapper := &mockKubeWrapper{}
+	kubeWrapper.Test(t)
+	defer kubeWrapper.AssertExpectations(t)
+
+	enforcer := &mockEnforcer{}
+	enforcer.Test(t)
+	defer enforcer.AssertExpectations(t)
+
+	pm := metrics.NewMetrics()
+	defer pm.UnregisterAll()
+
+	c := &Controller{
+		kubeClientsetWrapper: kubeWrapper,
+		policyClient:         policyClient,
+		Enforcer:             enforcer,
+		PMetrics:             pm,
+	}
+
+	// Pod has a permitted regular container and a policy-denied ephemeral container.
+	pod := corev1.PodSpec{
+		Containers: []corev1.Container{
+			{Image: "docker.io/library/busybox:1.36"},
+		},
+		EphemeralContainers: []corev1.EphemeralContainer{
+			{EphemeralContainerCommon: corev1.EphemeralContainerCommon{Image: "attacker.invalid/unsigned-debug:latest"}},
+		},
+	}
+
+	// The regular container is permitted.
+	policyClient.On("GetPolicyToEnforce", "default", "docker.io/library/busybox:1.36").
+		Return(&policyv1.Policy{}, nil).Once()
+	enforcer.On("VulnerabilityPolicy", mock.Anything, mock.Anything, mock.Anything).
+		Return(vulnerability.ScanResponse{CanDeploy: true}).Once()
+	enforcer.On("DigestByPolicy", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+		Return((*bytes.Buffer)(nil), error(nil), error(nil)).Once()
+
+	// The ephemeral container image is denied by policy.
+	policyClient.On("GetPolicyToEnforce", "default", "attacker.invalid/unsigned-debug:latest").
+		Return(&policyv1.Policy{}, fmt.Errorf("image not permitted by policy")).Once()
+
+	resp := c.admitPod("default", "/spec", pod)
+
+	assert.False(t, resp.Allowed, "ephemeral container with policy-denied image must not be admitted")
+}
+
+// TestController_admitPod_ephemeralContainerNoMutation verifies that even when
+// policy resolves a digest for an ephemeral container image, no mutation patch
+// is emitted. The Kubernetes storage strategy (dropNonEphemeralContainerUpdates)
+// would discard patches to any field outside spec.ephemeralContainers anyway,
+// and Portieris does not generate ephemeral-container-specific patch paths.
+func TestController_admitPod_ephemeralContainerNoMutation(t *testing.T) {
+	policyClient := &mockPolicyClient{}
+	policyClient.Test(t)
+	defer policyClient.AssertExpectations(t)
+
+	kubeWrapper := &mockKubeWrapper{}
+	kubeWrapper.Test(t)
+	defer kubeWrapper.AssertExpectations(t)
+
+	enforcer := &mockEnforcer{}
+	enforcer.Test(t)
+	defer enforcer.AssertExpectations(t)
+
+	pm := metrics.NewMetrics()
+	defer pm.UnregisterAll()
+
+	c := &Controller{
+		kubeClientsetWrapper: kubeWrapper,
+		policyClient:         policyClient,
+		Enforcer:             enforcer,
+		PMetrics:             pm,
+	}
+
+	// Pod with only an ephemeral container whose policy resolves a digest.
+	pod := corev1.PodSpec{
+		EphemeralContainers: []corev1.EphemeralContainer{
+			{EphemeralContainerCommon: corev1.EphemeralContainerCommon{Image: "docker.io/library/busybox:1.36"}},
+		},
+	}
+
+	digest := &bytes.Buffer{}
+	digest.WriteString("abc123")
+
+	policyClient.On("GetPolicyToEnforce", "default", "docker.io/library/busybox:1.36").
+		Return(&policyv1.Policy{}, nil).Once()
+	enforcer.On("VulnerabilityPolicy", mock.Anything, mock.Anything, mock.Anything).
+		Return(vulnerability.ScanResponse{CanDeploy: true}).Once()
+	enforcer.On("DigestByPolicy", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+		Return(digest, error(nil), error(nil)).Once()
+
+	resp := c.admitPod("default", "/spec", pod)
+
+	assert.True(t, resp.Allowed, "ephemeral container with permitted image must be admitted")
+	assert.Nil(t, resp.Patch, "no mutation patch must be emitted for ephemeral containers")
+}
+
+// TestController_admitPod_mixedContainersOnlyRegularPatched verifies that when a pod
+// has both regular and ephemeral containers, digest-pin patches are emitted only for
+// the regular container and not for the ephemeral container.
+func TestController_admitPod_mixedContainersOnlyRegularPatched(t *testing.T) {
+	policyClient := &mockPolicyClient{}
+	policyClient.Test(t)
+	defer policyClient.AssertExpectations(t)
+
+	kubeWrapper := &mockKubeWrapper{}
+	kubeWrapper.Test(t)
+	defer kubeWrapper.AssertExpectations(t)
+
+	enforcer := &mockEnforcer{}
+	enforcer.Test(t)
+	defer enforcer.AssertExpectations(t)
+
+	pm := metrics.NewMetrics()
+	defer pm.UnregisterAll()
+
+	c := &Controller{
+		kubeClientsetWrapper: kubeWrapper,
+		policyClient:         policyClient,
+		Enforcer:             enforcer,
+		PMetrics:             pm,
+	}
+
+	// Pod with one regular container (digest resolved → patch expected) and one
+	// ephemeral container (digest resolved → patch must be discarded).
+	pod := corev1.PodSpec{
+		Containers: []corev1.Container{
+			{Image: "icr.io/portieris/policy:v1"},
+		},
+		EphemeralContainers: []corev1.EphemeralContainer{
+			{EphemeralContainerCommon: corev1.EphemeralContainerCommon{Image: "docker.io/library/busybox:1.36"}},
+		},
+	}
+
+	regularDigest := &bytes.Buffer{}
+	regularDigest.WriteString("regulardigest")
+
+	ephemeralDigest := &bytes.Buffer{}
+	ephemeralDigest.WriteString("ephemeraldigest")
+
+	// Regular container: permitted, digest resolved.
+	policyClient.On("GetPolicyToEnforce", "default", "icr.io/portieris/policy:v1").
+		Return(&policyv1.Policy{}, nil).Once()
+	enforcer.On("VulnerabilityPolicy", mock.Anything, mock.Anything, mock.Anything).
+		Return(vulnerability.ScanResponse{CanDeploy: true}).Twice()
+	enforcer.On("DigestByPolicy", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+		Return(regularDigest, error(nil), error(nil)).Once()
+
+	// Ephemeral container: permitted, digest also resolved (patches must be discarded).
+	policyClient.On("GetPolicyToEnforce", "default", "docker.io/library/busybox:1.36").
+		Return(&policyv1.Policy{}, nil).Once()
+	enforcer.On("DigestByPolicy", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+		Return(ephemeralDigest, error(nil), error(nil)).Once()
+
+	resp := c.admitPod("default", "/spec", pod)
+
+	require.True(t, resp.Allowed, "pod with permitted regular and ephemeral containers must be admitted")
+	require.NotNil(t, resp.Patch, "regular container digest-pin patch must be present")
+
+	var patches []types.JSONPatch
+	require.NoError(t, json.Unmarshal(resp.Patch, &patches))
+	require.Len(t, patches, 1, "exactly one patch expected (regular container only)")
+	assert.Equal(t, "/spec/containers/0/image", patches[0].Path,
+		"patch must target the regular container, not the ephemeral container")
+	assert.NotContains(t, patches[0].Path, "ephemeralContainers",
+		"ephemeral container must not appear in any patch")
+}
+
+// TestController_admitPod_ephemeralContainerBlankImageSkipped verifies that an
+// ephemeral container with a blank image is skipped and does not cause a denial.
+func TestController_admitPod_ephemeralContainerBlankImageSkipped(t *testing.T) {
+	policyClient := &mockPolicyClient{}
+	policyClient.Test(t)
+	defer policyClient.AssertExpectations(t)
+
+	kubeWrapper := &mockKubeWrapper{}
+	kubeWrapper.Test(t)
+	defer kubeWrapper.AssertExpectations(t)
+
+	enforcer := &mockEnforcer{}
+	enforcer.Test(t)
+	defer enforcer.AssertExpectations(t)
+
+	pm := metrics.NewMetrics()
+	defer pm.UnregisterAll()
+
+	c := &Controller{
+		kubeClientsetWrapper: kubeWrapper,
+		policyClient:         policyClient,
+		Enforcer:             enforcer,
+		PMetrics:             pm,
+	}
+
+	// Pod with only an ephemeral container whose image is blank.
+	// GetPolicyToEnforce must never be called — no mock expectation is set,
+	// so AssertExpectations will fail if it is called unexpectedly.
+	pod := corev1.PodSpec{
+		EphemeralContainers: []corev1.EphemeralContainer{
+			{EphemeralContainerCommon: corev1.EphemeralContainerCommon{Image: "  "}},
+		},
+	}
+
+	resp := c.admitPod("default", "/spec", pod)
+
+	assert.True(t, resp.Allowed, "pod with blank ephemeral container image must be admitted")
+	assert.Nil(t, resp.Patch, "no patch must be emitted for blank ephemeral container image")
 }
 
 func TestController_getPatchesForContainers(t *testing.T) {

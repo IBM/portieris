@@ -98,7 +98,7 @@ func (c *Controller) admitPod(namespace, specPath string, pod corev1.PodSpec) *a
 		a.MapStringsToAdmissionResponse(denials)
 		if err != nil {
 			a.ToAdmissionResponse(err)
-			a.Flush()
+			return a.Flush()
 		}
 		patches = append(patches, newPatches...)
 		for key, value := range denials {
@@ -107,6 +107,33 @@ func (c *Controller) admitPod(namespace, specPath string, pod corev1.PodSpec) *a
 			} else {
 				decisions[key] = append(decisions[key], value...)
 			}
+		}
+	}
+
+	// Enforce policy for ephemeral containers. Digest-pin patches are discarded
+	// for two reasons:
+	//   1. The pods/ephemeralcontainers subresource is append-only: ephemeral
+	//      containers cannot be modified once added, so mutating the image field
+	//      of an already-submitted container would fail validation.
+	//   2. The Kubernetes storage strategy (dropNonEphemeralContainerUpdates)
+	//      preserves only spec.ephemeralContainers from the webhook-mutated object;
+	//      patches to any other field (e.g. spec.containers) are silently dropped.
+	// Only denials are enforced.
+	ephemeralAsContainers := make([]corev1.Container, len(pod.EphemeralContainers))
+	for i, ec := range pod.EphemeralContainers {
+		ephemeralAsContainers[i] = corev1.Container{Image: ec.Image}
+	}
+	_, ephemeralDenials, err := c.getPatchesForContainers("ephemeralContainers", namespace, specPath, pod, ephemeralAsContainers)
+	a.MapStringsToAdmissionResponse(ephemeralDenials)
+	if err != nil {
+		a.ToAdmissionResponse(err)
+		return a.Flush()
+	}
+	for key, value := range ephemeralDenials {
+		if _, ok := decisions[key]; !ok {
+			decisions[key] = value
+		} else {
+			decisions[key] = append(decisions[key], value...)
 		}
 	}
 

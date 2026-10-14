@@ -63,7 +63,7 @@ webhooks:
       - operations: [ "CREATE", "UPDATE" ]
         apiGroups: ["*"]
         apiVersions: ["*"]
-        resources: ["pods", "deployments", "replicationcontrollers", "replicasets", "daemonsets", "statefulsets", "jobs", "cronjobs"]
+        resources: ["pods", "pods/ephemeralcontainers", "deployments", "replicationcontrollers", "replicasets", "daemonsets", "statefulsets", "jobs", "cronjobs"]
     failurePolicy: {{ .Values.webHooks.failurePolicy }}
     sideEffects: None
     admissionReviewVersions: ["v1"]
