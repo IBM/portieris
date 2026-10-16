@@ -1,7 +1,7 @@
 ---
 copyright:
   years: 2020-2026
-lastupdated: "2026-09-18"
+lastupdated: "2026-10-14"
 ---
 
 # Change Log
@@ -10,6 +10,12 @@ Notable changes recorded here.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v-next
+
+## v0.16.0
+
+Release: 2026-10-15
+- Fix admission policy bypass for ephemeral containers
+- Upgrade dependencies
 
 ## v0.15.1
 
