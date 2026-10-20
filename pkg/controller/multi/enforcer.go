@@ -1,4 +1,4 @@
-// Copyright 2020, 2021 Portieris Authors.
+// Copyright 2020, 2026 Portieris Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -103,7 +103,7 @@ func (e enforcer) DigestByPolicy(namespace string, img *image.Reference, credent
 		}
 		glog.Infof("DCT digest: %v", notaryDigest)
 		if notaryDigest != nil {
-			if digest != nil && notaryDigest != digest {
+			if digest != nil && !bytes.Equal(notaryDigest.Bytes(), digest.Bytes()) {
 				return nil, fmt.Errorf("Notary signs conflicting digest: %v simple: %v", notaryDigest, digest), nil
 			}
 			digest = notaryDigest
