@@ -1,7 +1,7 @@
 ---
 copyright:
   years: 2020-2026
-lastupdated: "2026-10-14"
+lastupdated: "2026-10-23"
 ---
 
 # Change Log
@@ -10,6 +10,11 @@ Notable changes recorded here.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v-next
+
+## v0.16.1
+
+Release: 2026-10-23
+- Build with go-toolset 1.26.10 for CVE
 
 ## v0.16.0
 
