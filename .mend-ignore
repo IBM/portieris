@@ -1,1 +1,2 @@
 CVE-2026-85747 # github.com/docker/distribution: not applicable — vulnerable function registry/client.(*manifests).Get() is not imported by Portieris; docker/distribution is a transitive dependency of theupdateframework/notary which uses only context/auth/errcode sub-packages; confirmed via `go list -deps ./...` (prep-v0.16.0)
+CVE-2026-114236 # go.podman.io/storage-v1.65.0: no fix available yet, not reported by govulncheck
