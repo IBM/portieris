@@ -40,7 +40,7 @@ RUN --mount=type=secret,id=GOPROXY,env=GOPROXY go mod download \
     && CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build \
     -ldflags="-X github.com/IBM/portieris/internal/info.Version=$PORTIERIS_VERSION" -a \
     -tags containers_image_openpgp -o portieris ./cmd/portieris \
-    && go version -m -v portieris | (grep dep || true) | awk '{print "{\"Path\": \""$2 "\", \"Version\": \"" $3 "\"}"}' > /deps.jsonl
+    && go version -m -v portieris
 
 #################################################################################
 # Finally, copy the minimal image contents and the built binary into the scratch image
