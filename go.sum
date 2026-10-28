@@ -9,6 +9,8 @@ github.com/BurntSushi/toml v1.6.0 h1:dRaEfpa2VI55EwlIW72hMRHdWouJeRF7TPYhI+AUQjk
 github.com/BurntSushi/toml v1.6.0/go.mod h1:ukJfTF/6rtPPRCnwkur4qwRxa8vTRFBF0uk2lLoLwho=
 github.com/IBM/go-sdk-core/v5 v5.25.0 h1:wQEw6Cb9akKekjF22GsreARg6lmEszonVk3pzzS1fWw=
 github.com/IBM/go-sdk-core/v5 v5.25.0/go.mod h1:B4JsTbYRtgrTY+jjDARcPtITOMLEbyYtB4FblDn2RdQ=
+github.com/IBM/go-sdk-core/v5 v5.25.1 h1:vLQ5/fjn7+Fc4tWmyALqLytMM4Lrh4XHLUogaZWZ2w8=
+github.com/IBM/go-sdk-core/v5 v5.25.1/go.mod h1:mhCkszCCPNBJiXo+CeDvABZMTs6A+GfmIgeVV95UfaI=
 github.com/Masterminds/semver/v3 v3.4.0 h1:Zog+i5UMtVoCU8oKka5P7i9q9HgrJeGzI9SA1Xbatp0=
 github.com/Masterminds/semver/v3 v3.4.0/go.mod h1:4V+yj/TJE1HU9XfppCwVMZq3I84lprf4nC11bSS5beM=
 github.com/ProtonMail/go-crypto v1.5.2 h1:cucYnvqcY7UOXVD//mSyjeaPY0SSN3v5cDkYPxumINk=
@@ -99,6 +101,8 @@ github.com/go-openapi/jsonreference v1.0.0 h1:jlmTr6torcd1YgDQvSfNmRtKzYDO4FGBkr
 github.com/go-openapi/jsonreference v1.0.0/go.mod h1:jtwdyGbJk0Xhe5Y+rwtglQP6Sb1WZST4rT32LWB+sv0=
 github.com/go-openapi/strfmt v0.27.2 h1:SG32SlbwNy92s0KJiVxt2joJeFdqIYHvwrA0OU6HqzQ=
 github.com/go-openapi/strfmt v0.27.2/go.mod h1:M4CKsMO0Fb8qR10+1Ra75wCKNNquy+Vj+4LWZrhTo2E=
+github.com/go-openapi/strfmt v0.27.3 h1:cyf4J5Wjpd6bFpAs44MF8PsbWF/mWXhn82Ck/hgQZgw=
+github.com/go-openapi/strfmt v0.27.3/go.mod h1:Bl+xadPLa3nhBiaCAxNND1vrQfzyEjF0vBrLx96n/4E=
 github.com/go-openapi/swag v0.29.2 h1:9n8frkcsuQRA0INU31VbxNxt1zBaHxrHYGEf5BUjFi4=
 github.com/go-openapi/swag v0.29.2/go.mod h1:RkCiX1gCVXWgLOavDXE3ALJrQ/VO2ziiIzOUs3z10xo=
 github.com/go-openapi/swag/cmdutils v0.29.2 h1:cXEzX/nWCODon251f+1HgL75/R4XXML5IZxgLCWMoro=
