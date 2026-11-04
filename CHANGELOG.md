@@ -1,7 +1,7 @@
 ---
 copyright:
   years: 2020-2026
-lastupdated: "2026-10-23"
+lastupdated: "2026-11-04"
 ---
 
 # Change Log
@@ -10,6 +10,11 @@ Notable changes recorded here.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v-next
+
+## v0.16.2
+
+Release: 2026-11-04
+- Upgrade golang.org/x/net to v0.62.0 (GO-2026-6866, GO-2026-6860)
 
 ## v0.16.1
 
