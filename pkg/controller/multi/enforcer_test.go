@@ -81,6 +81,7 @@ func (msv *mockSimpleVerifier) VerifyByPolicy(imageToVerify string, credentials 
 }
 
 func Test_enforcer_DigestByPolicy(t *testing.T) {
+	trustEnabled := true
 	type transformPoliciesMock struct {
 		policy *signature.Policy
 		err    error
@@ -102,6 +103,11 @@ func Test_enforcer_DigestByPolicy(t *testing.T) {
 	type removeRegistryDirMock struct {
 		err error
 	}
+	type notaryVerifyByPolicyMock struct {
+		digest string
+		deny   error
+		err    error
+	}
 	tests := []struct {
 		name                 string
 		namespace            string
@@ -113,6 +119,7 @@ func Test_enforcer_DigestByPolicy(t *testing.T) {
 		createRegistryDir    *createRegistryDirMock
 		simpleVerifyByPolicy *simpleVerifyByPolicyMock
 		removeRegistryDir    *removeRegistryDirMock
+		notaryVerifyByPolicy *notaryVerifyByPolicyMock
 		wantDigest           string
 		wantDeny             error
 		wantErr              error
@@ -330,6 +337,114 @@ func Test_enforcer_DigestByPolicy(t *testing.T) {
 			wantDeny:   nil,
 			wantErr:    nil,
 		},
+		{
+			name:      "Allow access if trust is enabled and simple signing is not required",
+			namespace: "wibble",
+			imageName: "icr.io/wibble/some:tag",
+			policy: &policyv1.Policy{
+				Trust: policyv1.Trust{
+					Enabled: &trustEnabled,
+				},
+			},
+			notaryVerifyByPolicy: &notaryVerifyByPolicyMock{
+				digest: "sha256:cafe0000",
+			},
+			wantDigest: "sha256:cafe0000",
+			wantDeny:   nil,
+			wantErr:    nil,
+		},
+		{
+			name:      "Allow access if trust and simple signing agree on the digest",
+			namespace: "wibble",
+			imageName: "icr.io/wibble/some:tag",
+			policy: &policyv1.Policy{
+				Trust: policyv1.Trust{
+					Enabled: &trustEnabled,
+				},
+				Simple: policyv1.Simple{
+					Requirements: []policyv1.SimpleRequirement{
+						{
+							Type:      "test",
+							KeySecret: "noOneCares",
+						},
+					},
+					StoreURL:    "some.url.com",
+					StoreSecret: "someSecret1234",
+				},
+			},
+			transformPolicies: &transformPoliciesMock{},
+			getBasicCredentials: &getBasicCredentialsMock{
+				storeUser:     "sillyUser",
+				storePassword: "password1234",
+			},
+			createRegistryDir: &createRegistryDirMock{
+				storeConfigDir: "vault",
+			},
+			simpleVerifyByPolicy: &simpleVerifyByPolicyMock{
+				digest: "sha256:cafe0000",
+			},
+			removeRegistryDir: &removeRegistryDirMock{},
+			notaryVerifyByPolicy: &notaryVerifyByPolicyMock{
+				digest: "sha256:cafe0000",
+			},
+			wantDigest: "sha256:cafe0000",
+			wantDeny:   nil,
+			wantErr:    nil,
+		},
+		{
+			name:      "Deny if trust and simple signing disagree on the digest",
+			namespace: "wibble",
+			imageName: "icr.io/wibble/some:tag",
+			policy: &policyv1.Policy{
+				Trust: policyv1.Trust{
+					Enabled: &trustEnabled,
+				},
+				Simple: policyv1.Simple{
+					Requirements: []policyv1.SimpleRequirement{
+						{
+							Type:      "test",
+							KeySecret: "noOneCares",
+						},
+					},
+					StoreURL:    "some.url.com",
+					StoreSecret: "someSecret1234",
+				},
+			},
+			transformPolicies: &transformPoliciesMock{},
+			getBasicCredentials: &getBasicCredentialsMock{
+				storeUser:     "sillyUser",
+				storePassword: "password1234",
+			},
+			createRegistryDir: &createRegistryDirMock{
+				storeConfigDir: "vault",
+			},
+			simpleVerifyByPolicy: &simpleVerifyByPolicyMock{
+				digest: "sha256:cafe0000",
+			},
+			removeRegistryDir: &removeRegistryDirMock{},
+			notaryVerifyByPolicy: &notaryVerifyByPolicyMock{
+				digest: "sha256:beef1111",
+			},
+			wantDigest: "",
+			wantDeny:   fmt.Errorf("Notary signs conflicting digest: sha256:beef1111 simple: sha256:cafe0000"),
+			wantErr:    nil,
+		},
+		{
+			name:      "If trust VerifyByPolicy says deny, deny",
+			namespace: "wibble",
+			imageName: "icr.io/wibble/some:tag",
+			policy: &policyv1.Policy{
+				Trust: policyv1.Trust{
+					Enabled: &trustEnabled,
+				},
+			},
+			notaryVerifyByPolicy: &notaryVerifyByPolicyMock{
+				deny: fmt.Errorf("not signed"),
+			},
+			wantDigest: "",
+			wantDeny:   fmt.Errorf("trust: policy denied the request: not signed"),
+			wantErr:    nil,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -350,6 +465,16 @@ func Test_enforcer_DigestByPolicy(t *testing.T) {
 			notaryVerfier := mockNotaryVerifier{}
 			notaryVerfier.Test(t)
 			defer notaryVerfier.AssertExpectations(t)
+			if tt.notaryVerifyByPolicy != nil {
+				var notaryDigest *bytes.Buffer
+				if tt.notaryVerifyByPolicy.digest != "" {
+					notaryDigest = bytes.NewBuffer([]byte(tt.notaryVerifyByPolicy.digest))
+				}
+				notaryVerfier.
+					On("VerifyByPolicy", tt.namespace, img, tt.credentials, tt.policy).
+					Return(notaryDigest, tt.notaryVerifyByPolicy.deny, tt.notaryVerifyByPolicy.err).
+					Once()
+			}
 
 			simpleVerifier := mockSimpleVerifier{}
 			simpleVerifier.Test(t)
@@ -399,7 +524,7 @@ func Test_enforcer_DigestByPolicy(t *testing.T) {
 			gotDigest, gotDeny, gotErr := e.DigestByPolicy(tt.namespace, img, tt.credentials, tt.policy)
 
 			if tt.wantDigest != "" {
-				wantDigest := bytes.NewBuffer([]byte(tt.simpleVerifyByPolicy.digest))
+				wantDigest := bytes.NewBuffer([]byte(tt.wantDigest))
 				assert.Equal(t, wantDigest, gotDigest)
 			}
 			assert.Equal(t, tt.wantDeny, gotDeny)
