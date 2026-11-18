@@ -29,6 +29,9 @@ webhooks:
     rules: []
     sideEffects: None
     admissionReviewVersions: ["v1"]
+    {{ if .Values.webHooks.timeoutSeconds }}
+    timeoutSeconds: {{ .Values.webHooks.timeoutSeconds }}
+    {{- end }}
 ---
 # webhook replaces the inoperative one, after the service is installed
 apiVersion: admissionregistration.k8s.io/v1
@@ -85,3 +88,6 @@ webhooks:
     objectSelector:
 {{ toYaml .Values.ObjectSelectorAdmissionSkip | indent 6 }}
     {{ end }}
+    {{ if .Values.webHooks.timeoutSeconds }}
+    timeoutSeconds: {{ .Values.webHooks.timeoutSeconds }}
+    {{- end }}
