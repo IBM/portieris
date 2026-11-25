@@ -214,12 +214,11 @@ func TestController_admitPod_ephemeralContainerPolicyEnforced(t *testing.T) {
 	assert.False(t, resp.Allowed, "ephemeral container with policy-denied image must not be admitted")
 }
 
-// TestController_admitPod_ephemeralContainerNoMutation verifies that even when
-// policy resolves a digest for an ephemeral container image, no mutation patch
-// is emitted. The Kubernetes storage strategy (dropNonEphemeralContainerUpdates)
-// would discard patches to any field outside spec.ephemeralContainers anyway,
-// and Portieris does not generate ephemeral-container-specific patch paths.
-func TestController_admitPod_ephemeralContainerNoMutation(t *testing.T) {
+// TestController_admitPod_ephemeralContainerMutation verifies that when
+// policy resolves a digest for an ephemeral container image, a digest-pin
+// mutation patch is emitted. This protects against an attacker switching the
+// tag between admission and kubelet pull (CVE fix).
+func TestController_admitPod_ephemeralContainerMutation(t *testing.T) {
 	policyClient := &mockPolicyClient{}
 	policyClient.Test(t)
 	defer policyClient.AssertExpectations(t)
@@ -262,13 +261,19 @@ func TestController_admitPod_ephemeralContainerNoMutation(t *testing.T) {
 	resp := c.admitPod("default", "/spec", pod)
 
 	assert.True(t, resp.Allowed, "ephemeral container with permitted image must be admitted")
-	assert.Nil(t, resp.Patch, "no mutation patch must be emitted for ephemeral containers")
+	require.NotNil(t, resp.Patch, "mutation patch must be emitted for ephemeral containers")
+
+	var patches []types.JSONPatch
+	require.NoError(t, json.Unmarshal(resp.Patch, &patches))
+	require.Len(t, patches, 1, "exactly one patch expected (ephemeral container)")
+	assert.Equal(t, "/spec/ephemeralContainers/0/image", patches[0].Path)
+	assert.Equal(t, "docker.io/library/busybox@sha256:abc123", patches[0].Value)
 }
 
-// TestController_admitPod_mixedContainersOnlyRegularPatched verifies that when a pod
-// has both regular and ephemeral containers, digest-pin patches are emitted only for
-// the regular container and not for the ephemeral container.
-func TestController_admitPod_mixedContainersOnlyRegularPatched(t *testing.T) {
+// TestController_admitPod_mixedContainersBothPatched verifies that when a pod
+// has both regular and ephemeral containers, digest-pin patches are emitted for
+// both.
+func TestController_admitPod_mixedContainersBothPatched(t *testing.T) {
 	policyClient := &mockPolicyClient{}
 	policyClient.Test(t)
 	defer policyClient.AssertExpectations(t)
@@ -292,7 +297,7 @@ func TestController_admitPod_mixedContainersOnlyRegularPatched(t *testing.T) {
 	}
 
 	// Pod with one regular container (digest resolved → patch expected) and one
-	// ephemeral container (digest resolved → patch must be discarded).
+	// ephemeral container (digest resolved → patch expected).
 	pod := corev1.PodSpec{
 		Containers: []corev1.Container{
 			{Image: "icr.io/portieris/policy:v1"},
@@ -316,7 +321,7 @@ func TestController_admitPod_mixedContainersOnlyRegularPatched(t *testing.T) {
 	enforcer.On("DigestByPolicy", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 		Return(regularDigest, error(nil), error(nil)).Once()
 
-	// Ephemeral container: permitted, digest also resolved (patches must be discarded).
+	// Ephemeral container: permitted, digest resolved.
 	policyClient.On("GetPolicyToEnforce", "default", "docker.io/library/busybox:1.36").
 		Return(&policyv1.Policy{}, nil).Once()
 	enforcer.On("DigestByPolicy", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
@@ -325,15 +330,15 @@ func TestController_admitPod_mixedContainersOnlyRegularPatched(t *testing.T) {
 	resp := c.admitPod("default", "/spec", pod)
 
 	require.True(t, resp.Allowed, "pod with permitted regular and ephemeral containers must be admitted")
-	require.NotNil(t, resp.Patch, "regular container digest-pin patch must be present")
+	require.NotNil(t, resp.Patch, "digest-pin patches must be present")
 
 	var patches []types.JSONPatch
 	require.NoError(t, json.Unmarshal(resp.Patch, &patches))
-	require.Len(t, patches, 1, "exactly one patch expected (regular container only)")
-	assert.Equal(t, "/spec/containers/0/image", patches[0].Path,
-		"patch must target the regular container, not the ephemeral container")
-	assert.NotContains(t, patches[0].Path, "ephemeralContainers",
-		"ephemeral container must not appear in any patch")
+	require.Len(t, patches, 2, "two patches expected (regular and ephemeral containers)")
+	assert.Equal(t, "/spec/containers/0/image", patches[0].Path)
+	assert.Equal(t, "icr.io/portieris/policy@sha256:regulardigest", patches[0].Value)
+	assert.Equal(t, "/spec/ephemeralContainers/0/image", patches[1].Path)
+	assert.Equal(t, "docker.io/library/busybox@sha256:ephemeraldigest", patches[1].Value)
 }
 
 // TestController_admitPod_ephemeralContainerBlankImageSkipped verifies that an
