@@ -153,7 +153,7 @@ When you create the secret, ensure that you're creating the key with a value of 
 kubectl create secret generic my-pubkey --from-file=key=<your_pub_key_file>
 ```
 
-The following example requires that images from `icr.io` are signed by the identity with its public key in `my-pubkey`. If multiple public keys are present in `my-pubkey`, the image is required to be signed by any one of them. 
+The following example requires that images from `icr.io` are signed by the identity with its public key in the Kubernetes secret called `my-pubkey`. If multiple public keys are present in `my-pubkey`, the image is required to be signed by any one of them.
 
 ```yaml
 apiVersion: portieris.cloud.ibm.com/v1
@@ -170,7 +170,7 @@ spec:
             keySecret: my-pubkey
 ```
 
-The following example requires that images from `icr.io` are signed by the identity with public key in `my-pubkey` and the identity with public key in `your-pubkey`.
+The following example requires that images from `icr.io` are signed by both the identity with public key in the `my-pubkey` secret in the same namespace as the policy and also the identity with public key in the `your-pubkey` secret in the `my-namespace` namespace.
 
 ```yaml
 apiVersion: portieris.cloud.ibm.com/v1
@@ -187,6 +187,7 @@ spec:
             keySecret: my-pubkey
           - type: "signedBy"
             keySecret: your-pubkey
+            keySecretNamespace: my-namespace
 ```
 
 The following example requires that a specific image is signed, but it allows the registry location to change. In this pattern, a policy for each image is required to exactly define the new location.
@@ -362,3 +363,5 @@ If role-based access control (RBAC) is enabled on your Kubernetes cluster, you c
   ```
 
   **Tip** Users and Service Accounts with the `cluster-admin` role have access to all resources. The cluster-admin role grants access to administer security policies, even if you do not edit the role. Make sure to control who has the `cluster-admin` role, and grant access only to people that you want to allow to modify security policies.
+
+* Portieris uses the Kubernetes built-in Secret object to store the public key used to validate image signatures. Users with edit access to Secrets in the namespace where the key is stored are able to change the key used to validate the signatures, even if they can't edit the Portieris policy. You can use the `keySecretNamespace` field in your Portieris policy to change it to search a different namespace if you need to prevent operators with secret edit permission from changing the signing key. You can then set the permissions on the other namespace to be more restrictive according to your requirements.
