@@ -11,6 +11,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v-next
 
+## v0.16.3
+
+Release: 2026-11-25
+
+- Image mutations are now applied to ephemeral containers
+
 ## v0.16.2
 
 Release: 2026-11-04

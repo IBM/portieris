@@ -82,13 +82,19 @@ func (c *Controller) admitPod(namespace, specPath string, pod corev1.PodSpec) *a
 	decisions := map[string][]string{}
 
 	// for each container image subtype
-	for _, containerType := range []string{"initContainers", "containers"} {
+	for _, containerType := range []string{"initContainers", "containers", "ephemeralContainers"} {
 		var containers []corev1.Container
 		switch containerType {
 		case "initContainers":
 			containers = pod.InitContainers
 		case "containers":
 			containers = pod.Containers
+		case "ephemeralContainers":
+			ephemeralAsContainers := make([]corev1.Container, len(pod.EphemeralContainers))
+			for i, ec := range pod.EphemeralContainers {
+				ephemeralAsContainers[i] = corev1.Container{Image: ec.Image}
+			}
+			containers = ephemeralAsContainers
 		default:
 			a.StringToAdmissionResponse("Unhandled container type")
 			return a.Flush()
@@ -107,33 +113,6 @@ func (c *Controller) admitPod(namespace, specPath string, pod corev1.PodSpec) *a
 			} else {
 				decisions[key] = append(decisions[key], value...)
 			}
-		}
-	}
-
-	// Enforce policy for ephemeral containers. Digest-pin patches are discarded
-	// for two reasons:
-	//   1. The pods/ephemeralcontainers subresource is append-only: ephemeral
-	//      containers cannot be modified once added, so mutating the image field
-	//      of an already-submitted container would fail validation.
-	//   2. The Kubernetes storage strategy (dropNonEphemeralContainerUpdates)
-	//      preserves only spec.ephemeralContainers from the webhook-mutated object;
-	//      patches to any other field (e.g. spec.containers) are silently dropped.
-	// Only denials are enforced.
-	ephemeralAsContainers := make([]corev1.Container, len(pod.EphemeralContainers))
-	for i, ec := range pod.EphemeralContainers {
-		ephemeralAsContainers[i] = corev1.Container{Image: ec.Image}
-	}
-	_, ephemeralDenials, err := c.getPatchesForContainers("ephemeralContainers", namespace, specPath, pod, ephemeralAsContainers)
-	a.MapStringsToAdmissionResponse(ephemeralDenials)
-	if err != nil {
-		a.ToAdmissionResponse(err)
-		return a.Flush()
-	}
-	for key, value := range ephemeralDenials {
-		if _, ok := decisions[key]; !ok {
-			decisions[key] = value
-		} else {
-			decisions[key] = append(decisions[key], value...)
 		}
 	}
 
