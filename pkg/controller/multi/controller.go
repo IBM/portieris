@@ -82,13 +82,19 @@ func (c *Controller) admitPod(namespace, specPath string, pod corev1.PodSpec) *a
 	decisions := map[string][]string{}
 
 	// for each container image subtype
-	for _, containerType := range []string{"initContainers", "containers"} {
+	for _, containerType := range []string{"initContainers", "containers", "ephemeralContainers"} {
 		var containers []corev1.Container
 		switch containerType {
 		case "initContainers":
 			containers = pod.InitContainers
 		case "containers":
 			containers = pod.Containers
+		case "ephemeralContainers":
+			ephemeralAsContainers := make([]corev1.Container, len(pod.EphemeralContainers))
+			for i, ec := range pod.EphemeralContainers {
+				ephemeralAsContainers[i] = corev1.Container{Image: ec.Image}
+			}
+			containers = ephemeralAsContainers
 		default:
 			a.StringToAdmissionResponse("Unhandled container type")
 			return a.Flush()
@@ -107,32 +113,6 @@ func (c *Controller) admitPod(namespace, specPath string, pod corev1.PodSpec) *a
 			} else {
 				decisions[key] = append(decisions[key], value...)
 			}
-		}
-	}
-
-	// Enforce policy for ephemeral containers.
-	// Digest-pin patches are applied: Kubernetes's ValidatePodEphemeralContainersUpdate
-	// only rejects changes to containers that already exist in the stored pod; a
-	// newly appended ephemeral container may be mutated during the same admission
-	// request. The storage strategy (dropNonEphemeralContainerUpdates) preserves
-	// spec.ephemeralContainers from the webhook-mutated object, so the pinned
-	// digest survives into the stored pod.
-	ephemeralAsContainers := make([]corev1.Container, len(pod.EphemeralContainers))
-	for i, ec := range pod.EphemeralContainers {
-		ephemeralAsContainers[i] = corev1.Container{Image: ec.Image}
-	}
-	ephemeralPatches, ephemeralDenials, err := c.getPatchesForContainers("ephemeralContainers", namespace, specPath, pod, ephemeralAsContainers)
-	a.MapStringsToAdmissionResponse(ephemeralDenials)
-	if err != nil {
-		a.ToAdmissionResponse(err)
-		return a.Flush()
-	}
-	patches = append(patches, ephemeralPatches...)
-	for key, value := range ephemeralDenials {
-		if _, ok := decisions[key]; !ok {
-			decisions[key] = value
-		} else {
-			decisions[key] = append(decisions[key], value...)
 		}
 	}
 
