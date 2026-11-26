@@ -24,6 +24,18 @@ Portieris receives AdmissionRequests for the creation of, or edits to, all types
 
 Portieris' Admission Webhook is configured to fail closed. Three instances of Portieris ensure that it is able to approve its own upgrades and auto-recovery. If all instances of Portieris are unavailable, Kubernetes doesn't auto-recover it, and you must delete the MutatingAdmissionWebhook to allow Portieris to recover.
 
+## Supported workloads
+
+Portieris works with Kubernetes Pod resources, so it can process any workload that creates Pods, including for example Deployments and Stateful Sets. Custom resources that do not use Pod resources are not supported and will not be validated against your policies.
+
+Portieris examines the container images for the following container sections in the pod specification. Other container lists, including ones that might be added by Kubernetes in future, are not supported and will not be validated against your policies:
+
+- spec.containers
+- spec.initContainers
+- spec.ephemeralContainers
+
+If you require another type of container to be added, contributions are welcome!
+
 ## Image mutation option
 
 The default behavior is to mutate the image reference on successful admission so that it references an image immutably by using a digest and not a tag. This behavior ensures that there is little possibility that an image can be substituted after verification by making changes in the image registry. Without this safeguard there is a time window between admission and image pull, and also between admission and any subsequent re-pull of the image due to rescheduling where an image under a tag can change. Switching the image to the digest form ensures that the image content is guaranteed to be the one admitted. 
